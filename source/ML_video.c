@@ -26,7 +26,8 @@ bool ML_LoadSpriteFromBuffer(u16 nb, const u8 *filename, int x, int y)
 {
 	png_file_gx_t png_data = read_png_gx_file_buffer(filename);
 	
-	if(png_data.gxdata==NULL) return 0;
+	if(png_data.ok==0) return 0;
+	else if(png_data.gxdata==NULL) return 0;
 	
 	sprite[nb].data = png_data.gxdata;
 	sprite[nb].width = png_data.width;
@@ -54,7 +55,8 @@ bool ML_LoadSpriteFromFile(u16 nb, char *filename, int x, int y)
 {
 	png_file_gx_t png_data = read_png_gx_file(filename);
 	
-	if(png_data.gxdata==NULL) return 0;
+	if(png_data.ok==0) return 0;
+	else if(png_data.gxdata==NULL) return 0;
 	
 	sprite[nb].data = png_data.gxdata;
 	sprite[nb].width = png_data.width;
