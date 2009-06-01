@@ -132,6 +132,7 @@ wii:
 	@[ -d $(DEPS)/wii ] || mkdir -p $(DEPS)/wii
 	@[ -d wii ] || mkdir -p wii
 	@$(MAKE) PLATFORM=wii libs -C wii -f $(CURDIR)/Makefile
+	@mv $(LIBS)/wii/source.a $(BASEDIR)/lib/wii/libMLlib.a
 
 #---------------------------------------------------------------------------------
 #cube: include/libversion.h
@@ -168,11 +169,10 @@ $(MLLIB).a: $(MLOBJ)
 ##---------------------------------------------------------------------------------
 install:
 ##---------------------------------------------------------------------------------
-	@mkdir -p $(DEVKITPRO)/MLlib
-	@cp -frv $(INCDIR) $(DEVKITPRO)/MLlib
-	@cp -frv $(LIBS) $(DEVKITPRO)/MLlib
-	@mv $(MLPATH)/lib/wii/source.a $(MLPATH)/lib/libMLlib.a
-	@rm -frv $(MLPATH)/lib/wii/ $(MLPATH)/lib/cube/
+	@mkdir -p $(DEVKITPRO)/MLlib/lib
+	@mkdir -p $(DEVKITPRO)/MLlib/include
+	@cp -frv $(INCDIR)*.h $(DEVKITPRO)/MLlib/include/
+	@cp -frv $(LIBS)/wii/libMLlib.a $(DEVKITPRO)/MLlib/lib/
 
 
 #---------------------------------------------------------------------------------
