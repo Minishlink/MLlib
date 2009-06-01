@@ -19,7 +19,8 @@ extern u32 RGB2GC(u32 rgb);
 extern u32 RGB2GC_2(u8 r1, u8 g1, u8 b1, u8 r2, u8 g2, u8 b2);
 extern u32 FLIP32(u32 value);
 extern u16 FLIP16(u16 value);
-//extern int _PNGU_EncodeFromYCbYCr(IMGCTX ctx, PNGU_u32 width, PNGU_u32 height, void *buffer, PNGU_u32 stride);
+extern void _PNGU_YCbYCr_TO_RGB8(unsigned int ycbycr, unsigned char *r1, unsigned char *g1, unsigned char *b1, unsigned char *r2, unsigned char *g2, unsigned char *b2);
+extern int _pngu_clamp (int value, int min, int max);
 
 #ifdef __cplusplus
    }

@@ -100,117 +100,33 @@ u16 FLIP16(u16 value)
 	return ((value & 0xff) << 8) | ((value & 0xff00) >> 8);
 }
 
-// that's from PNGU lib :) A little modifed though
-/*int _PNGU_EncodeFromYCbYCr(IMGCTX ctx, PNGU_u32 width, PNGU_u32 height, void *buffer, PNGU_u32 stride)
+// that's from PNGU lib
+void _PNGU_YCbYCr_TO_RGB8(unsigned int ycbycr, unsigned char *r1, unsigned char *g1, unsigned char *b1, unsigned char *r2, unsigned char *g2, unsigned char *b2)
 {
-	png_uint_32 rowbytes;
-	PNGU_u32 x, y, buffWidth;
+	unsigned char *val = (unsigned char *) &ycbycr;
+	int r, g, b;
 
-	// Erase from the context any readed info
-	pngu_free_info (ctx);
-	ctx->propRead = 0;
+	r = 1.371f * (val[3] - 128);
+	g = - 0.698f * (val[3] - 128) - 0.336f * (val[1] - 128);
+	b = 1.732f * (val[1] - 128);
 
-	// Check if the user has selected a file to write the image
-	if (ctx->source == PNGU_SOURCE_BUFFER);	
+	*r1 = _pngu_clamp (val[0] + r, 0, 255);
+	*g1 = _pngu_clamp (val[0] + g, 0, 255);
+	*b1 = _pngu_clamp (val[0] + b, 0, 255);
 
-	else if (ctx->source == PNGU_SOURCE_DEVICE)
-	{
-		// Open file
-		if (!(ctx->fd = fopen (ctx->filename, "wb")))
-			return PNGU_CANT_OPEN_FILE;
-	}
-
-	else
-		return PNGU_NO_FILE_SELECTED;
-
-	// Allocation of libpng structs
-	ctx->png_ptr = png_create_write_struct (PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-    if (!(ctx->png_ptr))
-	{
-		if (ctx->source == PNGU_SOURCE_DEVICE)
-			fclose (ctx->fd);
-        return PNGU_LIB_ERROR;
-	}
-
-    ctx->info_ptr = png_create_info_struct (ctx->png_ptr);
-    if (!(ctx->info_ptr))
-    {
-		png_destroy_write_struct (&(ctx->png_ptr), (png_infopp)NULL);
-		if (ctx->source == PNGU_SOURCE_DEVICE)
-			fclose (ctx->fd);
-        return PNGU_LIB_ERROR;
-    }
-
-	if (ctx->source == PNGU_SOURCE_BUFFER)
-	{
-		// Installation of our custom data writer function
-		ctx->cursor = 0;
-		png_set_write_fn (ctx->png_ptr, ctx, pngu_write_data_to_buffer, pngu_flush_data_to_buffer);
-	}
-	else if (ctx->source == PNGU_SOURCE_DEVICE)
-	{
-		// Default data writer uses function fwrite, so it needs to use our FILE*
-		png_init_io (ctx->png_ptr, ctx->fd);
-	}
-
-	// Setup output file properties
-    png_set_IHDR (ctx->png_ptr, ctx->info_ptr, width, height, 8, PNG_COLOR_TYPE_RGB, 
-				PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
-
-	// Allocate memory to store the image in RGB format
-	rowbytes = width * 3;
-	if (rowbytes % 4)
-		rowbytes = ((rowbytes / 4) + 1) * 4; // Add extra padding so each row starts in a 4 byte boundary
-
-	ctx->img_data = malloc (rowbytes * height);
-	if (!ctx->img_data)
-	{
-		png_destroy_write_struct (&(ctx->png_ptr), (png_infopp)NULL);
-		if (ctx->source == PNGU_SOURCE_DEVICE)
-			fclose (ctx->fd);
-		return PNGU_LIB_ERROR;
-	}
-
-	ctx->row_pointers = malloc (sizeof (png_bytep) * height);
-	if (!ctx->row_pointers)
-	{
-		png_destroy_write_struct (&(ctx->png_ptr), (png_infopp)NULL);
-		if (ctx->source == PNGU_SOURCE_DEVICE)
-			fclose (ctx->fd);
-		return PNGU_LIB_ERROR;
-	}
-
-	// Encode YCbYCr image into RGB8 format
-	buffWidth = (width + stride) / 2;
-	for (y = 0; y < height; y++)
-	{
-		ctx->row_pointers[y] = ctx->img_data + (y * rowbytes);
-
-		for (x = 0; x < (width / 2); x++)
-			PNGU_YCbYCr_TO_RGB8 ( ((PNGU_u32 *)buffer)[y*buffWidth+x], 
-				((PNGU_u8 *) ctx->row_pointers[y]+x*6), ((PNGU_u8 *) ctx->row_pointers[y]+x*6+1),
-				((PNGU_u8 *) ctx->row_pointers[y]+x*6+2), ((PNGU_u8 *) ctx->row_pointers[y]+x*6+3),
-				((PNGU_u8 *) ctx->row_pointers[y]+x*6+4), ((PNGU_u8 *) ctx->row_pointers[y]+x*6+5) );
-	}
-
-	// Tell libpng where is our image data
-	png_set_rows (ctx->png_ptr, ctx->info_ptr, ctx->row_pointers);
-
-	// Write file header and image data
-	png_write_png (ctx->png_ptr, ctx->info_ptr, PNG_TRANSFORM_IDENTITY, NULL);
-
-	// Tell libpng we have no more data to write
-	png_write_end (ctx->png_ptr, (png_infop) NULL);
-
-	// Free resources
-	free (ctx->img_data);
-	free (ctx->row_pointers);
-	png_destroy_write_struct (&(ctx->png_ptr), &(ctx->info_ptr));
-	if (ctx->source == PNGU_SOURCE_DEVICE)
-		fclose (ctx->fd);
-
-	// Success
-	return PNGU_OK;
+	*r2 = _pngu_clamp (val[2] + r, 0, 255);
+	*g2 = _pngu_clamp (val[2] + g, 0, 255);
+	*b2 = _pngu_clamp (val[2] + b, 0, 255);
 }
-*/
+
+// that's from PNGU lib
+int _pngu_clamp (int value, int min, int max)
+{
+	if (value < min)
+		value = min;
+	else if (value > max)
+		value = max;
+
+	return value;
+}
 

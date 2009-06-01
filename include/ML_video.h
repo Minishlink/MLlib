@@ -207,6 +207,8 @@ extern u32 ML_GetPixelColor(int nb, int x, int y);
 */
 extern void ML_SplashScreen();
 
+extern bool ML_Screenshot(const char *filename);
+
 extern void ML_GX_Init(); // Init GX system
 extern void ML_GX_Refresh(); // Refresh GX system
 
