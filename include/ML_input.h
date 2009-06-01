@@ -51,7 +51,7 @@ typedef struct {
 
 /**
 * \struct Wii_GForce
-* \brief This structure is a part of the WPads struct. (Gravity Force)
+* \brief This structure is a part of the WPads, Nunchuks struct. (Gravity Force)
 */
 typedef struct {
 	float X, 
@@ -60,27 +60,15 @@ typedef struct {
 } Wii_GForce;
 
 /**
-* \struct Wii_Accel
-* \brief This structure is a part of the WPads struct. (Accelerometer)
-*/
-typedef struct {
-	byte X,
-	Y,
-	Z;
-} Wii_Accel;
-
-/**
 * \struct Wii_Orientation
-* \brief This structure is a part of the WPads struct. (Orientation)
-*
-* These values are from -180 to 180 degrees. 
+* \brief This structure is a part of the WPads, Nunchuks structs. (Orientation)
 */
 typedef struct {
-	float Roll, /*!< Roll value */
-	Pitch, /*!< Pitch value */
-	SmoothRoll, /*!< Smoothed roll value */
-	SmoothPitch, /*!< Smoothed pitch value */
-	Yaw; /*!< Yaw value */
+	float Roll, /*!< Roll value from -180 to 180 degrees */
+	Pitch, /*!< Pitch value from -180 to 180 degrees */
+	JustRoll, /*!< Original roll value from -180 to 180 degrees */
+	JustPitch, /*!< Original pitch value from -180 to 180 degrees */
+	Yaw; /*!< Yaw value from -26 to 26 degrees */
 } Wii_Orientation;
 
 /**
@@ -93,7 +81,6 @@ typedef struct {
 	Newpress; /*!< see struct Wii_WPad */
 	Wii_IR IR; /*!< see struct Wii_IR */
 	Wii_GForce GForce; /*!< see struct Wii_GForce */
-	Wii_Accel Accel; /*!< see struct Wii_Accel */
 	Wii_Orientation Orient; /*!< see struct Wii_Orientation */
 	bool Enabled; /*!< Is the Nunchuk enabled ? */
 } WPads;
@@ -110,8 +97,8 @@ typedef struct {
 } Nunchuk_Buttons;
 
 /**
-* \struct Nunchuk_Stick
-* \brief This structure is a part of the Nunchuks struct. (Joystick)
+* \struct Joystick
+* \brief This structure is a part of the Nunchuks, CPads structs. (Joystick)
 *
 * Angle is relative to the positive y-axis into quadrant I and ranges from 0 to 360 degrees. So if the joystick is held straight upwards then angle is 0 degrees. If it is held to the right it is 90, down is 180, and left is 270.\n
 * Magnitude is the distance from the center to where the joystick is being held. The magnitude ranges from 0 to 1. If the joystick is only slightly tilted from the center the magnitude will be low, but if it is closer to the outter edge the value will be higher. (from Wiiuse documentation) 
@@ -119,7 +106,7 @@ typedef struct {
 typedef struct {
 	float Angle, /*!< Angle from 0 to 360 */
 	Magnitude; /*!< Magnitude from 0 to 1 */
-} Nunchuk_Stick;
+} Joystick;
 
 /**
 * \struct Nunchuks
@@ -129,7 +116,9 @@ typedef struct {
 	Nunchuk_Buttons Held, /*!< see struct Nunchuk_Buttons */
 	Released, /*!< see struct Nunchuk_Buttons */
 	Newpress; /*!< see struct Nunchuk_Buttons */
-	Nunchuk_Stick Stick; /*!< see struct Nunchuk_Stick */
+	Joystick Stick; /*!< see struct Joystick */
+	Wii_GForce GForce; /*!< see struct Wii_GForce */
+	Wii_Orientation Orient; /*!< see struct Wii_Orientation */
 } Nunchuks;
 
 Nunchuks Nunchuk[WPAD_MAX_WIIMOTES];
@@ -164,6 +153,8 @@ typedef struct {
 	CPad_Buttons Held, /*!< see struct CPad_Buttons */
 	Released, /*!< see struct CPad_Buttons */
 	Newpress; /*!< see struct CPad_Buttons */
+	Joystick LeftStick, /*!< see struct Joystick */
+	RightStick; /*!< see struct Joystick */
 } CPads;
 
 CPads CPad[WPAD_MAX_WIIMOTES];
@@ -192,6 +183,7 @@ typedef struct {
 	GH_Buttons Held, /*!< see struct GH_Buttons */
 	Released, /*!< see struct GH_Buttons */
 	Newpress; /*!< see struct GH_Buttons */
+	Joystick Stick;
 } GH;
 
 GH Guitar[WPAD_MAX_WIIMOTES];
