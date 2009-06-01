@@ -418,17 +418,98 @@ void ML_SplashScreen()
 	DCFlushRange(png_data.gxdata, png_data.width * png_data.height * 4);
 }
 
-/*bool ML_Screenshot(const char *filename)
+bool ML_Screenshot(const char *filename)
 {
 	if(fatInitDefault()) 
 	{
-		buffer = _PNGU_EncodeFromYCbYCr(pngContext, rmode->fbWidth, rmode->efbHeight, xfb[fb], 0);
+		png_uint_32 rowbytes;
+		unsigned int x, y, buffWidth;
+		unsigned int width = screenMode->fbWidth;
+		unsigned int height = screenMode->efbHeight;
+		void *buffer = xfb[whichfb];
+		FILE *fp;		
+
+		// Check if the user has selected a file to write the image
+		if (!(fp = fopen(filename, "wb")))
+			return 0;
 		
-		// enregsitrer le buffer dans fichier filename
+		// Allocation of libpng structs
+		png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+		if (!png_ptr)
+		{
+			fclose (fp);
+			return 0;
+		}
+
+		png_infop info_ptr = png_create_info_struct(png_ptr);
+		if (!info_ptr)
+		{
+			png_destroy_write_struct(&png_ptr, (png_infopp)NULL);
+			fclose(fp);
+			return 0;
+		}
+
+		// Default data writer uses function fwrite, so it needs to use our FILE*
+		png_init_io(png_ptr, fp);
+
+		// Setup output file properties
+		png_set_IHDR(png_ptr, info_ptr, width, height, 8, PNG_COLOR_TYPE_RGB, 
+				PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
+
+		// Allocate memory to store the image in RGB format
+		rowbytes = width * 3;
+		if (rowbytes % 4)
+			rowbytes = ((rowbytes / 4) + 1) * 4; // Add extra padding so each row starts in a 4 byte boundary
+
+		png_bytep img_data = malloc(rowbytes * height);
+		if(!img_data)
+		{
+			png_destroy_write_struct (&png_ptr, (png_infopp)NULL);
+			fclose (fp);
+			return 0;
+		}
+
+		png_bytep *row_pointers = malloc (sizeof (png_bytep) * height);
+		if (!row_pointers)
+		{
+			png_destroy_write_struct (&png_ptr, (png_infopp)NULL);
+			fclose (fp);
+			return 0;
+		}
+
+		// Encode YCbYCr image into RGB8 format
+		buffWidth = width / 2;
+		for (y = 0; y < height; y++)
+		{
+			row_pointers[y] = img_data + (y * rowbytes);
+
+			for (x = 0; x < (width / 2); x++)
+				_PNGU_YCbYCr_TO_RGB8(((unsigned int *)buffer)[y*buffWidth+x], 
+					((unsigned char *) row_pointers[y]+x*6), ((unsigned char *) row_pointers[y]+x*6+1),
+					((unsigned char *) row_pointers[y]+x*6+2), ((unsigned char *) row_pointers[y]+x*6+3),
+					((unsigned char *) row_pointers[y]+x*6+4), ((unsigned char *) row_pointers[y]+x*6+5) );
+		}
+
+		// Tell libpng where is our image data
+		png_set_rows(png_ptr, info_ptr, row_pointers);
+
+		// Write file header and image data
+		png_write_png(png_ptr, info_ptr, PNG_TRANSFORM_IDENTITY, NULL);
+
+		// Tell libpng we have no more data to write
+		png_write_end(png_ptr, (png_infop) NULL);
+
+		// Free resources
+		free (img_data);
+		free (row_pointers);
+		png_destroy_write_struct(&png_ptr, &info_ptr);
+		fclose (fp);
+
 		return 1;
 	} 
+	
 	return 0;
-}*/
+}
 
 //---------------------------------------------
 
