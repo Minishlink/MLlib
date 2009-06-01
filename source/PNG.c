@@ -24,6 +24,7 @@ png_file_gx_t read_png_gx_file(char* file_name)
 	int number_of_passes;
 	png_bytep *row_pointers;
 	png_file_gx_t lol;
+	lol.ok = 0;
 
 	char header[8]; // Check for support PNG header.
 	FILE* fp = NULL;
@@ -171,6 +172,7 @@ png_file_gx_t read_png_gx_file(char* file_name)
 	png_filep.bit_depth = bit_depth;
 	png_filep.data = row_pointers;
 	png_filep.gxdata = (void*)_pixels;
+	png_filep.ok = 1;
 	
 	// Move flush cached memory.
 	DCFlushRange(_pixels, _width * _height * 4);
@@ -202,6 +204,7 @@ png_file_gx_t read_png_gx_file_buffer(const u8* file_name)
 	int number_of_passes;
 	png_bytep *row_pointers;
 	png_file_gx_t lol;
+	lol.ok = 0;
 
 	char header[8]; // Check for support PNG header.
 	void* buffer = (void*)file_name;
@@ -335,6 +338,7 @@ png_file_gx_t read_png_gx_file_buffer(const u8* file_name)
 	png_filep.bit_depth = bit_depth;
 	png_filep.data = row_pointers;
 	png_filep.gxdata = (void*)_pixels;
+	png_filep.ok = 1;
 	
 	// Move flush cached memory.
 	DCFlushRange(_pixels, _width * _height * 4);

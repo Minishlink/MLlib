@@ -7,6 +7,7 @@
 
 typedef struct _png_file_t
 {
+	bool ok;
 	int width, height;
 	png_byte color_type;
 	int row_bytes;
