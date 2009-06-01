@@ -25,7 +25,7 @@ void ML_GetPads()
 
 void ML_SetNumberOfPads(u8 wiimotesNumber, u8 gc_padsNumber)
 {
-	nb_wiimote = wiimotesNumber;
+	if(wiimotesNumber <= WPAD_MAX_WIIMOTES)	nb_wiimote = wiimotesNumber;
 	nb_pads_gc = gc_padsNumber;
 }
 
@@ -41,7 +41,6 @@ void ML_GetPadsWii()
 	u32 pressed = 0, up = 0;
 	ir_t ir;
 	orient_t orient;
-	vec3w_t accel;
 	gforce_t gforce;
 	float theta;
 	u32 type;
@@ -125,15 +124,9 @@ void ML_GetPadsWii()
 			WPAD_Orientation(i, &orient);
 			Wiimote[i].Orient.Roll = orient.roll;
 			Wiimote[i].Orient.Pitch = orient.pitch;
-			Wiimote[i].Orient.SmoothRoll = orient.a_roll;
-			Wiimote[i].Orient.SmoothPitch = orient.a_pitch;
+			Wiimote[i].Orient.JustRoll = orient.a_roll;
+			Wiimote[i].Orient.JustPitch = orient.a_pitch;
 			Wiimote[i].Orient.Yaw = orient.yaw;
-
-			// Acceleration
-			WPAD_Accel(i, &accel);
-			Wiimote[i].Accel.X = accel.x;
-			Wiimote[i].Accel.Y = accel.y;
-			Wiimote[i].Accel.Z = accel.z;
 
 			// Gravity Force
 			WPAD_GForce(i, &gforce);
@@ -177,11 +170,16 @@ void ML_GetNunchuk()
 
 		// Nunchuk Stick
 		WPAD_Expansion(i, &data);
-		if(data.type == WPAD_EXP_NUNCHUK)
-		{
-			Nunchuk[i].Stick.Angle = data.nunchuk.js.ang;    
-			Nunchuk[i].Stick.Magnitude = data.nunchuk.js.mag; 
-		}
+		Nunchuk[i].Stick.Angle = data.nunchuk.js.ang;    
+		Nunchuk[i].Stick.Magnitude = data.nunchuk.js.mag; 
+		Nunchuk[i].GForce.X = data.nunchuk.gforce.x;
+		Nunchuk[i].GForce.Y = data.nunchuk.gforce.y;
+		Nunchuk[i].GForce.Z = data.nunchuk.gforce.z;
+		Nunchuk[i].Orient.Roll = data.nunchuk.orient.roll;
+		Nunchuk[i].Orient.JustRoll = data.nunchuk.orient.a_roll;
+		Nunchuk[i].Orient.Pitch = data.nunchuk.orient.pitch;
+		Nunchuk[i].Orient.JustPitch = data.nunchuk.orient.a_pitch;
+		Nunchuk[i].Orient.Yaw = data.nunchuk.orient.yaw;
 	}
 
 }
@@ -190,7 +188,8 @@ void ML_GetCPad()
 {
 	u32 pressed = 0, up = 0;
 	u8 i = 0;
-
+	expansion_t data;
+	
 	for(i = 0; i < nb_wiimote; i++)
 	{
 		pressed = WPAD_ButtonsHeld(i);
@@ -256,6 +255,13 @@ void ML_GetCPad()
 		CPad[i].Released.ZR = (up & WPAD_CLASSIC_BUTTON_ZR);
 		CPad[i].Newpress.ZR = (pressed & WPAD_CLASSIC_BUTTON_ZR) && (!CPad[i].Held.ZR);
 		CPad[i].Held.ZR = (pressed & WPAD_CLASSIC_BUTTON_ZR);
+		
+		// Sticks
+		WPAD_Expansion(i, &data);
+		CPad[i].LeftStick.Angle = data.classic.ljs.ang;    
+		CPad[i].LeftStick.Magnitude = data.classic.ljs.mag; 	
+		CPad[i].RightStick.Angle = data.classic.rjs.ang;    
+		CPad[i].RightStick.Magnitude = data.classic.rjs.mag; 
 	}
 }
 
@@ -263,6 +269,7 @@ void ML_GetGuitar()
 {
 	u32 pressed = 0, up = 0;
 	u8 i = 0;
+	expansion_t data;
 
 	for(i = 0; i < nb_wiimote; i++)
 	{
@@ -305,6 +312,11 @@ void ML_GetGuitar()
 		Guitar[i].Released.StrumDown = (up & WPAD_GUITAR_HERO_3_BUTTON_STRUM_DOWN);
 		Guitar[i].Newpress.StrumDown = (pressed & WPAD_GUITAR_HERO_3_BUTTON_STRUM_DOWN) && (!Guitar[i].Held.StrumDown);
 		Guitar[i].Held.StrumDown = (pressed & WPAD_GUITAR_HERO_3_BUTTON_STRUM_DOWN);
+		
+		// Stick
+		WPAD_Expansion(i, &data);
+		Guitar[i].Stick.Angle = data.gh3.js.ang;    
+		Guitar[i].Stick.Magnitude = data.gh3.js.mag; 	
 	}
 }
 
