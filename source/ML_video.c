@@ -44,6 +44,9 @@ bool ML_LoadSpriteFromBuffer(ML_Sprite *sprite, const u8 *filename, int x, int y
 	sprite->tiled = FALSE;
 	sprite->animated = FALSE;
 	sprite->currentFrame = 0;
+	sprite->nbTiles = 0;
+	sprite->i = 0;
+	sprite->waitForXRefreshBetweenFrames = 25;
 
 	GX_InitTexObj(&sprite->texObj, sprite->data, sprite->width, sprite->height, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);	
 	GX_InitTexObjLOD(&sprite->texObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, 0, 0, GX_ANISO_1);
@@ -73,6 +76,9 @@ bool ML_LoadSpriteFromFile(ML_Sprite *sprite, char *filename, int x, int y)
 	sprite->tiled = FALSE;
 	sprite->animated = FALSE;
 	sprite->currentFrame = 0;
+	sprite->nbTiles = 0;
+	sprite->i = 0;
+	sprite->waitForXRefreshBetweenFrames = 25;
 
 	GX_InitTexObj(&sprite->texObj, sprite->data, sprite->width, sprite->height, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);	
 	GX_InitTexObjLOD(&sprite->texObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, 0, 0, GX_ANISO_1);
