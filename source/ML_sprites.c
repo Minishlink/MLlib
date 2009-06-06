@@ -5,63 +5,83 @@
 * \brief This file contains sprites functions.
 */
 
-void ML_CloneSprite(u16 nb, u16 cloned_nb)
+void ML_CloneSprite(ML_Sprite *sprite, ML_Sprite *sprite2)
 {
-	sprite[nb] = sprite[cloned_nb];
+	*sprite = *sprite2;
 }
 
-void ML_AnimateSprite(u16 nb, bool enabled, u8 waitForXRefreshBetweenFrames)
+bool ML_IsSpriteVisible(ML_Sprite *sprite)
 {
-	if(sprite[nb].tiled)
+ 	if(!sprite->visible || &sprite->texObj == NULL || sprite->alpha == 0 || sprite->scaleX == 0 || sprite->scaleY == 0 || sprite->width == 0 || sprite->height == 0)
+ 		sprite->visible = 0;
+ 	else sprite->visible = 1;
+ 	
+ 	return sprite->visible;
+}
+
+void ML_AnimateSprite(ML_Sprite *sprite, bool enabled, u8 waitForXRefreshBetweenFrames)
+{
+	if(sprite->tiled)
 	{
-		sprite[nb].animated = enabled;
-		sprite[nb].waitForXRefreshBetweenFrames = waitForXRefreshBetweenFrames;
+		sprite->animated = enabled;
+		sprite->waitForXRefreshBetweenFrames = waitForXRefreshBetweenFrames;
 	}
 }
 
-void ML_MoveSpriteWiimotePad(u16 nb, u8 wpad)
+/*void ML_AnimateSpriteEx(ML_Sprite *sprite, bool enabled, u8 waitForXRefreshBetweenFrames, u8 from, u8 to)
 {
-	if(Wiimote[wpad].Held.Right) sprite[nb].x += sprite[nb].dx;
-	else if(Wiimote[wpad].Held.Left) sprite[nb].x -= sprite[nb].dx;
-	if(Wiimote[wpad].Held.Down) sprite[nb].y += sprite[nb].dy;
-	else if(Wiimote[wpad].Held.Up) sprite[nb].y -= sprite[nb].dy;
+	if(sprite->tiled)
+	{
+		sprite->animated = enabled;
+		sprite->waitForXRefreshBetweenFrames = waitForXRefreshBetweenFrames;
+		sprite->anime_from = from;
+		sprite->anime_to = to;
+	}
+}*/
+
+void ML_MoveSpriteWiimotePad(ML_Sprite *sprite, u8 wpad)
+{
+	if(Wiimote[wpad].Held.Right) sprite->x += sprite->dx;
+	else if(Wiimote[wpad].Held.Left) sprite->x -= sprite->dx;
+	if(Wiimote[wpad].Held.Down) sprite->y += sprite->dy;
+	else if(Wiimote[wpad].Held.Up) sprite->y -= sprite->dy;
 }
 
-void ML_MoveSpriteWiimoteIR(u16 nb, u8 wpad)
+void ML_MoveSpriteWiimoteIR(ML_Sprite *sprite, u8 wpad)
 {
 	if(Wiimote[wpad].IR.Valid)
 	{
-		sprite[nb].x = (Wiimote[wpad].IR.X / screenMode->fbWidth * (screenMode->fbWidth + (sprite[nb].width*sprite[nb].scaleX) * 2)) - (sprite[nb].width*sprite[nb].scaleX);
-		sprite[nb].y = (Wiimote[wpad].IR.Y / screenMode->xfbHeight * (screenMode->xfbHeight + (sprite[nb].height*sprite[nb].scaleY) * 2)) - (sprite[nb].height*sprite[nb].scaleY);
+		sprite->x = (Wiimote[wpad].IR.X / screenMode->fbWidth * (screenMode->fbWidth + (sprite->width*sprite->scaleX) * 2)) - (sprite->width*sprite->scaleX);
+		sprite->y = (Wiimote[wpad].IR.Y / screenMode->xfbHeight * (screenMode->xfbHeight + (sprite->height*sprite->scaleY) * 2)) - (sprite->height*sprite->scaleY);
 		
-		sprite[nb].visible = true;
-	} else sprite[nb].visible = false;
+		sprite->visible = true;
+	} else sprite->visible = false;
 }
 
-bool ML_IsWiimoteInSprite(u8 wpad, u16 nb)
+bool ML_IsWiimoteInSprite(u8 wpad, ML_Sprite *sprite)
 {	
 	int cursorX = (Wiimote[wpad].IR.X / screenMode->fbWidth * (screenMode->fbWidth + 2)) - 1;
 	int cursorY = (Wiimote[wpad].IR.Y / screenMode->xfbHeight * (screenMode->xfbHeight + 2)) - 1;
 	
-	if(cursorX >= sprite[nb].x &&
-	   cursorX <= sprite[nb].x + sprite[nb].width*sprite[nb].scaleX &&
-	   cursorY >= sprite[nb].y &&
-	   cursorY <= sprite[nb].y + sprite[nb].height*sprite[nb].scaleY
+	if(cursorX >= sprite->x &&
+	   cursorX <= sprite->x + sprite->width*sprite->scaleX &&
+	   cursorY >= sprite->y &&
+	   cursorY <= sprite->y + sprite->height*sprite->scaleY
 	  ) return true;
 	  else return false;
 }
 
-bool ML_IsCollision(u16 nb, u16 nb2)
+bool ML_IsCollision(ML_Sprite *sprite, ML_Sprite *sprite2)
 {
-	int sp1_left = sprite[nb].x;
-	int sp1_right = sprite[nb].x + sprite[nb].width*sprite[nb].scaleX;
-	int sp1_up = sprite[nb].y;
-	int sp1_down = sprite[nb].y + sprite[nb].height*sprite[nb].scaleY;
+	int sp1_left = sprite->x;
+	int sp1_right = sprite->x + sprite->width*sprite->scaleX;
+	int sp1_up = sprite->y;
+	int sp1_down = sprite->y + sprite->height*sprite->scaleY;
 	
-	int sp2_left = sprite[nb2].x;
-	int sp2_right = sprite[nb2].x + sprite[nb2].width*sprite[nb2].scaleX;
-	int sp2_up = sprite[nb2].y;
-	int sp2_down = sprite[nb2].y + sprite[nb2].height*sprite[nb2].scaleY;
+	int sp2_left = sprite2->x;
+	int sp2_right = sprite2->x + sprite2->width*sprite2->scaleX;
+	int sp2_up = sprite2->y;
+	int sp2_down = sprite2->y + sprite2->height*sprite2->scaleY;
 	
 	if(sp1_left > sp2_right ||
 	   sp1_right < sp2_left ||
@@ -71,17 +91,17 @@ bool ML_IsCollision(u16 nb, u16 nb2)
 	else return true;
 }
 
-bool ML_IsCollisionEx(u16 nb, u16 nb2)
+bool ML_IsCollisionEx(ML_Sprite *sprite, ML_Sprite *sprite2)
 {
-	int sp1_left = sprite[nb].x;
-	int sp1_right = sprite[nb].x + sprite[nb].width*sprite[nb].scaleX;
-	int sp1_up = sprite[nb].y;
-	int sp1_down = sprite[nb].y + sprite[nb].height*sprite[nb].scaleY;
+	int sp1_left = sprite->x;
+	int sp1_right = sprite->x + sprite->width*sprite->scaleX;
+	int sp1_up = sprite->y;
+	int sp1_down = sprite->y + sprite->height*sprite->scaleY;
 	
-	int sp2_left = sprite[nb2].x;
-	int sp2_right = sprite[nb2].x + sprite[nb2].width*sprite[nb2].scaleX;
-	int sp2_up = sprite[nb2].y;
-	int sp2_down = sprite[nb2].y + sprite[nb2].height*sprite[nb2].scaleY;
+	int sp2_left = sprite2->x;
+	int sp2_right = sprite2->x + sprite2->width*sprite2->scaleX;
+	int sp2_up = sprite2->y;
+	int sp2_down = sprite2->y + sprite2->height*sprite2->scaleY;
 	
 	if(sp1_left > sp2_right ||
        sp1_right < sp2_left ||
@@ -133,11 +153,11 @@ bool ML_IsCollisionEx(u16 nb, u16 nb2)
 		{
 			for(y = 0; y < rect_height; y++)
 			{
-				offset = ((((y + posY_spr1) >> 2)<<4)*sprite[nb].width) + (((x+posX_spr1) >> 2)<<6) + ((((y+posY_spr1)%4 << 2) + (x+posX_spr1)%4 ) << 1); 
-				a1 = *(sprite[nb].data+offset);
+				offset = ((((y + posY_spr1) >> 2)<<4)*sprite->width) + (((x+posX_spr1) >> 2)<<6) + ((((y+posY_spr1)%4 << 2) + (x+posX_spr1)%4 ) << 1); 
+				a1 = *(sprite->data+offset);
 				
-				offset = ((((y + posY_spr2) >> 2)<<4)*sprite[nb2].width) + (((x+posX_spr2) >> 2)<<6) + ((((y+posY_spr2)%4 << 2) + (x+posX_spr2)%4 ) << 1); 
-				a2 = *(sprite[nb2].data+offset);
+				offset = ((((y + posY_spr2) >> 2)<<4)*sprite2->width) + (((x+posX_spr2) >> 2)<<6) + ((((y+posY_spr2)%4 << 2) + (x+posX_spr2)%4 ) << 1); 
+				a2 = *(sprite2->data+offset);
 				
 				// Teste si les deux pixels ne sont pas transparents
 				if(a1 != 0x00 && a2 != 0x00)
@@ -148,26 +168,26 @@ bool ML_IsCollisionEx(u16 nb, u16 nb2)
 	}
 }
 
-void ML_Cursor(u16 nb, u8 wpad)
+void ML_Cursor(ML_Sprite *sprite, u8 wpad)
 {
-	ML_MoveSpriteWiimoteIR(nb, wpad);
-	ML_DrawSprite(nb);
+	ML_MoveSpriteWiimoteIR(sprite, wpad);
+	ML_DrawSprite(sprite);
 }
 
-void ML_RotateSprite(u16 nb, float angle, u8 autoRotate)
+void ML_RotateSprite(ML_Sprite *sprite, float angle, u8 autoRotate)
 {
-	sprite[nb].rotated = autoRotate;	
-	if(sprite[nb].rotated)
+	sprite->rotated = autoRotate;	
+	if(sprite->rotated)
 	{
-		sprite[nb].angle += angle;
-	} else sprite[nb].angle = angle;
+		sprite->angle += angle;
+	} else sprite->angle = angle;
 }
 
-void ML_SetSpriteXY(u16 nb, int x, int y) { sprite[nb].x = x; sprite[nb].y = y; }
-void ML_SetSpriteX(u16 nb, int x) { sprite[nb].x = x; }
-void ML_SetSpriteY(u16 nb, int y) { sprite[nb].y = y; }
-void ML_SetSpriteSize(u16 nb, u16 width, u16 height) { sprite[nb].width = width; sprite[nb].height = height; }
-void ML_SetSpriteScale(u16 nb, float scaleX, float scaleY) { sprite[nb].scaleX = scaleX; sprite[nb].scaleY = scaleY; }
-void ML_SetSpriteVelocity(u16 nb, int dx, int dy) { sprite[nb].x = dx; sprite[nb].dy = dy; }
-void ML_SetSpriteAlpha(u16 nb, u8 alpha) { sprite[nb].alpha = alpha; }
+void ML_SetSpriteXY(ML_Sprite *sprite, int x, int y) { sprite->x = x; sprite->y = y; }
+void ML_SetSpriteX(ML_Sprite *sprite, int x) { sprite->x = x; }
+void ML_SetSpriteY(ML_Sprite *sprite, int y) { sprite->y = y; }
+void ML_SetSpriteSize(ML_Sprite *sprite, u16 width, u16 height) { sprite->width = width; sprite->height = height; }
+void ML_SetSpriteScale(ML_Sprite *sprite, float scaleX, float scaleY) { sprite->scaleX = scaleX; sprite->scaleY = scaleY; }
+void ML_SetSpriteVelocity(ML_Sprite *sprite, int dx, int dy) { sprite->x = dx; sprite->dy = dy; }
+void ML_SetSpriteAlpha(ML_Sprite *sprite, u8 alpha) { sprite->alpha = alpha; }
 

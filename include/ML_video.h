@@ -6,19 +6,17 @@
 #endif /* __cplusplus */
 
 #define DEFAULT_FIFO_SIZE	(1024*1024)
-#define NUM_SPRITES 1024
 
 // Sprite structure
 typedef struct {
 	GXTexObj texObj;
 	int i;
-	int x,y;			// screen co-ordinates
-	int dx, dy;			// velocity
+	long x, y;			// screen co-ordinates
+	long dx, dy;
 	bool visible;
-	u32 width;
-	u32 height;
+	u16 width;
+	u16 height;
 	u8 *data;
-	u16 clone_nb;
 	u8 rotated;
 	u8 alpha;
 	float scaleX, scaleY;
@@ -29,7 +27,7 @@ typedef struct {
 	u16 currentFrame;
 	u16 nbTiles;
 	float tileWidth, tileHeight;
-} Sprite;
+} ML_Sprite;
 
 // BMP structure
 typedef struct
@@ -46,8 +44,6 @@ typedef struct
   u32 biCompression;		/*** Is this compressed? ***/
 } __attribute__ ((__packed__)) WINBITMAP;
 
-Sprite sprite[NUM_SPRITES];
-
 GXRModeObj *screenMode;
 int _screenWidth, _screenHeight;
 
@@ -56,14 +52,12 @@ int _screenWidth, _screenHeight;
 * \brief This file contains video headers.
 */
 
-
 /*****************************************************
 ******************       GX         ******************
 ******************************************************/
 
-
 /**
-* \fn bool ML_LoadSpriteFromBuffer(u16 nb, const u8 *filename, int x, int y)
+* \fn bool ML_LoadSpriteFromBuffer(ML_Sprite *sprite, const u8 *filename, int x, int y)
 * \brief This function loads a PNG image in memory from the buffer (see tutorial/wiki).
 * @param nb The sprite number you will use after.
 * @param filename The path to the PNG file. (eg. sprite_png)
@@ -71,10 +65,10 @@ int _screenWidth, _screenHeight;
 * @param y Y position
 * @return 0 if it failed, 1 else.
 */
-extern bool ML_LoadSpriteFromBuffer(u16 nb, const u8 *filename, int x, int y);
+extern bool ML_LoadSpriteFromBuffer(ML_Sprite *sprite, const u8 *filename, int x, int y);
 
 /**
-* \fn bool ML_LoadSpriteFromFile(u16 nb, char *filename, int x, int y)
+* \fn bool ML_LoadSpriteFromFile(ML_Sprite *sprite, char *filename, int x, int y)
 * \brief This function loads a PNG image in memory from a file.
 * @param nb The sprite number you will use after.
 * @param filename The path to the PNG file. (eg. "sprite.png")
@@ -82,28 +76,28 @@ extern bool ML_LoadSpriteFromBuffer(u16 nb, const u8 *filename, int x, int y);
 * @param y Y position
 * @return 0 if it failed, 1 else.
 */
-extern bool ML_LoadSpriteFromFile(u16 nb, char *filename, int x, int y);
+extern bool ML_LoadSpriteFromFile(ML_Sprite *sprite, char *filename, int x, int y);
 
 /**
-* \fn void ML_DrawSprite(u16 nb)
+* \fn void ML_DrawSprite(ML_Sprite *sprite)
 * \brief This function shows the sprite which is already loaded, of course.
-* @param nb Sprite number
+* @param sprite Sprite
 */
-extern void ML_DrawSprite(u16 nb);
+extern void ML_DrawSprite(ML_Sprite *sprite);
 
 /**
-* \fn void ML_DrawSpriteXY(u16 nb, int x, int y)
+* \fn void ML_DrawSpriteXY(ML_Sprite *sprite, int x, int y)
 * \brief This function shows the sprite which is already loaded. At X and Y positions.
-* @param nb Sprite number
+* @param sprite Sprite
 * @param x X position
 * @param y Y position
 */
-extern void ML_DrawSpriteXY(u16 nb, int x, int y);
+extern void ML_DrawSpriteXY(ML_Sprite *sprite, int x, int y);
 
 /**
-* \fn void ML_DrawSpriteFull(u16 nb, int x, int y, float angle, float scaleX, float scaleY, u8 alpha)
+* \fn void ML_DrawSpriteFull(ML_Sprite *sprite, int x, int y, float angle, float scaleX, float scaleY, u8 alpha)
 * \brief This function shows the sprite which is already loaded. It can be faster when you have many things to do on the sprites in a time.
-* @param nb Sprite number
+* @param sprite Sprite
 * @param x X position
 * @param y Y position
 * @param angle Angle in degrees ( -180 -> +180 )
@@ -111,26 +105,41 @@ extern void ML_DrawSpriteXY(u16 nb, int x, int y);
 * @param scaleY Vertical scale 
 * @param alpha Transparency ( 0 -> 255 )
 */
-extern void ML_DrawSpriteFull(u16 nb, int x, int y, float angle, float scaleX, float scaleY, u8 alpha);
+extern void ML_DrawSpriteFull(ML_Sprite *sprite, int x, int y, float angle, float scaleX, float scaleY, u8 alpha);
 
 /**
-* \fn void ML_InitTile(u16 nb, u16 width, u16 height)
+* \fn void ML_DrawTexture(GXTexObj *texObj, int x, int y, u16 width, u16 height, float angle, float scaleX, float scaleY, u8 alpha)
+* \brief This function shows the sprite which is already loaded. It can be faster when you have many things to do on the sprites in a time.
+* @param texObj GX Texture (it's sprite.texObj)
+* @param x X position
+* @param y Y position
+* @param width Width
+* @param height Height
+* @param angle Angle in degrees ( -180 -> +180 )
+* @param scaleX Horizontal scale
+* @param scaleY Vertical scale 
+* @param alpha Transparency ( 0 -> 255 )
+*/
+extern void ML_DrawTexture(GXTexObj *texObj, int x, int y, u16 width, u16 height, float angle, float scaleX, float scaleY, u8 alpha);
+
+/**
+* \fn void ML_InitTile(ML_Sprite *sprite, u16 width, u16 height)
 * \brief This function inits the tile system of the sprite.
-* @param nb Sprite number
+* @param sprite Sprite
 * @param width Width of the tile
 * @param height Height of the tile
 */
-extern void ML_InitTile(u16 nb, u16 width, u16 height);
+extern void ML_InitTile(ML_Sprite *sprite, u16 width, u16 height);
 
 /**
-* \fn void ML_DrawTile(u16 nb, int x, int y, u16 frame)
+* \fn void ML_DrawTile(ML_Sprite *sprite, int x, int y, u16 frame)
 * \brief This function draws a tile.
-* @param nb Sprite number
+* @param sprite Sprite
 * @param x X position
 * @param y Y position
 * @param frame Tile n°<frame>
 */
-extern void ML_DrawTile(u16 nb, int x, int y, u16 frame);
+extern void ML_DrawTile(ML_Sprite *sprite, int x, int y, u16 frame);
 
 /**
 * \fn void ML_Brightness(u8 alpha)
@@ -155,24 +164,24 @@ extern bool ML_FadeOut();
 extern bool ML_FadeIn();
 
 /**
-* \fn void ML_Text(int nb, int x, int y, const char *text, ...)
+* \fn void ML_Text(ML_Sprite *sprite, int x, int y, const char *text, ...)
 * \brief This function draws some graphic text.
-* @param nb Sprite number of the font (the font is in fact an image, a sprite)
+* @param sprite Sprite of the font (the font is in fact an image, a sprite)
 * @param x X position
 * @param y Y position
 * @param text Text which can have arguments
 */
-extern void ML_Text(int nb, int x, int y, const char *text, ...);
+extern void ML_Text(ML_Sprite *sprite, int x, int y, const char *text, ...);
 
 /**
-* \fn void ML_Text(int nb, int x, int y, const char *text, ...)
+* \fn void ML_Text(ML_Sprite *sprite, int x, int y, const char *text, ...)
 * \brief This function draws some graphic text, but with no arguments and other funny thing : just faster !
-* @param nb Sprite number of the font (the font is in fact an image, a sprite)
+* @param sprite Sprite of the font (the font is in fact an image, a sprite)
 * @param x X position
 * @param y Y position
 * @param text Text
 */
-extern void ML_SimpleText(int nb, int x, int y, const char *text);
+extern void ML_SimpleText(ML_Sprite *sprite, int x, int y, const char *text);
 
 /**
 * \fn void ML_SetBackgroundColor(GXColor color)
@@ -182,24 +191,24 @@ extern void ML_SimpleText(int nb, int x, int y, const char *text);
 extern void ML_SetBackgroundColor(GXColor color);
 
 /**
-* \fn void ML_SetPixelColor(int nb, int x, int y, u32 color)
+* \fn void ML_SetPixelColor(ML_Sprite *sprite, int x, int y, u32 color)
 * \brief This function sets the color value of a pixel on a sprite.
-* @param nb Sprite number
+* @param sprite Sprite
 * @param x X position of the pixel
 * @param y Y position of the pixel
 * @param color New color of the pixel
 */
-extern void ML_SetPixelColor(int nb, int x, int y, u32 color);
+extern void ML_SetPixelColor(ML_Sprite *sprite, int x, int y, u32 color);
 
 /**
-* \fn u32 ML_GetPixelColor(int nb, int x, int y)
+* \fn u32 ML_GetPixelColor(ML_Sprite *sprite, int x, int y)
 * \brief This function returns the color value of the pixel on a sprite.
-* @param nb Sprite number
+* @param sprite Sprite
 * @param x X position of the pixel
 * @param y Y position of the pixel
 * @return Color of the pixel
 */
-extern u32 ML_GetPixelColor(int nb, int x, int y);
+extern u32 ML_GetPixelColor(ML_Sprite *sprite, int x, int y);
 
 /**
 * \fn void ML_SplashScreen()
@@ -209,6 +218,7 @@ extern void ML_SplashScreen();
 
 extern bool ML_Screenshot(const char *filename);
 
+void _drawImage(GXTexObj *texObj, int x, int y, u32 _width, u32 _height, float scaleX, float scaleY, float angle, u8 alpha, bool tiled, u16 frame, float tileWidth, float tileHeight);
 extern void ML_GX_Init(); // Init GX system
 extern void ML_GX_Refresh(); // Refresh GX system
 
