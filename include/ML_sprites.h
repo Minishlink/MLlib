@@ -35,6 +35,8 @@ extern bool ML_IsSpriteVisible(ML_Sprite *sprite);
 */
 extern void ML_AnimateSprite(ML_Sprite *sprite, bool enabled, u8 waitForXSecondsBetweenFrames);
 
+extern void ML_AnimateSpriteEx(ML_Sprite *sprite, bool enabled, u8 waitForXRefreshBetweenFrames, u8 from, u8 to);
+
 /**
 * \fn void ML_MoveSpriteWiimotePad(ML_Sprite *sprite, u8 wpad)
 * \brief This function moves the sprite with the D-Pad of the Wiimote.
@@ -67,7 +69,7 @@ extern bool ML_IsWiimoteInSprite(u8 wpad, ML_Sprite *sprite);
 * @param sprite2 2nd Sprite
 * @return 1 if there is collision, 0 else.
 */
-extern bool ML_IsCollision(ML_Sprite *sprite, ML_Sprite *sprite2);
+extern bool ML_IsCollision(const ML_Sprite *sprite, const ML_Sprite *sprite2);
 
 /**
 * \fn bool ML_IsCollisionEx(ML_Sprite *sprite, ML_Sprite *sprite2)
@@ -76,7 +78,7 @@ extern bool ML_IsCollision(ML_Sprite *sprite, ML_Sprite *sprite2);
 * @param sprite2 2nd Sprite
 * @return 1 if there is collision, 0 else.
 */
-extern bool ML_IsCollisionEx(ML_Sprite *sprite, ML_Sprite *sprite2);
+extern bool ML_IsCollisionEx(const ML_Sprite *sprite, const ML_Sprite *sprite2);
 
 /**
 * \fn void ML_Cursor(ML_Sprite *sprite, u8 wpad)

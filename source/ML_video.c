@@ -3,14 +3,14 @@
 
 // FB
 static void *xfb[2] = { NULL, NULL };
-u32 whichfb = 0;
+static u32 whichfb = 0;
 
 // GX
-void *gp_fifo = NULL;
-Mtx GXmodelView2D;
+static void *gp_fifo = NULL;
+static Mtx GXmodelView2D;
 
 // Others
-u8 _alphaFade;
+static u8 _alphaFade;
 
 /**
 * \file
@@ -109,7 +109,7 @@ void ML_DrawSpriteXY(ML_Sprite *sprite, int x, int y)
 		if(sprite->i == sprite->waitForXRefreshBetweenFrames)
 		{
 			sprite->i = 0;
-			if(sprite->currentFrame == sprite->nbTiles-1) sprite->currentFrame = 0;
+			if(sprite->currentFrame == sprite->anime_to-1) sprite->currentFrame = sprite->anime_from;
 			else sprite->currentFrame++;
 		} else sprite->i++;
 		
