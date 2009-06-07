@@ -174,6 +174,8 @@ extern bool ML_FadeIn();
 */
 extern void ML_Text(ML_Sprite *sprite, int x, int y, const char *text, ...);
 
+extern void ML_TextBox(ML_Sprite *sprite, int x, int y, int x2, int y2, const char *text, ...);
+
 /**
 * \fn void ML_Text(ML_Sprite *sprite, int x, int y, const char *text, ...)
 * \brief This function draws some graphic text, but with no arguments and other funny thing : just faster !
