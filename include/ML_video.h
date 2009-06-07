@@ -24,6 +24,7 @@ typedef struct {
 	bool tiled;
 	bool animated;
 	u8 waitForXRefreshBetweenFrames;
+	u8 anime_from, anime_to;
 	u16 currentFrame;
 	u16 nbTiles;
 	float tileWidth, tileHeight;
@@ -59,7 +60,7 @@ int _screenWidth, _screenHeight;
 /**
 * \fn bool ML_LoadSpriteFromBuffer(ML_Sprite *sprite, const u8 *filename, int x, int y)
 * \brief This function loads a PNG image in memory from the buffer (see tutorial/wiki).
-* @param nb The sprite number you will use after.
+* @param sprite The sprite you will use after.
 * @param filename The path to the PNG file. (eg. sprite_png)
 * @param x X position
 * @param y Y position
@@ -70,7 +71,7 @@ extern bool ML_LoadSpriteFromBuffer(ML_Sprite *sprite, const u8 *filename, int x
 /**
 * \fn bool ML_LoadSpriteFromFile(ML_Sprite *sprite, char *filename, int x, int y)
 * \brief This function loads a PNG image in memory from a file.
-* @param nb The sprite number you will use after.
+* @param sprite The sprite you will use after.
 * @param filename The path to the PNG file. (eg. "sprite.png")
 * @param x X position
 * @param y Y position
@@ -248,13 +249,13 @@ extern void ML_CleanVideoBGColor(int color);
 
 /**
 * \fn void ML_Refresh()
-* \brief This function refresh the MLlib (Get PADS status, and refresh video)
+* \brief This function refresh the MLlib (Get pads status, and refresh video)
 */
 extern void ML_Refresh();
 
 /**
 * \fn void ML_RefreshConsoleMode()
-* \brief CONSOLE MODE - This function refresh the MLlib (Get PADS status, and refresh video)
+* \brief CONSOLE MODE - This function refresh the MLlib (Get pads status, and refresh video)
 */
 extern void ML_RefreshConsoleMode();
 

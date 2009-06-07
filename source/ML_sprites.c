@@ -21,14 +21,10 @@ bool ML_IsSpriteVisible(ML_Sprite *sprite)
 
 void ML_AnimateSprite(ML_Sprite *sprite, bool enabled, u8 waitForXRefreshBetweenFrames)
 {
-	if(sprite->tiled)
-	{
-		sprite->animated = enabled;
-		sprite->waitForXRefreshBetweenFrames = waitForXRefreshBetweenFrames;
-	}
+	ML_AnimateSpriteEx(sprite, enabled, waitForXRefreshBetweenFrames, 0, sprite->nbTiles);
 }
 
-/*void ML_AnimateSpriteEx(ML_Sprite *sprite, bool enabled, u8 waitForXRefreshBetweenFrames, u8 from, u8 to)
+void ML_AnimateSpriteEx(ML_Sprite *sprite, bool enabled, u8 waitForXRefreshBetweenFrames, u8 from, u8 to)
 {
 	if(sprite->tiled)
 	{
@@ -37,7 +33,7 @@ void ML_AnimateSprite(ML_Sprite *sprite, bool enabled, u8 waitForXRefreshBetween
 		sprite->anime_from = from;
 		sprite->anime_to = to;
 	}
-}*/
+}
 
 void ML_MoveSpriteWiimotePad(ML_Sprite *sprite, u8 wpad)
 {
@@ -71,7 +67,7 @@ bool ML_IsWiimoteInSprite(u8 wpad, ML_Sprite *sprite)
 	  else return false;
 }
 
-bool ML_IsCollision(ML_Sprite *sprite, ML_Sprite *sprite2)
+bool ML_IsCollision(const ML_Sprite *sprite, const ML_Sprite *sprite2)
 {
 	int sp1_left = sprite->x;
 	int sp1_right = sprite->x + sprite->width*sprite->scaleX;
@@ -91,7 +87,7 @@ bool ML_IsCollision(ML_Sprite *sprite, ML_Sprite *sprite2)
 	else return true;
 }
 
-bool ML_IsCollisionEx(ML_Sprite *sprite, ML_Sprite *sprite2)
+bool ML_IsCollisionEx(const ML_Sprite *sprite, const ML_Sprite *sprite2)
 {
 	int sp1_left = sprite->x;
 	int sp1_right = sprite->x + sprite->width*sprite->scaleX;
