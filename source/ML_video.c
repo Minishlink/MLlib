@@ -189,6 +189,25 @@ bool ML_FadeOut()
 }
 
 void ML_Text(ML_Sprite *sprite, int x, int y, const char *text, ...)
+{ 
+    int i = 0, size = 0, j = 0;
+    char buffer[1024];
+	u8 c = 0;
+	
+    va_list argp;
+    va_start(argp, text);
+    size = vsprintf(buffer, text, argp);
+    va_end(argp);
+	
+    for(i=0; i < size; i++) 
+    {
+        c = buffer[i]-32;
+        if(buffer[i] == '\n' || x+j*sprite->tileWidth*sprite->scaleX >= screenMode->fbWidth) { y += sprite->tileHeight*sprite->scaleY; j = -1; }
+        else ML_DrawTile(sprite, x+j*sprite->tileWidth*sprite->scaleX, y, c); j++; 
+    }
+}
+
+void ML_TextBox(ML_Sprite *sprite, int x, int y, int x2, int y2, const char *text, ...)
 {
 	int i = 0, size = 0, j = 0;
     char buffer[1024];
@@ -202,12 +221,9 @@ void ML_Text(ML_Sprite *sprite, int x, int y, const char *text, ...)
     for(i=0; i < size; i++) 
     {
         c = buffer[i]-32;
-        if(buffer[i] == '\n') { y += sprite->tileHeight*sprite->scaleY; j = 0; }
-        else 
-        { 
-        	if((x+j*sprite->tileWidth*sprite->scaleX) >= screenMode->fbWidth) { y += sprite->tileHeight*sprite->scaleY; i--; j = -1; }
-        	else  { ML_DrawTile(sprite, x+j*sprite->tileWidth*sprite->scaleX, y, c); j++; }
-        }
+        if(y > y2) return;
+        if(buffer[i] == '\n' || x+j*sprite->tileWidth*sprite->scaleX >= x2) { y += sprite->tileHeight*sprite->scaleY; j = -1; }
+        else ML_DrawTile(sprite, x+j*sprite->tileWidth*sprite->scaleX, y, c); j++; 
     }
 }
 
