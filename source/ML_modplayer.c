@@ -30,13 +30,12 @@ void ML_PlayMODFromBuffer(MODPlay *play, const u8 *mod)
 
 void ML_PlayMODFromFile(MODPlay *play, const char *filename)
 {	
-	long size = 0;
-	
-	FILE *fp = fopen(filename,"r");
+
+	FILE *fp = fopen(filename,"rb");
 	if(fp == NULL) return;
 	
 	fseek(fp, 0 , SEEK_END);  // Obtient la taille du fichier
-	size = ftell(fp);
+	long size = ftell(fp);
 	rewind (fp);
 	
 	char *buffer = (char *)malloc(size);

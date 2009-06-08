@@ -80,7 +80,8 @@ VPATH :=	$(MLDIR)
 MLOBJ		:=	ML_draw.o ML_init.o	\
 			ML_input.o ML_modplayer.o ML_mp3player.o \
 			ML_time.o ML_video.o ML_system.o ML_sprites.o \
-			PNG.o globals.o MLlib_SplashScreen.png.o
+			PNG.o globals.o MLlib_SplashScreen.png.o \
+			ML_font.o
 
 #---------------------------------------------------------------------------------
 # Build rules:
