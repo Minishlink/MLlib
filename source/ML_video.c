@@ -56,6 +56,7 @@ bool ML_LoadSpriteFromBuffer(ML_Sprite *sprite, const u8 *filename, int x, int y
 
 bool ML_LoadSpriteFromFile(ML_Sprite *sprite, char *filename, int x, int y)
 {
+	chdir("/");
 	png_file_gx_t png_data = read_png_gx_file(filename);
 	
 	if(png_data.ok==0) return 0;
