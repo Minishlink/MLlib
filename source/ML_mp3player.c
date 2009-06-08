@@ -9,8 +9,11 @@
 
 void ML_InitMP3()
 {
-	ASND_Init();
-	setAsnd(TRUE);
+	if(!getAsnd())
+	{
+		ASND_Init();
+		setAsnd(TRUE);
+	}
 	MP3Player_Init();
 }
 
