@@ -153,6 +153,24 @@ void ML_DrawTile(ML_Sprite *sprite, int x, int y, u16 frame)
 		 _drawImage(&sprite->texObj, sprite->x, sprite->y, sprite->width, sprite->height, sprite->scaleX, sprite->scaleY, sprite->angle, sprite->alpha, 1, frame, sprite->tileWidth, sprite->tileHeight);
 }
 
+void ML_DrawRect(int x, int y, u16 width, u16 height, u32 rgba)
+{
+	int x2 = x + width;
+    int y2 = y + height;
+    Vector v[] = {{x,y,0.0f}, {x2,y,0.0f}, {x2,y2,0.0f}, {x,y2,0.0f}, {x,y,0.0f}};
+    
+    int i;
+    GXColor color = RGB_u32_u8(rgba);
+    
+	GX_Begin(GX_TRIANGLEFAN, GX_VTXFMT0, 4);
+    for(i = 0; i < 4; i++) 
+    {
+        GX_Position3f32(v[i].x, v[i].y,  v[i].z);
+        GX_Color4u8(color.r, color.g, color.b, color.a);
+    }
+    GX_End();
+}
+
 void ML_Brightness(u8 alpha)
 { 
     Vector v[] = {{0,0,0.0f}, {screenMode->fbWidth,0,0.0f}, {screenMode->fbWidth,screenMode->xfbHeight,0.0f}, {0,screenMode->xfbHeight,0.0f}, {0,0,0.0f}};    
