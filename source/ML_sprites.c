@@ -168,6 +168,8 @@ void ML_Cursor(ML_Sprite *sprite, u8 wpad)
 {
 	ML_MoveSpriteWiimoteIR(sprite, wpad);
 	ML_DrawSprite(sprite);
+	sprite->x += (sprite->width*sprite->scaleX)/2;
+	sprite->y += (sprite->height*sprite->scaleY)/2;
 }
 
 void ML_RotateSprite(ML_Sprite *sprite, float angle, u8 autoRotate)
