@@ -6,6 +6,10 @@
 * \brief This file contains system headers.
 */
 
+#ifdef __cplusplus
+   extern "C" {
+#endif /* __cplusplus */
+
 enum T_WiiPower
 {
     RESET   	= 0x2001,
