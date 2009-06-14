@@ -30,10 +30,22 @@
 #include <gcmodplay.h>
 #include <time.h>
 #include <sys/time.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <wiiuse/wpad.h>
 #include <fat.h>
+#include <wchar.h>
+
+// libpng ported to Wii by mavakadachi 
 #include <png/png.h>
 
+// FreeTypelib ported to Wii by Tantric
+#include <ft2build.h>
+#include FT_FREETYPE_H
+#include FT_BITMAP_H
+
+
+// MLlib now
 #include "ML_define.h"
 #include "globals.h"
 
@@ -46,6 +58,7 @@
 #include "ML_input.h"
 #include "ML_mp3player.h"
 #include "ML_modplayer.h"
+#include "ML_font.h"
 #include "PNG.h"
 
 

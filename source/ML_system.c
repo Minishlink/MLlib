@@ -93,3 +93,18 @@ void _flushAndClean(bool GXyes)
     VIDEO_Flush();
 }
 
+// ----------------------------------------
+
+void ML_Debug(const char* filename)
+{
+	if(fatInitDefault())
+	{
+		chdir("/");
+		mkdir("logs", 0755);
+		chdir("/logs/");
+		FILE *f;
+		f = fopen(filename, "wb");
+		if(f) fclose(f);
+	}
+}
+

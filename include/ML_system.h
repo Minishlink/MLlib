@@ -28,19 +28,19 @@ enum T_WiiPower
 #define ML_ShutdownWii(); SYS_ResetSystem(SYS_POWEROFF,0,0);
 
 /**
-* \fn extern void ML_Exit()
+* \fn void ML_Exit()
 * \brief This function exits the app/game. If it was launched from HBC/Wiiload, it will return to the HBC; if not, it will return to the Wii menu. :)
 */
 extern void ML_Exit();
 
 /**
-* \fn extern void ML_ExitConsoleMode()
+* \fn void ML_ExitConsoleMode()
 * \brief CONSOLE MODE - This function exits the app/game. If it was launched from HBC/Wiiload, it will return to the HBC; if not, it will return to the Wii menu. :)
 */
 extern void ML_ExitConsoleMode();
 
 /**
-* \fn extern void ML_SetPowerMode(int value)
+* \fn void ML_SetPowerMode(int value)
 * \brief NOT RECOMMENDED - This function set the wii power mode to the value (see enum T_WiiPower). It's better to use ML_ReturnToWii(); and ML_ShutdownWii();. ML_Exit(); is the best though !
 * @param value The Wii will set itself to this value power mode.
 */
@@ -49,6 +49,13 @@ extern void ML_SetPowerMode(int value);
 void ML_CallbackForPowerAndReset(bool GXyes);
 
 void _flushAndClean(bool GXyes);
+
+/**
+* \fn void ML_Debug(const char* filename)
+* \brief For debug purposes, you can call this function. It will create a file in /logs/ named with the "filename" char. 
+* @param filename Name of the file.
+*/
+extern void ML_Debug(const char* filename);
 
 #ifdef __cplusplus
    }
