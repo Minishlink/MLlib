@@ -22,77 +22,110 @@ static u8 _alphaFade;
 ************************ GX ****************************
 **************************************************** **/
 
-bool ML_LoadSpriteFromBuffer(ML_Sprite *sprite, const u8 *filename, int x, int y)
-{
-	png_file_gx_t png_data = read_png_gx_file_buffer(filename);
-	
-	if(png_data.ok==0) return 0;
-	else if(png_data.gxdata==NULL) return 0;
-	
-	sprite->data = png_data.gxdata;
-	sprite->width = png_data.width;
-	sprite->height = png_data.height;
-	sprite->x = x;
-	sprite->y = y;
-	sprite->visible = TRUE;
-	sprite->dx = 1;
-	sprite->dy = 1;
-	sprite->rotated = FALSE;
-	sprite->scaleX = 1;
-	sprite->scaleY = 1;
-	sprite->alpha = 255;
-	sprite->tiled = FALSE;
-	sprite->animated = FALSE;
-	sprite->currentFrame = 0;
-	sprite->nbTiles = 0;
-	sprite->i = 0;
-	sprite->waitForXRefreshBetweenFrames = 25;
+bool ML_LoadSpriteFromBuffer(ML_Image *image, ML_Sprite *sprite, const u8 *filename, int x, int y)
+{	
+	return _loadImage(image, sprite, NULL, NULL, filename, x, y, 0);
+}
 
-	GX_InitTexObj(&sprite->texObj, sprite->data, sprite->width, sprite->height, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);	
-	GX_InitTexObjLOD(&sprite->texObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, 0, 0, GX_ANISO_1);
+bool ML_LoadSpriteFromFile(ML_Image *image, ML_Sprite *sprite, char *filename, int x, int y)
+{
+	return _loadImage(image, sprite, NULL, filename, NULL, x, y, 1);
+}
+
+bool ML_LoadBackgroundFromBuffer(ML_Image *image, ML_Sprite *sprite, ML_Background *background, const u8 *filename, int x, int y)
+{	
+	return _loadImage(image, NULL, background, NULL, filename, x, y, 0);
+}
+
+bool ML_LoadBackgroundFromFile(ML_Image *image, ML_Sprite *sprite, ML_Background *background, char *filename, int x, int y)
+{
+	return _loadImage(image, NULL, background, filename, NULL, x, y, 1);
+}
+
+bool _loadImage(ML_Image *image, ML_Sprite *sprite, ML_Background *background, char *filename, const u8 *buffer, int x, int y, bool fat)
+{
+	_initImage(image);
+	
+	if(sprite)
+		_initSprite(sprite);
+	else if(background) _initBackground(background);
+
+	bool ok = 0;
+	
+	if(fat)
+	{
+		if(!fatInitDefault()) return 0;
+		
+		chdir("/");
+		ok = read_png_gx_file(filename, image);
+	}
+	else ok = read_png_gx_file_buffer(buffer, image);
+	
+	if(!ok) return 0;
+	
+	if(sprite)
+	{
+		sprite->width = image->width;
+		sprite->height = image->height;
+		sprite->x = x;
+		sprite->y = y;
+	}
+	else if(background)
+	{
+		background->width = image->width;
+		background->height = image->height;
+		background->x = x;
+		background->y = y;
+	}
+	
+	GX_InitTexObj(&image->texObj, image->data, image->width, image->height, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);	
+	GX_InitTexObjLOD(&image->texObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, 0, 0, GX_ANISO_1);
 	
 	return 1;
 }
 
-bool ML_LoadSpriteFromFile(ML_Sprite *sprite, char *filename, int x, int y)
-{
-	chdir("/");
-	png_file_gx_t png_data = read_png_gx_file(filename);
-	
-	if(png_data.ok==0) return 0;
-	else if(png_data.gxdata==NULL) return 0;
-	
-	sprite->data = png_data.gxdata;
-	sprite->width = png_data.width;
-	sprite->height = png_data.height;
-	sprite->x = x;
-	sprite->y = y;
+void _initImage(ML_Image *image)
+{	
+	image->width = 0;
+	image->height = 0;
+	image->data = NULL;
+}
+
+void _initSprite(ML_Sprite *sprite)
+{	
+	*sprite = (ML_Sprite){0};
 	sprite->visible = TRUE;
 	sprite->dx = 1;
 	sprite->dy = 1;
-	sprite->rotated = FALSE;
 	sprite->scaleX = 1;
 	sprite->scaleY = 1;
 	sprite->alpha = 255;
-	sprite->tiled = FALSE;
-	sprite->animated = FALSE;
-	sprite->currentFrame = 0;
-	sprite->nbTiles = 0;
-	sprite->i = 0;
-	sprite->waitForXRefreshBetweenFrames = 25;
-
-	GX_InitTexObj(&sprite->texObj, sprite->data, sprite->width, sprite->height, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);	
-	GX_InitTexObjLOD(&sprite->texObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, 0, 0, GX_ANISO_1);
-	
-	return 1;
 }
 
-void ML_DrawSprite(ML_Sprite *sprite)
+void _initBackground(ML_Background *background)
+{	
+	*background = (ML_Background){0};
+	background->visible = TRUE;
+	background->scaleX = 1;
+	background->scaleY = 1;
+	background->alpha = 255;
+}
+
+void ML_DeleteImage(ML_Image *image)
 {
-	ML_DrawSpriteXY(sprite, sprite->x, sprite->y);
+	if(image->data)
+	{
+		free(image->data);
+		image->data = NULL;
+	}
 }
 
-void ML_DrawSpriteXY(ML_Sprite *sprite, int x, int y)
+void ML_DrawSprite(ML_Image *image, ML_Sprite *sprite)
+{
+	ML_DrawSpriteXY(image, sprite, sprite->x, sprite->y);
+}
+
+void ML_DrawSpriteXY(ML_Image *image, ML_Sprite *sprite, int x, int y)
 {
 	sprite->x = x; sprite->y = y;
 	
@@ -101,9 +134,9 @@ void ML_DrawSpriteXY(ML_Sprite *sprite, int x, int y)
 	if(!sprite->animated)
 	{
 		if(!sprite->tiled)
-			_drawImage(&sprite->texObj, sprite->x, sprite->y, sprite->width, sprite->height, sprite->scaleX, sprite->scaleY, sprite->angle, sprite->alpha, 0, 0, 0, 0);
+			_drawImage(&image->texObj, sprite->x, sprite->y, sprite->width, sprite->height, sprite->scaleX, sprite->scaleY, sprite->angle, sprite->alpha, 0, 0, 0, 0);
 		else
-			ML_DrawTile(sprite, sprite->x, sprite->y, sprite->currentFrame);
+			ML_DrawTile(image, sprite, sprite->x, sprite->y, sprite->currentFrame);
 	}
 	else
 	{
@@ -114,11 +147,11 @@ void ML_DrawSpriteXY(ML_Sprite *sprite, int x, int y)
 			else sprite->currentFrame++;
 		} else sprite->i++;
 		
-		ML_DrawTile(sprite, sprite->x, sprite->y, sprite->currentFrame);
+		ML_DrawTile(image, sprite, sprite->x, sprite->y, sprite->currentFrame);
 	}
 }
 
-void ML_DrawSpriteFull(ML_Sprite *sprite, int x, int y, float angle, float scaleX, float scaleY, u8 alpha)
+void ML_DrawSpriteFull(ML_Image *image, ML_Sprite *sprite, int x, int y, float angle, float scaleX, float scaleY, u8 alpha)
 {
 	sprite->x = x;
 	sprite->y = y;
@@ -127,7 +160,7 @@ void ML_DrawSpriteFull(ML_Sprite *sprite, int x, int y, float angle, float scale
 	sprite->scaleY = scaleY;
 	sprite->alpha = alpha;
 	
-	ML_DrawSpriteXY(sprite, sprite->x, sprite->y);
+	ML_DrawSpriteXY(image, sprite, sprite->x, sprite->y);
 }
 
 void ML_DrawTexture(GXTexObj *texObj, int x, int y, u16 width, u16 height, float angle, float scaleX, float scaleY, u8 alpha)
@@ -143,14 +176,14 @@ void ML_InitTile(ML_Sprite *sprite, u16 width, u16 height)
 	sprite->nbTiles = (sprite->width/sprite->tileWidth) * (sprite->height/sprite->tileHeight);
 }
 
-void ML_DrawTile(ML_Sprite *sprite, int x, int y, u16 frame)
+void ML_DrawTile(ML_Image *image, ML_Sprite *sprite, int x, int y, u16 frame)
 {
 	if(!ML_IsSpriteVisible(sprite)) return;
 	
 	sprite->x = x; sprite->y = y;
 
 	if(sprite->tiled)
-		 _drawImage(&sprite->texObj, sprite->x, sprite->y, sprite->width, sprite->height, sprite->scaleX, sprite->scaleY, sprite->angle, sprite->alpha, 1, frame, sprite->tileWidth, sprite->tileHeight);
+		 _drawImage(&image->texObj, sprite->x, sprite->y, sprite->width, sprite->height, sprite->scaleX, sprite->scaleY, sprite->angle, sprite->alpha, 1, frame, sprite->tileWidth, sprite->tileHeight);
 }
 
 void ML_DrawRect(int x, int y, u16 width, u16 height, u32 rgba)
@@ -207,7 +240,7 @@ bool ML_FadeOut()
 	else return 0;
 }
 
-void ML_Text(ML_Sprite *sprite, int x, int y, const char *text, ...)
+void ML_DrawImageText(ML_Image *image, ML_Sprite *sprite, int x, int y, const char *text, ...)
 { 
     int i = 0, size = 0, j = 0;
     char buffer[1024];
@@ -222,11 +255,11 @@ void ML_Text(ML_Sprite *sprite, int x, int y, const char *text, ...)
     {
         c = buffer[i]-32;
         if(buffer[i] == '\n' || x+j*sprite->tileWidth*sprite->scaleX >= screenMode->fbWidth) { y += sprite->tileHeight*sprite->scaleY; j = -1; }
-        else ML_DrawTile(sprite, x+j*sprite->tileWidth*sprite->scaleX, y, c); j++; 
+        else ML_DrawTile(image, sprite, x+j*sprite->tileWidth*sprite->scaleX, y, c); j++; 
     }
 }
 
-void ML_TextBox(ML_Sprite *sprite, int x, int y, int x2, int y2, const char *text, ...)
+void ML_DrawImageTextBox(ML_Image *image, ML_Sprite *sprite, int x, int y, int x2, int y2, const char *text, ...)
 {
 	int i = 0, size = 0, j = 0;
     char buffer[1024];
@@ -242,19 +275,19 @@ void ML_TextBox(ML_Sprite *sprite, int x, int y, int x2, int y2, const char *tex
         c = buffer[i]-32;
         if(y > y2) return;
         if(buffer[i] == '\n' || x+j*sprite->tileWidth*sprite->scaleX >= x2) { y += sprite->tileHeight*sprite->scaleY; j = -1; }
-        else ML_DrawTile(sprite, x+j*sprite->tileWidth*sprite->scaleX, y, c); j++; 
+        else ML_DrawTile(image, sprite, x+j*sprite->tileWidth*sprite->scaleX, y, c); j++; 
     }
 }
 
-void ML_SimpleText(ML_Sprite *sprite, int x, int y, const char *text)
+void ML_DrawImageSimpleText(ML_Image *image, ML_Sprite *sprite, int x, int y, const char *text)
 {
 	int i = 0, size = strlen(text);
 	u8 c = 0;
 	
-    for(i=0; i < size; i++) 
+    for(i=0; i < size; i++)
     {
         c = text[i]-32;
-        ML_DrawTile(sprite, x+i*sprite->tileWidth*sprite->scaleX, y, c);
+        ML_DrawTile(image, sprite, x+i*sprite->tileWidth*sprite->scaleX, y, c);
     }
 }
 
@@ -264,32 +297,32 @@ void ML_SetBackgroundColor(GXColor color)
 }
 
 // These two next functions are mainly inspired from GRRLIB, thank you for these equation/algorithm !
-void ML_SetPixelColor(ML_Sprite *sprite, int x, int y, u32 color) 
+void ML_SetPixelColor(ML_Image *image, int x, int y, u32 color) 
 {
-	u8 *truc = (u8*)sprite->data;
+	u8 *truc = (u8*)image->data;
 	u32 offset;
 
-	offset = (((y >> 2)<<4)*sprite->width) + ((x >> 2)<<6) + (((y%4 << 2) + x%4 ) <<1); // Fuckin equation found by NoNameNo ;)
+	offset = (((y >> 2)<<4)*image->width) + ((x >> 2)<<6) + (((y%4 << 2) + x%4 ) <<1); // Fuckin equation found by NoNameNo ;)
 
 	*(truc+offset)=(color) & 0xFF;
 	*(truc+offset+1)=(color>>24) & 0xFF;
 	*(truc+offset+32)=(color>>16) & 0xFF;
 	*(truc+offset+33)=(color>>8) & 0xFF;
 	
-	sprite->data = truc;
+	image->data = truc;
 	
-	DCFlushRange(sprite->data, sprite->width * sprite->height * 4);
-	GX_InitTexObj(&sprite->texObj, sprite->data, sprite->width, sprite->height, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);	
-	GX_InitTexObjLOD(&sprite->texObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, 0, 0, GX_ANISO_1);
+	DCFlushRange(image->data, image->width * image->height * 4);
+	GX_InitTexObj(&image->texObj, image->data, image->width, image->height, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);	
+	GX_InitTexObjLOD(&image->texObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, 0, 0, GX_ANISO_1);
 }
 
-u32 ML_GetPixelColor(ML_Sprite *sprite, int x, int y) 
+u32 ML_GetPixelColor(ML_Image *image, int x, int y) 
 {
-	u8 *truc = (u8*)sprite->data;
+	u8 *truc = (u8*)image->data;
 	u8 r, g, b, a;
 	u32 offset;
 
-	offset = (((y >> 2)<<4)*sprite->width) + ((x >> 2)<<6) + (((y%4 << 2) + x%4 ) << 1); // Fuckin equation found by NoNameNo ;)
+	offset = (((y >> 2)<<4)*image->width) + ((x >> 2)<<6) + (((y%4 << 2) + x%4 ) << 1); // Fuckin equation found by NoNameNo ;)
 
 	a=*(truc+offset);
 	r=*(truc+offset+1);
@@ -301,32 +334,33 @@ u32 ML_GetPixelColor(ML_Sprite *sprite, int x, int y)
 
 void ML_SplashScreen()
 {
-	bool continuer = 1;
 	int i = 0;
+	bool ok = 0;
 	
-	GXTexObj texObj;
-	png_file_gx_t png_data = read_png_gx_file_buffer(MLlib_SplashScreen_png);
+	ML_Image image;
+	_initImage(&image);
+	ok = read_png_gx_file_buffer(MLlib_SplashScreen_png, &image);
 	
-	if(png_data.gxdata==NULL) 
+	if(!ok) 
 		return;
 	
-	GX_InitTexObj(&texObj, png_data.gxdata, png_data.width, png_data.height, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
-	GX_InitTexObjLOD(&texObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, 0, 0, GX_ANISO_1);
+	GX_InitTexObj(&image.texObj, image.data, image.width, image.height, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+	GX_InitTexObjLOD(&image.texObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, 0, 0, GX_ANISO_1);
 	
-	while(continuer)
+	while(ok)
 	{
-		if(Wiimote[0].Held.A) { continuer = 0; }
+		if(Wiimote[0].Held.A) { ok = 0; }
 		
-		_drawImage(&texObj, 0, 0, png_data.width, png_data.height, 1, 1, 0, 255, 0, 0, 0, 0);
+		_drawImage(&image.texObj, 0, 0, image.width, image.height, 1, 1, 0, 255, 0, 0, 0, 0);
 		
 		i++;
-		if(i >= 1800) continuer = 0;
+		if(i >= 1800) ok = 0;
 	
 		ML_Refresh();
 	}
 	ML_Refresh();
 	VIDEO_WaitVSync();
-	DCFlushRange(png_data.gxdata, png_data.width * png_data.height * 4);
+	ML_DeleteImage(&image);
 }
 
 bool ML_Screenshot(const char *filename)
@@ -424,7 +458,7 @@ bool ML_Screenshot(const char *filename)
 
 //---------------------------------------------
 
-void _drawImage(GXTexObj *texObj, int x, int y, u32 _width, u32 _height, float scaleX, float scaleY, float angle, u8 alpha, bool tiled, u16 frame, float tileWidth, float tileHeight)
+void _drawImage(GXTexObj *texObj, int x, int y, u16 _width, u16 _height, float scaleX, float scaleY, float angle, u8 alpha, bool tiled, u16 frame, u16 tileWidth, u16 tileHeight)
 {
 	Mtx44 m, m1, m2, mv;
 	u16 width, height;
@@ -436,8 +470,10 @@ void _drawImage(GXTexObj *texObj, int x, int y, u32 _width, u32 _height, float s
 		GX_SetTevOp(GX_TEVSTAGE0, GX_MODULATE);
 		GX_SetVtxDesc(GX_VA_TEX0, GX_DIRECT);
 
-		width = (_width*scaleX)*0.5;
-		height = (_height*scaleY)*0.5;
+		//width = (_width*scaleX)*0.5;
+		//height = (_height*scaleY)*0.5;
+		width = _width>>1;
+		height = _height>>1;
 		guMtxIdentity (m1);
 		guMtxScaleApply(m1, m1, scaleX, scaleY, 1.0);
 		Vector axis = (Vector) {0, 0, 1};
@@ -449,21 +485,21 @@ void _drawImage(GXTexObj *texObj, int x, int y, u32 _width, u32 _height, float s
 		GX_LoadPosMtxImm (mv, GX_PNMTX0);
 
 		GX_Begin(GX_QUADS, GX_VTXFMT0, 4);
-		GX_Position3f32(-width, -height, 0);
-		GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
-		GX_TexCoord2f32(0, 0);
+			GX_Position3f32(-width, -height, 0);
+			GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
+			GX_TexCoord2f32(0, 0);
 
-		GX_Position3f32(width, -height, 0);
-		GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
-		GX_TexCoord2f32(1, 0);
+			GX_Position3f32(width, -height, 0);
+			GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
+			GX_TexCoord2f32(1, 0);
 
-		GX_Position3f32(width, height, 0);
-		GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
-		GX_TexCoord2f32(1, 1);
+			GX_Position3f32(width, height, 0);
+			GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
+			GX_TexCoord2f32(1, 1);
 
-		GX_Position3f32(-width, height, 0);
-		GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
-		GX_TexCoord2f32(0, 1);
+			GX_Position3f32(-width, height, 0);
+			GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
+			GX_TexCoord2f32(0, 1);
 		GX_End();
 	}
 	else
@@ -496,25 +532,25 @@ void _drawImage(GXTexObj *texObj, int x, int y, u32 _width, u32 _height, float s
 		GX_LoadPosMtxImm (mv, GX_PNMTX0);
 	
 		GX_Begin(GX_QUADS, GX_VTXFMT0, 4);
-		GX_Position3f32(-width, -height, 0);
-		GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
-		GX_TexCoord2f32(s1, t1);
+			GX_Position3f32(-width, -height, 0);
+			GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
+			GX_TexCoord2f32(s1, t1);
 
-		GX_Position3f32(width, -height, 0);
-		GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
-		GX_TexCoord2f32(s2, t1);
+			GX_Position3f32(width, -height, 0);
+			GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
+			GX_TexCoord2f32(s2, t1);
 
-		GX_Position3f32(width, height, 0);
-		GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
-		GX_TexCoord2f32(s2, t2);
+			GX_Position3f32(width, height, 0);
+			GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
+			GX_TexCoord2f32(s2, t2);
 
-		GX_Position3f32(-width, height, 0);
-		GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
-		GX_TexCoord2f32(s1, t2);
+			GX_Position3f32(-width, height, 0);
+			GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
+			GX_TexCoord2f32(s1, t2);
 		GX_End();
 	}
 	
-	GX_LoadPosMtxImm (GXmodelView2D, GX_PNMTX0);
+	GX_LoadPosMtxImm(GXmodelView2D, GX_PNMTX0);
 
 	GX_SetTevOp (GX_TEVSTAGE0, GX_PASSCLR);
 	GX_SetVtxDesc (GX_VA_TEX0, GX_NONE);

@@ -3,20 +3,12 @@
 
 /**
 * \file
-* \brief This file contains sprites headers.
+* \brief This file contains images headers.
 */
 
 #ifdef __cplusplus
    extern "C" {
 #endif /* __cplusplus */
-
-/**
-* \fn void ML_CloneSprite(ML_Sprite *sprite, ML_Sprite *sprite2)
-* \brief This function clones a sprite.
-* @param sprite New sprite
-* @param sprite2 Cloned sprite
-*/
-extern void ML_CloneSprite(ML_Sprite *sprite, ML_Sprite *sprite2);
 
 /**
 * \fn bool ML_IsSpriteVisible(ML_Sprite *sprite)
@@ -35,10 +27,19 @@ extern bool ML_IsSpriteVisible(ML_Sprite *sprite);
 */
 extern void ML_AnimateSprite(ML_Sprite *sprite, bool enabled, u8 waitForXSecondsBetweenFrames);
 
+/**
+* \fn void ML_AnimateSpriteEx(ML_Sprite *sprite, bool enabled, u8 waitForXRefreshBetweenFrames, u8 from, u8 to)
+* \brief This function animates the sprite which needs to be tiled (and initialized for that). It will animate from "from" to "to" in loops.
+* @param sprite Sprite
+* @param enabled Animation enabled (1) or disabled (0)
+* @param waitForXRefreshBetweenFrames This is the last of time between each frames.
+* @param from From where the sprite will begin the animation
+* @param to To where the sprite will finish the animations
+*/
 extern void ML_AnimateSpriteEx(ML_Sprite *sprite, bool enabled, u8 waitForXRefreshBetweenFrames, u8 from, u8 to);
 
 /**
-* \fn void ML_MoveSpriteWiimotePad(ML_Sprite *sprite, u8 wpad)
+* \fn void ML_MoveImageWiimotePad(ML_Sprite *sprite, u8 wpad)
 * \brief This function moves the sprite with the D-Pad of the Wiimote.
 * @param sprite Sprite
 * @param wpad Which Wiimote
@@ -78,15 +79,15 @@ extern bool ML_IsCollision(const ML_Sprite *sprite, const ML_Sprite *sprite2);
 * @param sprite2 2nd Sprite
 * @return 1 if there is collision, 0 else.
 */
-extern bool ML_IsCollisionEx(const ML_Sprite *sprite, const ML_Sprite *sprite2);
+extern bool ML_IsCollisionEx(const ML_Image *image, ML_Sprite *sprite, const ML_Image *image2, ML_Sprite *sprite2);
 
 /**
-* \fn void ML_Cursor(ML_Sprite *sprite, u8 wpad)
+* \fn void ML_Cursor(ML_Image *image, ML_Sprite *sprite, u8 wpad)
 * \brief This function draws the sprite as a cursor. Wiimote pointer will be in the center of the sprite.
 * @param sprite Sprite
 * @param wpad Which Wiimote
 */
-extern void ML_Cursor(ML_Sprite *sprite, u8 wpad);
+extern void ML_Cursor(ML_Image *image, ML_Sprite *sprite, u8 wpad);
 
 /**
 * \fn void ML_RotateSprite(ML_Sprite *sprite, float angle, u8 autoRotate)

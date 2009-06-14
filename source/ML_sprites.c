@@ -2,17 +2,12 @@
 
 /**
 * \file
-* \brief This file contains sprites functions.
+* \brief This file contains images functions.
 */
-
-void ML_CloneSprite(ML_Sprite *sprite, ML_Sprite *sprite2)
-{
-	*sprite = *sprite2;
-}
 
 bool ML_IsSpriteVisible(ML_Sprite *sprite)
 {
- 	if(!sprite->visible || &sprite->texObj == NULL || sprite->alpha == 0 || sprite->scaleX == 0 || sprite->scaleY == 0 || sprite->width == 0 || sprite->height == 0)
+ 	if(!sprite->visible || sprite->alpha == 0 || sprite->scaleX == 0 || sprite->scaleY == 0 || sprite->width == 0 || sprite->height == 0)
  		sprite->visible = 0;
  	else sprite->visible = 1;
  	
@@ -87,7 +82,7 @@ bool ML_IsCollision(const ML_Sprite *sprite, const ML_Sprite *sprite2)
 	else return true;
 }
 
-bool ML_IsCollisionEx(const ML_Sprite *sprite, const ML_Sprite *sprite2)
+bool ML_IsCollisionEx(const ML_Image *image, ML_Sprite *sprite, const ML_Image *image2, ML_Sprite *sprite2)
 {
 	int sp1_left = sprite->x;
 	int sp1_right = sprite->x + sprite->width*sprite->scaleX;
@@ -150,10 +145,10 @@ bool ML_IsCollisionEx(const ML_Sprite *sprite, const ML_Sprite *sprite2)
 			for(y = 0; y < rect_height; y++)
 			{
 				offset = ((((y + posY_spr1) >> 2)<<4)*sprite->width) + (((x+posX_spr1) >> 2)<<6) + ((((y+posY_spr1)%4 << 2) + (x+posX_spr1)%4 ) << 1); 
-				a1 = *(sprite->data+offset);
+				a1 = *(image->data+offset);
 				
 				offset = ((((y + posY_spr2) >> 2)<<4)*sprite2->width) + (((x+posX_spr2) >> 2)<<6) + ((((y+posY_spr2)%4 << 2) + (x+posX_spr2)%4 ) << 1); 
-				a2 = *(sprite2->data+offset);
+				a2 = *(image2->data+offset);
 				
 				// Teste si les deux pixels ne sont pas transparents
 				if(a1 != 0x00 && a2 != 0x00)
@@ -164,10 +159,10 @@ bool ML_IsCollisionEx(const ML_Sprite *sprite, const ML_Sprite *sprite2)
 	}
 }
 
-void ML_Cursor(ML_Sprite *sprite, u8 wpad)
+void ML_Cursor(ML_Image *image, ML_Sprite *sprite, u8 wpad)
 {
 	ML_MoveSpriteWiimoteIR(sprite, wpad);
-	ML_DrawSprite(sprite);
+	ML_DrawSprite(image, sprite);
 	sprite->x += (sprite->width*sprite->scaleX)/2;
 	sprite->y += (sprite->height*sprite->scaleY)/2;
 }
