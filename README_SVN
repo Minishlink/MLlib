@@ -1,0 +1,6 @@
+If you want to compile this nighty build, you need to have :
+- libpng installed
+- FreeType installed
+- MLlib_Splashscreen.png converted to a .o with bin2o
+
+- If it says "make[1]: *** No rule to make target `ML_font.o'", then you need to edit the Makefile and remove ML_font.o from the MLOBJ variable.
