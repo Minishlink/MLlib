@@ -75,10 +75,7 @@ void ML_CallbackForPowerAndReset(bool GXyes) // Thanks Botskiz !
 // ----------------------------------------
 
 void _flushAndClean(bool GXyes)
-{
-	if(GXyes) ML_Refresh();
-	else ML_RefreshConsoleMode();
-	
+{	
 	if(getAsnd()) { ASND_Pause(1); ASND_End(); }
 	
 	VIDEO_SetBlack(TRUE);

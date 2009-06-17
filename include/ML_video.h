@@ -16,6 +16,7 @@ typedef struct {
 
 // Sprite structure
 typedef struct {
+	ML_Image *image;
 	long i;
 	s16 x, y;
 	s8 dx, dy;
@@ -85,6 +86,8 @@ int _screenWidth, _screenHeight;
 */
 extern bool ML_LoadSpriteFromBuffer(ML_Image *image, ML_Sprite *sprite, const u8 *filename, int x, int y);
 
+extern void ML_DrawSpriteXY2(ML_Sprite *sprite, int x, int y);
+
 /**
 * \fn bool ML_LoadSpriteFromFile(ML_Image *image, ML_Sprite *sprite, char *filename, int x, int y)
 * \brief This function loads a PNG image in memory from a file.
@@ -102,30 +105,24 @@ extern bool ML_LoadBackgroundFromFile(ML_Image *image, ML_Sprite *sprite, ML_Bac
 
 inline bool _loadImage(ML_Image *image, ML_Sprite *sprite, ML_Background *background, char *filename, const u8 *buffer, int x, int y, bool fat);
 
-inline void _initSprite(ML_Sprite *sprite);
-inline void _initBackground(ML_Background *background);
-inline void _initImage(ML_Image *image);
-
-extern void ML_DeleteImage(ML_Image *image);
-
 /**
 * \fn void ML_DrawSprite(ML_Sprite *sprite)
 * \brief This function shows the sprite which is already loaded, of course.
 * @param sprite Sprite
 */
-extern void ML_DrawSprite(ML_Image *image, ML_Sprite *sprite);
+extern void ML_DrawSprite(ML_Sprite *sprite);
 
 /**
-* \fn void ML_DrawSpriteXY(ML_Image *image, ML_Sprite *sprite, int x, int y)
+* \fn void ML_DrawSpriteXY(ML_Sprite *sprite, int x, int y)
 * \brief This function shows the sprite which is already loaded. At X and Y positions.
 * @param sprite Sprite
 * @param x X position
 * @param y Y position
 */
-extern void ML_DrawSpriteXY(ML_Image *image, ML_Sprite *sprite, int x, int y);
+extern void ML_DrawSpriteXY(ML_Sprite *sprite, int x, int y);
 
 /**
-* \fn void ML_DrawSpriteFull(ML_Image *image, ML_Sprite *sprite, int x, int y, float angle, float scaleX, float scaleY, u8 alpha)
+* \fn void ML_DrawSpriteFull(ML_Sprite *sprite, int x, int y, float angle, float scaleX, float scaleY, u8 alpha)
 * \brief This function shows the sprite which is already loaded. It can be faster when you have many things to do on the sprites in a time.
 * @param sprite Sprite
 * @param x X position
@@ -135,7 +132,7 @@ extern void ML_DrawSpriteXY(ML_Image *image, ML_Sprite *sprite, int x, int y);
 * @param scaleY Vertical scale 
 * @param alpha Transparency ( 0 -> 255 )
 */
-extern void ML_DrawSpriteFull(ML_Image *image, ML_Sprite *sprite, int x, int y, float angle, float scaleX, float scaleY, u8 alpha);
+extern void ML_DrawSpriteFull(ML_Sprite *sprite, int x, int y, float angle, float scaleX, float scaleY, u8 alpha);
 
 /**
 * \fn void ML_DrawTexture(GXTexObj *texObj, int x, int y, u16 width, u16 height, float angle, float scaleX, float scaleY, u8 alpha)
@@ -162,14 +159,14 @@ extern void ML_DrawTexture(GXTexObj *texObj, int x, int y, u16 width, u16 height
 extern void ML_InitTile(ML_Sprite *sprite, u16 width, u16 height);
 
 /**
-* \fn void ML_DrawTile(ML_Image *image, ML_Sprite *sprite, int x, int y, u16 frame)
+* \fn void ML_DrawTile(ML_Sprite *sprite, int x, int y, u16 frame)
 * \brief This function draws a tile.
 * @param sprite Sprite
 * @param x X position
 * @param y Y position
 * @param frame Tile n°<frame>
 */
-extern void ML_DrawTile(ML_Image *image, ML_Sprite *sprite, int x, int y, u16 frame);
+extern void ML_DrawTile(ML_Sprite *sprite, int x, int y, u16 frame);
 
 /**
 * \fn void ML_Brightness(u8 alpha)
@@ -194,19 +191,19 @@ extern bool ML_FadeOut();
 extern bool ML_FadeIn();
 
 /**
-* \fn void ML_DrawImageText(ML_Image *image, ML_Sprite *sprite, int x, int y, const char *text, ...)
+* \fn void ML_DrawSpriteText(ML_Sprite *sprite, int x, int y, const char *text, ...)
 * \brief This function draws some graphic text.
 * @param sprite Sprite for extra-features like transparency, etc...
 * @param x X position
 * @param y Y position
 * @param text Text which can have arguments
 */
-extern void ML_DrawImageText(ML_Image *image, ML_Sprite *sprite, int x, int y, const char *text, ...);
+extern void ML_DrawSpriteText(ML_Sprite *sprite, int x, int y, const char *text, ...);
 
-extern void ML_DrawImageTextBox(ML_Image *image, ML_Sprite *sprite, int x, int y, int x2, int y2, const char *text, ...);
+extern void ML_DrawSpriteTextBox(ML_Sprite *sprite, int x, int y, int x2, int y2, const char *text, ...);
 
 /**
-* \fn void ML_DrawImageSimpleText(ML_Image *image, ML_Sprite *sprite, int x, int y, const char *text, ...)
+* \fn void ML_DrawSpriteSimpleText(ML_Sprite *sprite, int x, int y, const char *text, ...)
 * \brief This function draws some graphic text, but with no arguments and other funny thing : just faster !
 * @param image Image of the font
 * @param sprite Sprite for extra-features like transparency, etc...
@@ -214,7 +211,7 @@ extern void ML_DrawImageTextBox(ML_Image *image, ML_Sprite *sprite, int x, int y
 * @param y Y position
 * @param text Text
 */
-extern void ML_DrawImageSimpleText(ML_Image *image, ML_Sprite *sprite, int x, int y, const char *text);
+extern void ML_DrawSpriteSimpleText(ML_Sprite *sprite, int x, int y, const char *text);
 
 /**
 * \fn void ML_SetBackgroundColor(GXColor color)
