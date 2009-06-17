@@ -49,7 +49,7 @@ bool _loadImage(ML_Image *image, ML_Sprite *sprite, ML_Background *background, c
 	if(sprite)
 		_initSprite(sprite);
 	else if(background) _initBackground(background);
-
+	 
 	bool ok = 0;
 	
 	if(fat)
@@ -63,8 +63,14 @@ bool _loadImage(ML_Image *image, ML_Sprite *sprite, ML_Background *background, c
 	
 	if(!ok) return 0;
 	
+	DCFlushRange(image->data, image->width * image->height * 4);
+	
+	GX_InitTexObj(&image->texObj, image->data, image->width, image->height, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);	
+	GX_InitTexObjLOD(&image->texObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, 0, 0, GX_ANISO_1);
+	
 	if(sprite)
 	{
+		sprite->image = image;
 		sprite->width = image->width;
 		sprite->height = image->height;
 		sprite->x = x;
@@ -78,54 +84,15 @@ bool _loadImage(ML_Image *image, ML_Sprite *sprite, ML_Background *background, c
 		background->y = y;
 	}
 	
-	GX_InitTexObj(&image->texObj, image->data, image->width, image->height, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);	
-	GX_InitTexObjLOD(&image->texObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, 0, 0, GX_ANISO_1);
-	
 	return 1;
 }
 
-void _initImage(ML_Image *image)
-{	
-	image->width = 0;
-	image->height = 0;
-	image->data = NULL;
-}
-
-void _initSprite(ML_Sprite *sprite)
-{	
-	*sprite = (ML_Sprite){0};
-	sprite->visible = TRUE;
-	sprite->dx = 1;
-	sprite->dy = 1;
-	sprite->scaleX = 1;
-	sprite->scaleY = 1;
-	sprite->alpha = 255;
-}
-
-void _initBackground(ML_Background *background)
-{	
-	*background = (ML_Background){0};
-	background->visible = TRUE;
-	background->scaleX = 1;
-	background->scaleY = 1;
-	background->alpha = 255;
-}
-
-void ML_DeleteImage(ML_Image *image)
+void ML_DrawSprite(ML_Sprite *sprite)
 {
-	if(image->data)
-	{
-		free(image->data);
-		image->data = NULL;
-	}
+	ML_DrawSpriteXY(sprite, sprite->x, sprite->y);
 }
 
-void ML_DrawSprite(ML_Image *image, ML_Sprite *sprite)
-{
-	ML_DrawSpriteXY(image, sprite, sprite->x, sprite->y);
-}
-
-void ML_DrawSpriteXY(ML_Image *image, ML_Sprite *sprite, int x, int y)
+void ML_DrawSpriteXY(ML_Sprite *sprite, int x, int y)
 {
 	sprite->x = x; sprite->y = y;
 	
@@ -133,10 +100,7 @@ void ML_DrawSpriteXY(ML_Image *image, ML_Sprite *sprite, int x, int y)
 	
 	if(!sprite->animated)
 	{
-		if(!sprite->tiled)
-			_drawImage(&image->texObj, sprite->x, sprite->y, sprite->width, sprite->height, sprite->scaleX, sprite->scaleY, sprite->angle, sprite->alpha, 0, 0, 0, 0);
-		else
-			ML_DrawTile(image, sprite, sprite->x, sprite->y, sprite->currentFrame);
+		_drawImage(&sprite->image->texObj, sprite->x, sprite->y, sprite->width, sprite->height, sprite->scaleX, sprite->scaleY, sprite->angle, sprite->alpha, sprite->tiled, sprite->currentFrame, sprite->tileWidth, sprite->tileHeight);
 	}
 	else
 	{
@@ -147,11 +111,11 @@ void ML_DrawSpriteXY(ML_Image *image, ML_Sprite *sprite, int x, int y)
 			else sprite->currentFrame++;
 		} else sprite->i++;
 		
-		ML_DrawTile(image, sprite, sprite->x, sprite->y, sprite->currentFrame);
+		ML_DrawTile(sprite, sprite->x, sprite->y, sprite->currentFrame);
 	}
 }
 
-void ML_DrawSpriteFull(ML_Image *image, ML_Sprite *sprite, int x, int y, float angle, float scaleX, float scaleY, u8 alpha)
+void ML_DrawSpriteFull(ML_Sprite *sprite, int x, int y, float angle, float scaleX, float scaleY, u8 alpha)
 {
 	sprite->x = x;
 	sprite->y = y;
@@ -160,7 +124,7 @@ void ML_DrawSpriteFull(ML_Image *image, ML_Sprite *sprite, int x, int y, float a
 	sprite->scaleY = scaleY;
 	sprite->alpha = alpha;
 	
-	ML_DrawSpriteXY(image, sprite, sprite->x, sprite->y);
+	ML_DrawSpriteXY(sprite, sprite->x, sprite->y);
 }
 
 void ML_DrawTexture(GXTexObj *texObj, int x, int y, u16 width, u16 height, float angle, float scaleX, float scaleY, u8 alpha)
@@ -176,14 +140,13 @@ void ML_InitTile(ML_Sprite *sprite, u16 width, u16 height)
 	sprite->nbTiles = (sprite->width/sprite->tileWidth) * (sprite->height/sprite->tileHeight);
 }
 
-void ML_DrawTile(ML_Image *image, ML_Sprite *sprite, int x, int y, u16 frame)
+void ML_DrawTile(ML_Sprite *sprite, int x, int y, u16 frame)
 {
 	if(!ML_IsSpriteVisible(sprite)) return;
 	
 	sprite->x = x; sprite->y = y;
 
-	if(sprite->tiled)
-		 _drawImage(&image->texObj, sprite->x, sprite->y, sprite->width, sprite->height, sprite->scaleX, sprite->scaleY, sprite->angle, sprite->alpha, 1, frame, sprite->tileWidth, sprite->tileHeight);
+	_drawImage(&sprite->image->texObj, sprite->x, sprite->y, sprite->width, sprite->height, sprite->scaleX, sprite->scaleY, sprite->angle, sprite->alpha, sprite->tiled, frame, sprite->tileWidth, sprite->tileHeight);
 }
 
 void ML_DrawRect(int x, int y, u16 width, u16 height, u32 rgba)
@@ -240,7 +203,7 @@ bool ML_FadeOut()
 	else return 0;
 }
 
-void ML_DrawImageText(ML_Image *image, ML_Sprite *sprite, int x, int y, const char *text, ...)
+void ML_DrawSpriteText(ML_Sprite *sprite, int x, int y, const char *text, ...)
 { 
     int i = 0, size = 0, j = 0;
     char buffer[1024];
@@ -255,11 +218,11 @@ void ML_DrawImageText(ML_Image *image, ML_Sprite *sprite, int x, int y, const ch
     {
         c = buffer[i]-32;
         if(buffer[i] == '\n' || x+j*sprite->tileWidth*sprite->scaleX >= screenMode->fbWidth) { y += sprite->tileHeight*sprite->scaleY; j = -1; }
-        else ML_DrawTile(image, sprite, x+j*sprite->tileWidth*sprite->scaleX, y, c); j++; 
+        else ML_DrawTile(sprite, x+j*sprite->tileWidth*sprite->scaleX, y, c); j++; 
     }
 }
 
-void ML_DrawImageTextBox(ML_Image *image, ML_Sprite *sprite, int x, int y, int x2, int y2, const char *text, ...)
+void ML_DrawSpriteTextBox(ML_Sprite *sprite, int x, int y, int x2, int y2, const char *text, ...)
 {
 	int i = 0, size = 0, j = 0;
     char buffer[1024];
@@ -275,11 +238,11 @@ void ML_DrawImageTextBox(ML_Image *image, ML_Sprite *sprite, int x, int y, int x
         c = buffer[i]-32;
         if(y > y2) return;
         if(buffer[i] == '\n' || x+j*sprite->tileWidth*sprite->scaleX >= x2) { y += sprite->tileHeight*sprite->scaleY; j = -1; }
-        else ML_DrawTile(image, sprite, x+j*sprite->tileWidth*sprite->scaleX, y, c); j++; 
+        else ML_DrawTile(sprite, x+j*sprite->tileWidth*sprite->scaleX, y, c); j++; 
     }
 }
 
-void ML_DrawImageSimpleText(ML_Image *image, ML_Sprite *sprite, int x, int y, const char *text)
+void ML_DrawSpriteSimpleText(ML_Sprite *sprite, int x, int y, const char *text)
 {
 	int i = 0, size = strlen(text);
 	u8 c = 0;
@@ -287,7 +250,7 @@ void ML_DrawImageSimpleText(ML_Image *image, ML_Sprite *sprite, int x, int y, co
     for(i=0; i < size; i++)
     {
         c = text[i]-32;
-        ML_DrawTile(image, sprite, x+i*sprite->tileWidth*sprite->scaleX, y, c);
+        ML_DrawTile(sprite, x+i*sprite->tileWidth*sprite->scaleX, y, c);
     }
 }
 
@@ -346,6 +309,8 @@ void ML_SplashScreen()
 	
 	GX_InitTexObj(&image.texObj, image.data, image.width, image.height, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
 	GX_InitTexObjLOD(&image.texObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, 0, 0, GX_ANISO_1);
+	
+	DCFlushRange(image.data, image.width * image.height * 4);
 	
 	while(ok)
 	{

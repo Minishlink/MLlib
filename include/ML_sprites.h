@@ -3,12 +3,22 @@
 
 /**
 * \file
-* \brief This file contains images headers.
+* \brief This file contains sprites headers.
 */
 
 #ifdef __cplusplus
    extern "C" {
 #endif /* __cplusplus */
+
+inline void _initSprite(ML_Sprite *sprite);
+
+/**
+* \fn void ML_CloneSprite(ML_Sprite *sprite1, ML_Sprite *sprite2)
+* \brief This function clones two sprites.
+* @param sprite1 The original sprite
+* @param sprite2 The sprite which will be the same as sprite1
+*/
+extern void ML_CloneSprite(ML_Sprite *sprite1, ML_Sprite *sprite2);
 
 /**
 * \fn bool ML_IsSpriteVisible(ML_Sprite *sprite)
@@ -39,7 +49,7 @@ extern void ML_AnimateSprite(ML_Sprite *sprite, bool enabled, u8 waitForXSeconds
 extern void ML_AnimateSpriteEx(ML_Sprite *sprite, bool enabled, u8 waitForXRefreshBetweenFrames, u8 from, u8 to);
 
 /**
-* \fn void ML_MoveImageWiimotePad(ML_Sprite *sprite, u8 wpad)
+* \fn void ML_MoveSpriteWiimotePad(ML_Sprite *sprite, u8 wpad)
 * \brief This function moves the sprite with the D-Pad of the Wiimote.
 * @param sprite Sprite
 * @param wpad Which Wiimote
@@ -79,15 +89,15 @@ extern bool ML_IsCollision(const ML_Sprite *sprite, const ML_Sprite *sprite2);
 * @param sprite2 2nd Sprite
 * @return 1 if there is collision, 0 else.
 */
-extern bool ML_IsCollisionEx(const ML_Image *image, ML_Sprite *sprite, const ML_Image *image2, ML_Sprite *sprite2);
+extern bool ML_IsCollisionEx(const ML_Sprite *sprite, const ML_Sprite *sprite2);
 
 /**
-* \fn void ML_Cursor(ML_Image *image, ML_Sprite *sprite, u8 wpad)
+* \fn void ML_Cursor(ML_Sprite *sprite, u8 wpad)
 * \brief This function draws the sprite as a cursor. Wiimote pointer will be in the center of the sprite.
 * @param sprite Sprite
 * @param wpad Which Wiimote
 */
-extern void ML_Cursor(ML_Image *image, ML_Sprite *sprite, u8 wpad);
+extern void ML_Cursor(ML_Sprite *sprite, u8 wpad);
 
 /**
 * \fn void ML_RotateSprite(ML_Sprite *sprite, float angle, u8 autoRotate)

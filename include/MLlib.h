@@ -58,6 +58,8 @@
 #include "ML_input.h"
 #include "ML_mp3player.h"
 #include "ML_modplayer.h"
+#include "ML_backgrounds.h"
+#include "ML_images.h"
 #include "ML_font.h"
 #include "PNG.h"
 

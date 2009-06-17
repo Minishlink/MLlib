@@ -2,8 +2,24 @@
 
 /**
 * \file
-* \brief This file contains images functions.
+* \brief This file contains sprites functions.
 */
+
+void _initSprite(ML_Sprite *sprite)
+{		
+	*sprite = (ML_Sprite){0};
+	sprite->visible = TRUE;
+	sprite->dx = 1;
+	sprite->dy = 1;
+	sprite->scaleX = 1;
+	sprite->scaleY = 1;
+	sprite->alpha = 255;
+}
+
+void ML_CloneSprite(ML_Sprite *sprite1, ML_Sprite *sprite2)
+{
+	*sprite2 = *sprite1;
+}
 
 bool ML_IsSpriteVisible(ML_Sprite *sprite)
 {
@@ -82,7 +98,7 @@ bool ML_IsCollision(const ML_Sprite *sprite, const ML_Sprite *sprite2)
 	else return true;
 }
 
-bool ML_IsCollisionEx(const ML_Image *image, ML_Sprite *sprite, const ML_Image *image2, ML_Sprite *sprite2)
+bool ML_IsCollisionEx(const ML_Sprite *sprite, const ML_Sprite *sprite2)
 {
 	int sp1_left = sprite->x;
 	int sp1_right = sprite->x + sprite->width*sprite->scaleX;
@@ -145,10 +161,10 @@ bool ML_IsCollisionEx(const ML_Image *image, ML_Sprite *sprite, const ML_Image *
 			for(y = 0; y < rect_height; y++)
 			{
 				offset = ((((y + posY_spr1) >> 2)<<4)*sprite->width) + (((x+posX_spr1) >> 2)<<6) + ((((y+posY_spr1)%4 << 2) + (x+posX_spr1)%4 ) << 1); 
-				a1 = *(image->data+offset);
+				a1 = *(sprite->image->data+offset);
 				
 				offset = ((((y + posY_spr2) >> 2)<<4)*sprite2->width) + (((x+posX_spr2) >> 2)<<6) + ((((y+posY_spr2)%4 << 2) + (x+posX_spr2)%4 ) << 1); 
-				a2 = *(image2->data+offset);
+				a2 = *(sprite2->image->data+offset);
 				
 				// Teste si les deux pixels ne sont pas transparents
 				if(a1 != 0x00 && a2 != 0x00)
@@ -159,10 +175,10 @@ bool ML_IsCollisionEx(const ML_Image *image, ML_Sprite *sprite, const ML_Image *
 	}
 }
 
-void ML_Cursor(ML_Image *image, ML_Sprite *sprite, u8 wpad)
+void ML_Cursor(ML_Sprite *sprite, u8 wpad)
 {
 	ML_MoveSpriteWiimoteIR(sprite, wpad);
-	ML_DrawSprite(image, sprite);
+	ML_DrawSprite(sprite);
 	sprite->x += (sprite->width*sprite->scaleX)/2;
 	sprite->y += (sprite->height*sprite->scaleY)/2;
 }

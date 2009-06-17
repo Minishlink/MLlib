@@ -13,9 +13,9 @@ bool read_png_gx_file(char* file_name, ML_Image *image)
 {
     u32 x = 0, y = 0;
     int r = 0;
-    
-    png_byte color_type;
+
 	png_byte bit_depth;
+	png_byte color_type;
 
 	png_structp png_ptr;
 	png_infop info_ptr;
@@ -179,9 +179,9 @@ bool read_png_gx_file_buffer(const u8* file_name, ML_Image *image)
 {
  	u32 x = 0, y = 0;
     int r = 0;
-    
-    png_byte color_type;
+
 	png_byte bit_depth;
+	png_byte color_type;
 
 	png_structp png_ptr;
 	png_infop info_ptr;
@@ -311,9 +311,6 @@ bool read_png_gx_file_buffer(const u8* file_name, ML_Image *image)
 			}
 		}
 	}
-	
-	// Move flush cached memory.
-	DCFlushRange(image->data, image->width * image->height * 4);
 	
 	// Free up some memory
 	if(row_pointers){
