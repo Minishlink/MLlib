@@ -52,7 +52,7 @@ extern void ML_SetPowerMode(int value);
 
 void ML_CallbackForPowerAndReset(bool GXyes);
 
-void _flushAndClean(bool GXyes);
+void _flushAndClean(bool GXyes, bool refresh);
 
 /**
 * \fn void ML_Debug(const char* filename)

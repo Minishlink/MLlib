@@ -242,6 +242,15 @@ void ML_DrawSpriteTextBox(ML_Sprite *sprite, int x, int y, int x2, int y2, const
     }
 }
 
+// Contribution of Cid2Mizard
+void ML_DrawSpriteTextLimit(ML_Sprite *sprite, int x, int y, char *text, u8 limit) 
+{
+	char temp = text[limit];  
+	text[limit] = 0;  
+	ML_DrawSpriteSimpleText(sprite, x, y, text);  
+	text[limit] = temp;
+}
+
 void ML_DrawSpriteSimpleText(ML_Sprite *sprite, int x, int y, const char *text)
 {
 	int i = 0, size = strlen(text);
@@ -435,10 +444,11 @@ void _drawImage(GXTexObj *texObj, int x, int y, u16 _width, u16 _height, float s
 		GX_SetTevOp(GX_TEVSTAGE0, GX_MODULATE);
 		GX_SetVtxDesc(GX_VA_TEX0, GX_DIRECT);
 
-		//width = (_width*scaleX)*0.5;
-		//height = (_height*scaleY)*0.5;
-		width = _width>>1;
-		height = _height>>1;
+		width = (_width*scaleX)*0.5;
+		height = (_height*scaleY)*0.5;
+		//width = _width>>1;
+		//height = _height>>1;
+		
 		guMtxIdentity (m1);
 		guMtxScaleApply(m1, m1, scaleX, scaleY, 1.0);
 		Vector axis = (Vector) {0, 0, 1};
