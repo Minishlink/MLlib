@@ -118,15 +118,6 @@ extern void ML_RotateSprite(ML_Sprite *sprite, float angle, u8 autoRotate);
 extern void ML_SetSpriteXY(ML_Sprite *sprite, int x, int y);
 
 /**
-* \fn void ML_SetSpriteScale(ML_Sprite *sprite, float scaleX, float scaleY)
-* \brief This function changes the Scale X and Scale Y of the sprite.
-* @param sprite Sprite
-* @param scaleX New scale for the width of the sprite
-* @param scaleY New scale for the height of the sprite
-*/
-extern void ML_SetSpriteScale(ML_Sprite *sprite, float scaleX, float scaleY);
-
-/**
 * \fn void ML_SetSpriteX(ML_Sprite *sprite, int x)
 * \brief This function changes the X position of the sprite.
 * @param sprite Sprite
@@ -141,6 +132,15 @@ extern void ML_SetSpriteX(ML_Sprite *sprite, int x);
 * @param y New Y position
 */
 extern void ML_SetSpriteY(ML_Sprite *sprite, int y);
+
+/**
+* \fn void ML_SetSpriteScale(ML_Sprite *sprite, float scaleX, float scaleY)
+* \brief This function changes the Scale X and Scale Y of the sprite.
+* @param sprite Sprite
+* @param scaleX New scale for the width of the sprite
+* @param scaleY New scale for the height of the sprite
+*/
+extern void ML_SetSpriteScale(ML_Sprite *sprite, float scaleX, float scaleY);
 
 /**
 * \fn void ML_SetSpriteSize(ML_Sprite *sprite, u16 width, u16 height)
