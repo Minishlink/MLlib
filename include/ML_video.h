@@ -7,44 +7,59 @@
 
 #define DEFAULT_FIFO_SIZE	(1024*1024)
 
-// Image structure
+/**
+* \struct ML_Image
+* \brief This is the structure for images.
+*/
 typedef struct { 
-	GXTexObj texObj;
-	u8 *data;
-	u16 width, height;
+	GXTexObj texObj; /*!< Texture */
+	u8 *data; /*!< Data (ARGB) */
+	u16 width, /*!< Width */
+	height; /*!< Height */
 } ML_Image;
 
-// Sprite structure
+/**
+* \struct ML_Sprite
+* \brief This is the structure for sprites.
+*/
 typedef struct {
-	ML_Image *image;
-	long i;
-	s16 x, y;
-	s8 dx, dy;
-	bool visible;
-	u16 width;
-	u16 height;
-	u8 rotated;
-	u8 alpha;
-	float scaleX, scaleY;
-	float angle;
-	bool tiled;
-	bool animated;
-	u8 waitForXRefreshBetweenFrames;
-	u8 anime_from, anime_to;
-	u16 currentFrame;
-	u16 nbTiles;
-	u16 tileWidth, tileHeight;
+	ML_Image *image;  /*!< Pointer to the image associated with */
+	long i;  /*!< Used for the animation */
+	s16 x,  /*!< X position */
+	y; /*!< Y position */
+	s8 dx, /*!< X velocity */
+	dy; /*!< Y velocity */
+	bool visible; /*!< Member for setting the sprite visible or not */
+	u16 width; /*!< Width */
+	u16 height; /*!< Height */
+	u8 rotated; /*!< Is rotation enabled */
+	u8 alpha; /*!< Transparency (0-255) */
+	float scaleX, /*!< X scaling */
+	scaleY; /*!< Y scaling */
+	float angle; /*!< Angle in degrees */
+	bool tiled; /*!< Is tiling enabled */
+	bool animated; /*!< Is animation enabled */
+	u8 waitForXRefreshBetweenFrames;  /*!< Number of cycles between each frame changes */
+	u8 anime_from, /*!< Animation start at... */
+	anime_to; /*!< Animation end at... */
+	u16 currentFrame; /*!< Current frame */
+	u16 nbTiles; /*!< Number of tiles */
+	u16 tileWidth, /*!< Width of one tile */
+	tileHeight; /*!< Height of one tile */
 } ML_Sprite;
 
-// Background structure
-typedef struct { 
-	s16 x, y;
-	u16 width, height;
-	float scaleX, scaleY;
-	bool visible;
-	u8 rotated;
-	u8 alpha;
-	float angle;
+/**
+* \struct ML_Background
+* \brief This is the structure for backgrounds.
+*/
+typedef struct {
+	u16 width, /*!< Width */
+	height; /*!< Height */
+	float scaleX, /*!< X scaling */
+	scaleY; /*!< Y scaling */
+	u8 rotated; /*!< Is rotation enabled */
+	u8 alpha; /*!< Transparency (0-255) */
+	float angle; /*!< Angle in degrees */
 } ML_Background;
 
 // BMP structure

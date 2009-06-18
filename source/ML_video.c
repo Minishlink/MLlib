@@ -80,8 +80,6 @@ bool _loadImage(ML_Image *image, ML_Sprite *sprite, ML_Background *background, c
 	{
 		background->width = image->width;
 		background->height = image->height;
-		background->x = x;
-		background->y = y;
 	}
 	
 	return 1;
