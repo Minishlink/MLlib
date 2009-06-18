@@ -86,8 +86,6 @@ int _screenWidth, _screenHeight;
 */
 extern bool ML_LoadSpriteFromBuffer(ML_Image *image, ML_Sprite *sprite, const u8 *filename, int x, int y);
 
-extern void ML_DrawSpriteXY2(ML_Sprite *sprite, int x, int y);
-
 /**
 * \fn bool ML_LoadSpriteFromFile(ML_Image *image, ML_Sprite *sprite, char *filename, int x, int y)
 * \brief This function loads a PNG image in memory from a file.
@@ -200,12 +198,32 @@ extern bool ML_FadeIn();
 */
 extern void ML_DrawSpriteText(ML_Sprite *sprite, int x, int y, const char *text, ...);
 
+/**
+* \fn void ML_DrawSpriteTextLimit(ML_Sprite *sprite, int x, int y, char *text, u8 limit)
+* \brief This function draws some graphic text with a limit of characters.
+* @param sprite Sprite for extra-features like transparency, etc...
+* @param x X position
+* @param y Y position
+* @param text Text
+* @param limit Limit of characters
+*/
+extern inline void ML_DrawSpriteTextLimit(ML_Sprite *sprite, int x, int y, char *text, u8 limit);
+
+/**
+* \fn void ML_DrawSpriteTextBox(ML_Sprite *sprite, int x, int y, int x2, int y2, const char *text, ...)
+* \brief This function draws some graphic text within a box.
+* @param sprite Sprite for extra-features like transparency, etc...
+* @param x X position of the left-upper corner
+* @param y Y position of the left-bottom corner
+* @param x2 X position of the right-upper corner
+* @param x2 Y position of the right-bottom corner
+* @param text Text
+*/
 extern void ML_DrawSpriteTextBox(ML_Sprite *sprite, int x, int y, int x2, int y2, const char *text, ...);
 
 /**
 * \fn void ML_DrawSpriteSimpleText(ML_Sprite *sprite, int x, int y, const char *text, ...)
 * \brief This function draws some graphic text, but with no arguments and other funny thing : just faster !
-* @param image Image of the font
 * @param sprite Sprite for extra-features like transparency, etc...
 * @param x X position
 * @param y Y position

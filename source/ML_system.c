@@ -9,19 +9,21 @@
 
 void ML_SetPowerMode(int value)
 {
-   int fd = -1;
+	int fd = -1;
 
-   if (!((value > 0x2000) && (value < 0x2006))) { return; }
-   fd = IOS_Open("/dev/stm/immediate", 0);
-   IOS_Ioctl(fd, value, NULL, 0, NULL, 0);
-   IOS_Close(fd);
+	_flushAndClean(1, 1);
+
+	if (!((value > 0x2000) && (value < 0x2006))) { return; }
+	fd = IOS_Open("/dev/stm/immediate", 0);
+	IOS_Ioctl(fd, value, NULL, 0, NULL, 0);
+	IOS_Close(fd);
 }
 
 //---------------------------------------------
 
 void ML_Exit()
 {
-	_flushAndClean(true);
+	_flushAndClean(1, 1);
 	
 	char * sig = (char *)0x80001804;
 	if( sig[0] == 'S' &&
@@ -40,7 +42,7 @@ void ML_Exit()
 
 void ML_ExitConsoleMode()
 {
-	_flushAndClean(false);
+	_flushAndClean(0, 1);
 	
 	char * sig = (char *)0x80001804;
 	if( sig[0] == 'S' &&
@@ -61,12 +63,12 @@ void ML_CallbackForPowerAndReset(bool GXyes) // Thanks Botskiz !
 {	
 	if(bReset) // Reset the system.
 	{
-		_flushAndClean(GXyes);
+		_flushAndClean(GXyes, 0);
 		SYS_ResetSystem(SYS_RETURNTOMENU, 0, 0);
 	}
 	else if(bPowerOff) // Shut the system down.
 	{
-		_flushAndClean(GXyes);
+		_flushAndClean(GXyes, 0);
 		SYS_ResetSystem(SYS_POWEROFF, 0, 0);
 	}
 }
@@ -74,8 +76,14 @@ void ML_CallbackForPowerAndReset(bool GXyes) // Thanks Botskiz !
 
 // ----------------------------------------
 
-void _flushAndClean(bool GXyes)
+void _flushAndClean(bool GXyes, bool refresh)
 {	
+	if(refresh)
+	{
+		if(GXyes) ML_Refresh();
+		else ML_RefreshConsoleMode();
+	}
+	
 	if(getAsnd()) { ASND_Pause(1); ASND_End(); }
 	
 	VIDEO_SetBlack(TRUE);
