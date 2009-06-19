@@ -13,6 +13,11 @@ void _initBackground(ML_Background *background)
 	background->alpha = 255;
 }
 
+void ML_DrawBackground(ML_Background *background)
+{
+	_drawImage(&background->image->texObj, 0, 0, background->width, background->height, background->scaleX, background->scaleY, background->angle, background->alpha, 0, 0, 0, 0);
+}
+
 void ML_CloneBackground(ML_Background *background1, ML_Background *background2)
 {
 	*background2 = *background1;

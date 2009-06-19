@@ -16,6 +16,63 @@ void _initSprite(ML_Sprite *sprite)
 	sprite->alpha = 255;
 }
 
+void ML_DrawSprite(ML_Sprite *sprite)
+{
+	ML_DrawSpriteXY(sprite, sprite->x, sprite->y);
+}
+
+void ML_DrawSpriteXY(ML_Sprite *sprite, int x, int y)
+{
+	sprite->x = x; sprite->y = y;
+	
+	if(!ML_IsSpriteVisible(sprite)) return;
+	
+	if(!sprite->animated)
+	{
+		_drawImage(&sprite->image->texObj, sprite->x, sprite->y, sprite->width, sprite->height, sprite->scaleX, sprite->scaleY, sprite->angle, sprite->alpha, sprite->tiled, sprite->currentFrame, sprite->tileWidth, sprite->tileHeight);
+	}
+	else
+	{
+		if(sprite->i == sprite->waitForXRefreshBetweenFrames)
+		{
+			sprite->i = 0;
+			if(sprite->currentFrame == sprite->anime_to-1) sprite->currentFrame = sprite->anime_from;
+			else sprite->currentFrame++;
+		} else sprite->i++;
+		
+		ML_DrawTile(sprite, sprite->x, sprite->y, sprite->currentFrame);
+	}
+}
+
+void ML_DrawSpriteFull(ML_Sprite *sprite, int x, int y, float angle, float scaleX, float scaleY, u8 alpha)
+{
+	sprite->x = x;
+	sprite->y = y;
+	sprite->angle = angle;
+	sprite->scaleX = scaleX;
+	sprite->scaleY = scaleY;
+	sprite->alpha = alpha;
+	
+	ML_DrawSpriteXY(sprite, sprite->x, sprite->y);
+}
+
+void ML_InitTile(ML_Sprite *sprite, u16 width, u16 height)
+{
+	sprite->tiled = TRUE;
+	sprite->tileWidth = width;
+	sprite->tileHeight = height;
+	sprite->nbTiles = (sprite->width/sprite->tileWidth) * (sprite->height/sprite->tileHeight);
+}
+
+void ML_DrawTile(ML_Sprite *sprite, int x, int y, u16 frame)
+{
+	if(!ML_IsSpriteVisible(sprite)) return;
+	
+	 sprite->x = x; sprite->y = y;
+
+	_drawImage(&sprite->image->texObj, sprite->x, sprite->y, sprite->width, sprite->height, sprite->scaleX, sprite->scaleY, sprite->angle, sprite->alpha, sprite->tiled, frame, sprite->tileWidth, sprite->tileHeight);
+}
+
 void ML_CloneSprite(ML_Sprite *sprite1, ML_Sprite *sprite2)
 {
 	*sprite2 = *sprite1;
