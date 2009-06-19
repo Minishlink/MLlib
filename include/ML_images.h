@@ -27,6 +27,27 @@ extern void ML_CloneImage(ML_Image *image1, ML_Image *image2);
 */
 extern void ML_DeleteImage(ML_Image *image);
 
+/**
+* \fn void ML_FlipImageX(ML_Image *image)
+* \brief This function flips the image horizontally.
+* @param image Image
+*/
+extern void ML_FlipImageX(ML_Image *image);
+
+/**
+* \fn void ML_FlipImageY(ML_Image *image)
+* \brief This function flips the image vertically.
+* @param image Image
+*/
+extern void ML_FlipImageY(ML_Image *image);
+
+/**
+* \fn void ML_InvertImageColors(ML_Image *image)
+* \brief This function inverts the image colors.
+* @param image Image
+*/
+extern void ML_InvertImageColors(ML_Image *image);
+
 #ifdef __cplusplus
    }
 #endif /* __cplusplus */
