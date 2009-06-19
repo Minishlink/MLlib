@@ -11,6 +11,9 @@ static Mtx GXmodelView2D;
 
 // Others
 static u8 _alphaFade;
+static bool _fadeMode = 0;
+#define FADE_OUT	0
+#define FADE_IN		1
 
 /**
 * \file
@@ -125,6 +128,12 @@ void ML_Brightness(u8 alpha)
 
 bool ML_FadeIn()
 {
+	if(!_fadeMode == FADE_IN)
+	{
+		_fadeMode = FADE_IN;
+		_alphaFade = 255;
+	}
+	
 	if(_alphaFade > 240) _alphaFade -= 5;
 	else if(_alphaFade <= 240 && _alphaFade > 0) _alphaFade-=4;
 			
@@ -136,6 +145,12 @@ bool ML_FadeIn()
 
 bool ML_FadeOut()
 {
+	if(!_fadeMode == FADE_OUT)
+	{
+		_fadeMode = FADE_OUT;
+		_alphaFade = 0;
+	}
+	
 	if(_alphaFade < 240) _alphaFade += 4;
 	else if(_alphaFade >= 240 && _alphaFade < 255) _alphaFade+=5;
 			
@@ -143,69 +158,6 @@ bool ML_FadeOut()
 	
 	if(_alphaFade == 255) return 1;
 	else return 0;
-}
-
-void ML_DrawSpriteText(ML_Sprite *sprite, int x, int y, const char *text, ...)
-{ 
-    int i = 0, size = 0, j = 0;
-    char buffer[1024];
-	u8 c = 0;
-	y += sprite->tileHeight*sprite->scaleY;
-	
-    va_list argp;
-    va_start(argp, text);
-    size = vsprintf(buffer, text, argp);
-    va_end(argp);
-	
-    for(i=0; i < size; i++) 
-    {
-        c = buffer[i]-32;
-        if(buffer[i] == '\n' || x+j*sprite->tileWidth*sprite->scaleX >= screenMode->fbWidth) { y += sprite->tileHeight*sprite->scaleY; j = -1; }
-        else ML_DrawTile(sprite, x+j*sprite->tileWidth*sprite->scaleX, y, c); j++; 
-    }
-}
-
-void ML_DrawSpriteTextBox(ML_Sprite *sprite, int x, int y, int x2, int y2, const char *text, ...)
-{
-	int i = 0, size = 0, j = 0;
-    char buffer[1024];
-	u8 c = 0;
-	y += sprite->tileHeight*sprite->scaleY;
-	
-    va_list argp;
-    va_start(argp, text);
-    size = vsprintf(buffer, text, argp);
-    va_end(argp);
-	
-    for(i=0; i < size; i++) 
-    {
-        c = buffer[i]-32;
-        if(y > y2) return;
-        if(buffer[i] == '\n' || x+j*sprite->tileWidth*sprite->scaleX >= x2) { y += sprite->tileHeight*sprite->scaleY; j = -1; }
-        else ML_DrawTile(sprite, x+j*sprite->tileWidth*sprite->scaleX, y, c); j++; 
-    }
-}
-
-// Contribution of Cid2Mizard
-void ML_DrawSpriteTextLimit(ML_Sprite *sprite, int x, int y, char *text, u8 limit) 
-{
-	char temp = text[limit];  
-	text[limit] = 0;  
-	ML_DrawSpriteSimpleText(sprite, x, y, text);  
-	text[limit] = temp;
-}
-
-void ML_DrawSpriteSimpleText(ML_Sprite *sprite, int x, int y, const char *text)
-{
-	int i = 0, size = strlen(text);
-	u8 c = 0;
-	y += sprite->tileHeight*sprite->scaleY;
-	
-    for(i=0; i < size; i++)
-    {
-        c = text[i]-32;
-        ML_DrawTile(sprite, x+i*sprite->tileWidth*sprite->scaleX, y, c);
-    }
 }
 
 void ML_SetBackgroundColor(GXColor color)
@@ -258,7 +210,7 @@ void ML_SplashScreen()
 	_initImage(&image);
 	ok = read_png_gx_file_buffer(MLlib_SplashScreen_png, &image);
 	
-	_alphaFade = 255;
+	//_alphaFade = 255;
 	
 	if(!ok)
 		return;

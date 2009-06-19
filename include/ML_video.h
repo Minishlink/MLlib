@@ -135,6 +135,17 @@ inline bool _loadImage(ML_Image *image, ML_Sprite *sprite, ML_Background *backgr
 extern void ML_DrawTexture(GXTexObj *texObj, int x, int y, u16 width, u16 height, float angle, float scaleX, float scaleY, u8 alpha);
 
 /**
+* \fn void ML_DrawRect(int x, int y, u16 width, u16 height, u32 rgba)
+* \brief This function shows a rectangle with the color you want.
+* @param x X position
+* @param y Y position
+* @param width Width
+* @param height Height
+* @param rgba RGBA Color (HTML Color) like 0xFF0016FF (0xRED+GREEN+BLUE+ALPHA)
+*/
+extern void ML_DrawRect(int x, int y, u16 width, u16 height, u32 rgba);
+
+/**
 * \fn void ML_Brightness(u8 alpha)
 * \brief This function changes the opacity of the entire screen.
 * In fact, it draws a black rectangle which will be opacified.
@@ -155,49 +166,6 @@ extern bool ML_FadeOut();
 * @return 1 if it's finished, 0 if not.
 */
 extern bool ML_FadeIn();
-
-/**
-* \fn void ML_DrawSpriteText(ML_Sprite *sprite, int x, int y, const char *text, ...)
-* \brief This function draws some graphic text.
-* @param sprite Sprite for extra-features like transparency, etc...
-* @param x X position
-* @param y Y position
-* @param text Text which can have arguments
-*/
-extern void ML_DrawSpriteText(ML_Sprite *sprite, int x, int y, const char *text, ...);
-
-/**
-* \fn void ML_DrawSpriteTextLimit(ML_Sprite *sprite, int x, int y, char *text, u8 limit)
-* \brief This function draws some graphic text with a limit of characters.
-* @param sprite Sprite for extra-features like transparency, etc...
-* @param x X position
-* @param y Y position
-* @param text Text
-* @param limit Limit of characters
-*/
-extern inline void ML_DrawSpriteTextLimit(ML_Sprite *sprite, int x, int y, char *text, u8 limit);
-
-/**
-* \fn void ML_DrawSpriteTextBox(ML_Sprite *sprite, int x, int y, int x2, int y2, const char *text, ...)
-* \brief This function draws some graphic text within a box.
-* @param sprite Sprite for extra-features like transparency, etc...
-* @param x X position of the left-upper corner
-* @param y Y position of the left-bottom corner
-* @param x2 X position of the right-upper corner
-* @param x2 Y position of the right-bottom corner
-* @param text Text
-*/
-extern void ML_DrawSpriteTextBox(ML_Sprite *sprite, int x, int y, int x2, int y2, const char *text, ...);
-
-/**
-* \fn void ML_DrawSpriteSimpleText(ML_Sprite *sprite, int x, int y, const char *text, ...)
-* \brief This function draws some graphic text, but with no arguments and other funny thing : just faster !
-* @param sprite Sprite for extra-features like transparency, etc...
-* @param x X position
-* @param y Y position
-* @param text Text
-*/
-extern void ML_DrawSpriteSimpleText(ML_Sprite *sprite, int x, int y, const char *text);
 
 /**
 * \fn void ML_SetBackgroundColor(GXColor color)
