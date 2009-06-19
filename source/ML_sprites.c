@@ -73,6 +73,69 @@ void ML_DrawTile(ML_Sprite *sprite, int x, int y, u16 frame)
 	_drawImage(&sprite->image->texObj, sprite->x, sprite->y, sprite->width, sprite->height, sprite->scaleX, sprite->scaleY, sprite->angle, sprite->alpha, sprite->tiled, frame, sprite->tileWidth, sprite->tileHeight);
 }
 
+void ML_DrawSpriteText(ML_Sprite *sprite, int x, int y, const char *text, ...)
+{ 
+    int i = 0, size = 0, j = 0;
+    char buffer[1024];
+	u8 c = 0;
+	y += sprite->tileHeight*sprite->scaleY;
+	
+    va_list argp;
+    va_start(argp, text);
+    size = vsprintf(buffer, text, argp);
+    va_end(argp);
+	
+    for(i=0; i < size; i++) 
+    {
+        c = buffer[i]-32;
+        if(buffer[i] == '\n' || x+j*sprite->tileWidth*sprite->scaleX >= screenMode->fbWidth) { y += sprite->tileHeight*sprite->scaleY; j = -1; }
+        else ML_DrawTile(sprite, x+j*sprite->tileWidth*sprite->scaleX, y, c); j++; 
+    }
+}
+
+void ML_DrawSpriteTextBox(ML_Sprite *sprite, int x, int y, int x2, int y2, const char *text, ...)
+{
+	int i = 0, size = 0, j = 0;
+    char buffer[1024];
+	u8 c = 0;
+	y += sprite->tileHeight*sprite->scaleY;
+	
+    va_list argp;
+    va_start(argp, text);
+    size = vsprintf(buffer, text, argp);
+    va_end(argp);
+	
+    for(i=0; i < size; i++) 
+    {
+        c = buffer[i]-32;
+        if(y > y2) return;
+        if(buffer[i] == '\n' || x+j*sprite->tileWidth*sprite->scaleX >= x2) { y += sprite->tileHeight*sprite->scaleY; j = -1; }
+        else ML_DrawTile(sprite, x+j*sprite->tileWidth*sprite->scaleX, y, c); j++; 
+    }
+}
+
+// Contribution of Cid2Mizard
+void ML_DrawSpriteTextLimit(ML_Sprite *sprite, int x, int y, char *text, u8 limit) 
+{
+	char temp = text[limit];  
+	text[limit] = 0;  
+	ML_DrawSpriteSimpleText(sprite, x, y, text);  
+	text[limit] = temp;
+}
+
+void ML_DrawSpriteSimpleText(ML_Sprite *sprite, int x, int y, const char *text)
+{
+	int i = 0, size = strlen(text);
+	u8 c = 0;
+	y += sprite->tileHeight*sprite->scaleY;
+	
+    for(i=0; i < size; i++)
+    {
+        c = text[i]-32;
+        ML_DrawTile(sprite, x+i*sprite->tileWidth*sprite->scaleX, y, c);
+    }
+}
+
 void ML_CloneSprite(ML_Sprite *sprite1, ML_Sprite *sprite2)
 {
 	*sprite2 = *sprite1;
