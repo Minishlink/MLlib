@@ -13,6 +13,54 @@
 inline void _initSprite(ML_Sprite *sprite);
 
 /**
+* \fn void ML_DrawSprite(ML_Sprite *sprite)
+* \brief This function shows the sprite which is already loaded, of course.
+* @param sprite Sprite
+*/
+extern void ML_DrawSprite(ML_Sprite *sprite);
+
+/**
+* \fn void ML_DrawSpriteXY(ML_Sprite *sprite, int x, int y)
+* \brief This function shows the sprite which is already loaded. At X and Y positions.
+* @param sprite Sprite
+* @param x X position
+* @param y Y position
+*/
+extern void ML_DrawSpriteXY(ML_Sprite *sprite, int x, int y);
+
+/**
+* \fn void ML_DrawSpriteFull(ML_Sprite *sprite, int x, int y, float angle, float scaleX, float scaleY, u8 alpha)
+* \brief This function shows the sprite which is already loaded. It can be faster when you have many things to do on the sprites in a time.
+* @param sprite Sprite
+* @param x X position
+* @param y Y position
+* @param angle Angle in degrees ( -180 -> +180 )
+* @param scaleX Horizontal scale
+* @param scaleY Vertical scale 
+* @param alpha Transparency ( 0 -> 255 )
+*/
+extern void ML_DrawSpriteFull(ML_Sprite *sprite, int x, int y, float angle, float scaleX, float scaleY, u8 alpha);
+
+/**
+* \fn void ML_InitTile(ML_Sprite *sprite, u16 width, u16 height)
+* \brief This function inits the tile system of the sprite.
+* @param sprite Sprite
+* @param width Width of the tile
+* @param height Height of the tile
+*/
+extern void ML_InitTile(ML_Sprite *sprite, u16 width, u16 height);
+
+/**
+* \fn void ML_DrawTile(ML_Sprite *sprite, int x, int y, u16 frame)
+* \brief This function draws a tile.
+* @param sprite Sprite
+* @param x X position
+* @param y Y position
+* @param frame Tile n°<frame>
+*/
+extern void ML_DrawTile(ML_Sprite *sprite, int x, int y, u16 frame);
+
+/**
 * \fn void ML_CloneSprite(ML_Sprite *sprite1, ML_Sprite *sprite2)
 * \brief This function clones two sprites.
 * @param sprite1 The original sprite

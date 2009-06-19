@@ -32,12 +32,12 @@ bool ML_LoadSpriteFromFile(ML_Image *image, ML_Sprite *sprite, char *filename, i
 	return _loadImage(image, sprite, NULL, filename, NULL, x, y, 1);
 }
 
-bool ML_LoadBackgroundFromBuffer(ML_Image *image, ML_Sprite *sprite, ML_Background *background, const u8 *filename, int x, int y)
+bool ML_LoadBackgroundFromBuffer(ML_Image *image, ML_Background *background, const u8 *filename, int x, int y)
 {	
 	return _loadImage(image, NULL, background, NULL, filename, x, y, 0);
 }
 
-bool ML_LoadBackgroundFromFile(ML_Image *image, ML_Sprite *sprite, ML_Background *background, char *filename, int x, int y)
+bool ML_LoadBackgroundFromFile(ML_Image *image, ML_Background *background, char *filename, int x, int y)
 {
 	return _loadImage(image, NULL, background, filename, NULL, x, y, 1);
 }
@@ -78,6 +78,7 @@ bool _loadImage(ML_Image *image, ML_Sprite *sprite, ML_Background *background, c
 	}
 	else if(background)
 	{
+		background->image = image;
 		background->width = image->width;
 		background->height = image->height;
 	}
@@ -85,66 +86,9 @@ bool _loadImage(ML_Image *image, ML_Sprite *sprite, ML_Background *background, c
 	return 1;
 }
 
-void ML_DrawSprite(ML_Sprite *sprite)
-{
-	ML_DrawSpriteXY(sprite, sprite->x, sprite->y);
-}
-
-void ML_DrawSpriteXY(ML_Sprite *sprite, int x, int y)
-{
-	sprite->x = x; sprite->y = y;
-	
-	if(!ML_IsSpriteVisible(sprite)) return;
-	
-	if(!sprite->animated)
-	{
-		_drawImage(&sprite->image->texObj, sprite->x, sprite->y, sprite->width, sprite->height, sprite->scaleX, sprite->scaleY, sprite->angle, sprite->alpha, sprite->tiled, sprite->currentFrame, sprite->tileWidth, sprite->tileHeight);
-	}
-	else
-	{
-		if(sprite->i == sprite->waitForXRefreshBetweenFrames)
-		{
-			sprite->i = 0;
-			if(sprite->currentFrame == sprite->anime_to-1) sprite->currentFrame = sprite->anime_from;
-			else sprite->currentFrame++;
-		} else sprite->i++;
-		
-		ML_DrawTile(sprite, sprite->x, sprite->y, sprite->currentFrame);
-	}
-}
-
-void ML_DrawSpriteFull(ML_Sprite *sprite, int x, int y, float angle, float scaleX, float scaleY, u8 alpha)
-{
-	sprite->x = x;
-	sprite->y = y;
-	sprite->angle = angle;
-	sprite->scaleX = scaleX;
-	sprite->scaleY = scaleY;
-	sprite->alpha = alpha;
-	
-	ML_DrawSpriteXY(sprite, sprite->x, sprite->y);
-}
-
 void ML_DrawTexture(GXTexObj *texObj, int x, int y, u16 width, u16 height, float angle, float scaleX, float scaleY, u8 alpha)
 {
 	_drawImage(texObj, x, y, width, height, scaleX, scaleY, angle, alpha, 0, 0, 0, 0);
-}
-
-void ML_InitTile(ML_Sprite *sprite, u16 width, u16 height)
-{
-	sprite->tiled = TRUE;
-	sprite->tileWidth = width;
-	sprite->tileHeight = height;
-	sprite->nbTiles = (sprite->width/sprite->tileWidth) * (sprite->height/sprite->tileHeight);
-}
-
-void ML_DrawTile(ML_Sprite *sprite, int x, int y, u16 frame)
-{
-	if(!ML_IsSpriteVisible(sprite)) return;
-	
-	sprite->x = x; sprite->y = y;
-
-	_drawImage(&sprite->image->texObj, sprite->x, sprite->y, sprite->width, sprite->height, sprite->scaleX, sprite->scaleY, sprite->angle, sprite->alpha, sprite->tiled, frame, sprite->tileWidth, sprite->tileHeight);
 }
 
 void ML_DrawRect(int x, int y, u16 width, u16 height, u32 rgba)
@@ -206,6 +150,7 @@ void ML_DrawSpriteText(ML_Sprite *sprite, int x, int y, const char *text, ...)
     int i = 0, size = 0, j = 0;
     char buffer[1024];
 	u8 c = 0;
+	y += sprite->tileHeight*sprite->scaleY;
 	
     va_list argp;
     va_start(argp, text);
@@ -225,6 +170,7 @@ void ML_DrawSpriteTextBox(ML_Sprite *sprite, int x, int y, int x2, int y2, const
 	int i = 0, size = 0, j = 0;
     char buffer[1024];
 	u8 c = 0;
+	y += sprite->tileHeight*sprite->scaleY;
 	
     va_list argp;
     va_start(argp, text);
@@ -253,6 +199,7 @@ void ML_DrawSpriteSimpleText(ML_Sprite *sprite, int x, int y, const char *text)
 {
 	int i = 0, size = strlen(text);
 	u8 c = 0;
+	y += sprite->tileHeight*sprite->scaleY;
 	
     for(i=0; i < size; i++)
     {
@@ -305,13 +252,15 @@ u32 ML_GetPixelColor(ML_Image *image, int x, int y)
 void ML_SplashScreen()
 {
 	int i = 0;
-	bool ok = 0;
+	bool ok = 0, fadeOk = 0;
 	
 	ML_Image image;
 	_initImage(&image);
 	ok = read_png_gx_file_buffer(MLlib_SplashScreen_png, &image);
 	
-	if(!ok) 
+	_alphaFade = 255;
+	
+	if(!ok)
 		return;
 	
 	GX_InitTexObj(&image.texObj, image.data, image.width, image.height, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
@@ -327,6 +276,12 @@ void ML_SplashScreen()
 		
 		i++;
 		if(i >= 1800) ok = 0;
+		
+		if(!fadeOk) 
+		{
+			if(ML_FadeIn())
+				fadeOk = 1;
+		}
 	
 		ML_Refresh();
 	}
@@ -442,10 +397,10 @@ void _drawImage(GXTexObj *texObj, int x, int y, u16 _width, u16 _height, float s
 		GX_SetTevOp(GX_TEVSTAGE0, GX_MODULATE);
 		GX_SetVtxDesc(GX_VA_TEX0, GX_DIRECT);
 
-		width = (_width*scaleX)*0.5;
-		height = (_height*scaleY)*0.5;
-		//width = _width>>1;
-		//height = _height>>1;
+		//width = (_width*scaleX)*0.5;
+		//height = (_height*scaleY)*0.5;
+		width = _width>>1;
+		height = _height>>1;
 		
 		guMtxIdentity (m1);
 		guMtxScaleApply(m1, m1, scaleX, scaleY, 1.0);
@@ -458,19 +413,19 @@ void _drawImage(GXTexObj *texObj, int x, int y, u16 _width, u16 _height, float s
 		GX_LoadPosMtxImm (mv, GX_PNMTX0);
 
 		GX_Begin(GX_QUADS, GX_VTXFMT0, 4);
-			GX_Position3f32(-width, -height, 0);
+			GX_Position3f32(-width*scaleX, -height*scaleY, 0);
 			GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
 			GX_TexCoord2f32(0, 0);
 
-			GX_Position3f32(width, -height, 0);
+			GX_Position3f32(width*scaleX, -height*scaleY, 0);
 			GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
 			GX_TexCoord2f32(1, 0);
 
-			GX_Position3f32(width, height, 0);
+			GX_Position3f32(width*scaleX, height*scaleY, 0);
 			GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
 			GX_TexCoord2f32(1, 1);
 
-			GX_Position3f32(-width, height, 0);
+			GX_Position3f32(-width*scaleX, height*scaleY, 0);
 			GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
 			GX_TexCoord2f32(0, 1);
 		GX_End();
@@ -492,15 +447,16 @@ void _drawImage(GXTexObj *texObj, int x, int y, u16 _width, u16 _height, float s
 		GX_SetTevOp(GX_TEVSTAGE0, GX_MODULATE);
 		GX_SetVtxDesc(GX_VA_TEX0, GX_DIRECT);
 	
-		width = tileWidth*0.5;
-		height = tileHeight*0.5;
+		width = tileWidth>>1;
+		height = tileHeight>>1;
+		
 		guMtxIdentity (m1);
 		guMtxScaleApply(m1, m1, scaleX, scaleY, 1.0);
 		Vector axis = (Vector) {0, 0, 1};
 		guMtxRotAxisDeg (m2, &axis, angle);
 		guMtxConcat(m2, m1, m);
 
-		guMtxTransApply(m, m, x+width, y+height, 0);
+		guMtxTransApply(m, m, x+width*scaleX, y+height*scaleY, 0);
 		guMtxConcat (GXmodelView2D, m, mv);
 		GX_LoadPosMtxImm (mv, GX_PNMTX0);
 	

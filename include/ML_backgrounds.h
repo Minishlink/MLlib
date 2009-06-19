@@ -13,6 +13,13 @@
 inline void _initBackground(ML_Background *background);
 
 /**
+* \fn void ML_DrawBackground(ML_Background *background)
+* \brief This function shows the background.
+* @param background Background
+*/
+extern void ML_DrawBackground(ML_Background *background);
+
+/**
 * \fn void ML_CloneBackground(ML_Background *background1, ML_Background *background2)
 * \brief This function clones two backgrounds.
 * @param background1 The original background
