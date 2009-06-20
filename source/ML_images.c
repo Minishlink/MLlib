@@ -70,8 +70,9 @@ void ML_FlipImageX(ML_Image *image)
 	unsigned int x, y, texWidth = image->width - 1;
 
 	for (y = 0; y < image->height; y++) {
-		for (x = 0; x < image->width; x++) {
+		for (x = 0; x < image->width*0.5; x++) {
 			ML_SetPixelColor(image, texWidth - x, y, ML_GetPixelColor(image, x, y));
+			ML_SetPixelColor(image, x, y, ML_GetPixelColor(image, x, y));
 		}
 	}
 }

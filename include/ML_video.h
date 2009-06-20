@@ -114,7 +114,28 @@ extern bool ML_LoadSpriteFromBuffer(ML_Image *image, ML_Sprite *sprite, const u8
 */
 extern bool ML_LoadSpriteFromFile(ML_Image *image, ML_Sprite *sprite, char *filename, int x, int y);
 
+/**
+* \fn bool ML_LoadBackgroundFromBuffer(ML_Image *image, ML_Background *background, const u8 *filename, int x, int y)
+* \brief This function loads a PNG image in memory from the buffer (see tutorial/wiki).
+* @param image The image you're loading
+* @param background The background structure you will use after
+* @param filename The path to the PNG file. (eg. background_png)
+* @param x X position
+* @param y Y position
+* @return 0 if it failed, 1 else.
+*/
 extern bool ML_LoadBackgroundFromBuffer(ML_Image *image, ML_Background *background, const u8 *filename, int x, int y);
+
+/**
+* \fn bool ML_LoadBackgroundFromFile(ML_Image *image, ML_Background *background, char *filename, int x, int y)
+* \brief This function loads a PNG image in memory from a file.
+* @param image The image you're loading
+* @param background The background structure you will use after
+* @param filename The path to the PNG file. (eg. "background.png")
+* @param x X position
+* @param y Y position
+* @return 0 if it failed, 1 else.
+*/
 extern bool ML_LoadBackgroundFromFile(ML_Image *image, ML_Background *background, char *filename, int x, int y);
 
 inline bool _loadImage(ML_Image *image, ML_Sprite *sprite, ML_Background *background, char *filename, const u8 *buffer, int x, int y, bool fat);
@@ -180,6 +201,11 @@ extern void ML_SetBackgroundColor(GXColor color);
 */
 extern void ML_SplashScreen();
 
+/**
+* \fn bool ML_Screenshot(const char *filename)
+* \brief This function makes a screenshot of the screen at the root of your SD Card.
+* @param filename Name of the file which will be created
+*/
 extern bool ML_Screenshot(const char *filename);
 
 void _drawImage(GXTexObj *texObj, int x, int y, u16 _width, u16 _height, float scaleX, float scaleY, float angle, u8 alpha, bool tiled, u16 frame, u16 tileWidth, u16 tileHeight);

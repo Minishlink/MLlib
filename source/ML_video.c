@@ -191,7 +191,7 @@ void ML_SplashScreen()
 		i++;
 		if(i >= 1800) ok = 0;
 		
-		if(!fadeOk) 
+		if(!fadeOk)
 		{
 			if(ML_FadeIn())
 				fadeOk = 1;
