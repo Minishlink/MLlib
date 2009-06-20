@@ -36,7 +36,7 @@ extern void ML_FlushImage(ML_Image *image);
 
 /**
 * \fn void ML_SetPixelColor(ML_Image *image, int x, int y, u32 color)
-* \brief This function sets the color value of a pixel on a sprite. You need to call ML_FlushImage after doing your modifications ! ;)
+* \brief This function sets the color value of a pixel on a sprite. You need to call ML_FlushImage() after doing your modifications ! ;)
 * @param image Image
 * @param x X position of the pixel
 * @param y Y position of the pixel
@@ -57,7 +57,7 @@ extern u32 ML_GetPixelColor(ML_Image *image, int x, int y);
 
 /**
 * \fn void ML_FlipImageX(ML_Image *image)
-* \brief This function flips the image horizontally. You need to call ML_FlushImage after doing your modifications ! ;)
+* \brief This function flips the image horizontally. You need to call ML_FlushImage() after doing your modifications ! ;)
 * @param image Image
 * @see ML_FlushImage
 */
@@ -65,7 +65,7 @@ extern void ML_FlipImageX(ML_Image *image);
 
 /**
 * \fn void ML_FlipImageY(ML_Image *image)
-* \brief This function flips the image vertically. You need to call ML_FlushImage after doing your modifications ! ;)
+* \brief This function flips the image vertically. You need to call ML_FlushImage() after doing your modifications ! ;)
 * @param image Image
 * @see ML_FlushImage
 */
@@ -73,7 +73,7 @@ extern void ML_FlipImageY(ML_Image *image);
 
 /**
 * \fn void ML_InvertImageColors(ML_Image *image)
-* \brief This function inverts the image colors. You need to call ML_FlushImage after doing your modifications ! ;)
+* \brief This function inverts the image colors. You need to call ML_FlushImage() after doing your modifications ! ;)
 * @param image Image
 * @see ML_FlushImage
 */
@@ -81,7 +81,7 @@ extern void ML_InvertImageColors(ML_Image *image);
 
 /**
 * \fn void ML_ApplyGrayscaleToImage(ML_Image *image)
-* \brief This function applies grayscale onto the image. You need to call ML_FlushImage after doing your modifications ! ;)
+* \brief This function applies grayscale onto the image. You need to call ML_FlushImage() after doing your modifications ! ;)
 * @param image Image
 * @see ML_FlushImage
 */
