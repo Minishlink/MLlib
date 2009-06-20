@@ -175,26 +175,6 @@ extern bool ML_FadeIn();
 extern void ML_SetBackgroundColor(GXColor color);
 
 /**
-* \fn void ML_SetPixelColor(ML_Image *image, int x, int y, u32 color)
-* \brief This function sets the color value of a pixel on a sprite.
-* @param image Image
-* @param x X position of the pixel
-* @param y Y position of the pixel
-* @param color New color of the pixel
-*/
-extern void ML_SetPixelColor(ML_Image *image,  int x, int y, u32 color);
-
-/**
-* \fn u32 ML_GetPixelColor(ML_Image *image, int x, int y)
-* \brief This function returns the color value of the pixel on a sprite.
-* @param image Image
-* @param x X position of the pixel
-* @param y Y position of the pixel
-* @return Color of the pixel
-*/
-extern u32 ML_GetPixelColor(ML_Image *image, int x, int y);
-
-/**
 * \fn void ML_SplashScreen()
 * \brief This function shows the official Splash Screen made by Zeblackos. :)
 */
