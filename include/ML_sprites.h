@@ -88,13 +88,13 @@ extern inline void ML_DrawSpriteTextLimit(ML_Sprite *sprite, int x, int y, char 
 * @param x X position of the left-upper corner
 * @param y Y position of the left-bottom corner
 * @param x2 X position of the right-upper corner
-* @param x2 Y position of the right-bottom corner
+* @param y2 Y position of the right-bottom corner
 * @param text Text
 */
 extern void ML_DrawSpriteTextBox(ML_Sprite *sprite, int x, int y, int x2, int y2, const char *text, ...);
 
 /**
-* \fn void ML_DrawSpriteSimpleText(ML_Sprite *sprite, int x, int y, const char *text, ...)
+* \fn void ML_DrawSpriteSimpleText(ML_Sprite *sprite, int x, int y, const char *text)
 * \brief This function draws some graphic text, but with no arguments and other funny thing : just faster !
 * @param sprite Sprite for extra-features like transparency, etc...
 * @param x X position
@@ -165,7 +165,7 @@ extern void ML_MoveSpriteWiimoteIR(ML_Sprite *sprite, u8 wpad);
 extern bool ML_IsWiimoteInSprite(u8 wpad, ML_Sprite *sprite);
 
 /**
-* \fn bool ML_IsCollision(ML_Sprite *sprite, ML_Sprite *sprite2)
+* \fn bool ML_IsCollision(const ML_Sprite *sprite, const ML_Sprite *sprite2)
 * \brief This function checks if there is a collision between two sprites. It's a box-detection.
 * @param sprite 1st Sprite
 * @param sprite2 2nd Sprite
@@ -174,7 +174,7 @@ extern bool ML_IsWiimoteInSprite(u8 wpad, ML_Sprite *sprite);
 extern bool ML_IsCollision(const ML_Sprite *sprite, const ML_Sprite *sprite2);
 
 /**
-* \fn bool ML_IsCollisionEx(ML_Sprite *sprite, ML_Sprite *sprite2)
+* \fn bool ML_IsCollisionEx(const ML_Sprite *sprite, const ML_Sprite *sprite2)
 * \brief This function checks if there is a collision between two sprites. It's a pixel-detection.
 * @param sprite 1st Sprite
 * @param sprite2 2nd Sprite
@@ -244,7 +244,7 @@ extern void ML_SetSpriteSize(ML_Sprite *sprite, u16 width, u16 height);
 
 /**
 * \fn void ML_SetSpriteVelocity(ML_Sprite *sprite, int dx, int dy)
-* \brief This function set the velocity members of the sprite.
+* \brief This function sets the velocity members of the sprite.
 * @param sprite Sprite
 * @param dx New horizontal velocity
 * @param dy New vertical velocity
@@ -253,7 +253,7 @@ extern void ML_SetSpriteVelocity(ML_Sprite *sprite, int dx, int dy);
 
 /**
 * \fn void ML_SetSpriteAlpha(ML_Sprite *sprite, u8 alpha)
-* \brief This function set the transparency of the sprite.
+* \brief This function sets the transparency of the sprite.
 * @param sprite Sprite
 * @param alpha Transparency ( 0 -> 255 )
 */
