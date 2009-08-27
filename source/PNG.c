@@ -1,5 +1,9 @@
 #include <MLlib.h>
 
+/*			CREDITS
+ * This file is the work of Chaosteil and Feesh! who made libwiisprite, a part was made by Dhewg/
+ */
+
 static u32 __image_load_pos = 0;
 static void __image_load_buffer(png_structp png_ptr, png_bytep data, png_size_t length)
 {
