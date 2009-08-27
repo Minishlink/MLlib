@@ -1,6 +1,15 @@
 #include <MLlib.h>
 #include "MLlib_SplashScreen_png.h"
 
+/*                 CREDITS
+ *   These are the functions inspired or in some cases modified from the GRRLib by NoNameNo, Crayon and RedShade. (V 4.0.0) :
+ *		- ML_drawImage
+ *		- ML_ScreenShot
+ *		- ML_GX_Init
+ *		- ML_GX_Refresh
+ *		- ML_GX_FreeMemory
+ */
+
 // FB
 static void *xfb[2] = { NULL, NULL };
 static u32 whichfb = 0;
@@ -395,8 +404,8 @@ void _drawImage(GXTexObj *texObj, int x, int y, u16 _width, u16 _height, float s
 	
 	GX_LoadPosMtxImm(GXmodelView2D, GX_PNMTX0);
 
-	GX_SetTevOp (GX_TEVSTAGE0, GX_PASSCLR);
-	GX_SetVtxDesc (GX_VA_TEX0, GX_NONE);
+	GX_SetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+	GX_SetVtxDesc(GX_VA_TEX0, GX_NONE);
 }
 
 void ML_GX_Init()
