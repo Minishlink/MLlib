@@ -201,14 +201,14 @@ bool ML_IsWiimoteInSprite(u8 wpad, ML_Sprite *sprite)
 bool ML_IsCollision(const ML_Sprite *sprite, const ML_Sprite *sprite2)
 {
 	int sp1_left = sprite->x;
-	int sp1_right = sprite->x + sprite->width*sprite->scaleX;
+	int sp1_right = sprite->x + sprite->tileWidth*sprite->scaleX;
 	int sp1_up = sprite->y;
-	int sp1_down = sprite->y + sprite->height*sprite->scaleY;
+	int sp1_down = sprite->y + sprite->tileHeight*sprite->scaleY;
 	
 	int sp2_left = sprite2->x;
-	int sp2_right = sprite2->x + sprite2->width*sprite2->scaleX;
+	int sp2_right = sprite2->x + sprite2->tileWidth*sprite2->scaleX;
 	int sp2_up = sprite2->y;
-	int sp2_down = sprite2->y + sprite2->height*sprite2->scaleY;
+	int sp2_down = sprite2->y + sprite2->tileHeight*sprite2->scaleY;
 	
 	if(sp1_left > sp2_right ||
 	   sp1_right < sp2_left ||
@@ -221,14 +221,14 @@ bool ML_IsCollision(const ML_Sprite *sprite, const ML_Sprite *sprite2)
 bool ML_IsCollisionEx(const ML_Sprite *sprite, const ML_Sprite *sprite2)
 {
 	int sp1_left = sprite->x;
-	int sp1_right = sprite->x + sprite->width*sprite->scaleX;
+	int sp1_right = sprite->x + sprite->tileWidth*sprite->scaleX;
 	int sp1_up = sprite->y;
-	int sp1_down = sprite->y + sprite->height*sprite->scaleY;
+	int sp1_down = sprite->y + sprite->tileHeight*sprite->scaleY;
 	
 	int sp2_left = sprite2->x;
-	int sp2_right = sprite2->x + sprite2->width*sprite2->scaleX;
+	int sp2_right = sprite2->x + sprite2->tileWidth*sprite2->scaleX;
 	int sp2_up = sprite2->y;
-	int sp2_down = sprite2->y + sprite2->height*sprite2->scaleY;
+	int sp2_down = sprite2->y + sprite2->tileHeight*sprite2->scaleY;
 	
 	if(sp1_left > sp2_right ||
        sp1_right < sp2_left ||
@@ -280,10 +280,10 @@ bool ML_IsCollisionEx(const ML_Sprite *sprite, const ML_Sprite *sprite2)
 		{
 			for(y = 0; y < rect_height; y++)
 			{
-				offset = ((((y + posY_spr1) >> 2)<<4)*sprite->width) + (((x+posX_spr1) >> 2)<<6) + ((((y+posY_spr1)%4 << 2) + (x+posX_spr1)%4 ) << 1); 
+				offset = ((((y + posY_spr1) >> 2)<<4)*sprite->tileWidth) + (((x+posX_spr1) >> 2)<<6) + ((((y+posY_spr1)%4 << 2) + (x+posX_spr1)%4 ) << 1); 
 				a1 = *(sprite->image->data+offset);
 				
-				offset = ((((y + posY_spr2) >> 2)<<4)*sprite2->width) + (((x+posX_spr2) >> 2)<<6) + ((((y+posY_spr2)%4 << 2) + (x+posX_spr2)%4 ) << 1); 
+				offset = ((((y + posY_spr2) >> 2)<<4)*sprite2->tileWidth) + (((x+posX_spr2) >> 2)<<6) + ((((y+posY_spr2)%4 << 2) + (x+posX_spr2)%4 ) << 1); 
 				a2 = *(sprite2->image->data+offset);
 				
 				// Teste si les deux pixels ne sont pas transparents
