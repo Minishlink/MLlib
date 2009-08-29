@@ -178,8 +178,8 @@ void ML_MoveSpriteWiimoteIR(ML_Sprite *sprite, u8 wpad)
 {
 	if(Wiimote[wpad].IR.Valid)
 	{
-		sprite->x = (Wiimote[wpad].IR.X / screenMode->fbWidth * (screenMode->fbWidth + (sprite->width*sprite->scaleX) * 2)) - (sprite->width*sprite->scaleX);
-		sprite->y = (Wiimote[wpad].IR.Y / screenMode->xfbHeight * (screenMode->xfbHeight + (sprite->height*sprite->scaleY) * 2)) - (sprite->height*sprite->scaleY);
+		sprite->x = (Wiimote[wpad].IR.X / screenMode->fbWidth * (screenMode->fbWidth + (sprite->width*sprite->scaleX) * 2)) - (sprite->width*sprite->scaleX/2);
+		sprite->y = (Wiimote[wpad].IR.Y / screenMode->xfbHeight * (screenMode->xfbHeight + (sprite->height*sprite->scaleY) * 2)) - (sprite->height*sprite->scaleY/2);
 		
 		sprite->visible = true;
 	} else sprite->visible = false;
@@ -187,15 +187,20 @@ void ML_MoveSpriteWiimoteIR(ML_Sprite *sprite, u8 wpad)
 
 bool ML_IsWiimoteInSprite(u8 wpad, ML_Sprite *sprite)
 {	
-	int cursorX = (Wiimote[wpad].IR.X / screenMode->fbWidth * (screenMode->fbWidth + 2)) - 1;
-	int cursorY = (Wiimote[wpad].IR.Y / screenMode->xfbHeight * (screenMode->xfbHeight + 2)) - 1;
+	int cursorX = Wiimote[wpad].IR.X*1.3;
+	int cursorY = Wiimote[wpad].IR.Y*1.4;
 	
-	if(cursorX >= sprite->x &&
-	   cursorX <= sprite->x + sprite->width*sprite->scaleX &&
-	   cursorY >= sprite->y &&
-	   cursorY <= sprite->y + sprite->height*sprite->scaleY
-	  ) return true;
-	  else return false;
+	int sp1_left = sprite->x;
+	int sp1_right = sprite->x + (sprite->tileWidth*sprite->scaleX);
+	int sp1_up = sprite->y;
+	int sp1_down = sprite->y + (sprite->tileHeight*sprite->scaleY);
+	
+	if(sp1_left > cursorX+1 ||
+	   sp1_right < cursorX ||
+	   sp1_up > cursorY+1 ||
+	   sp1_down < cursorY)
+	   return false;
+	else return true;
 }
 
 bool ML_IsCollision(const ML_Sprite *sprite, const ML_Sprite *sprite2)
@@ -299,8 +304,8 @@ void ML_Cursor(ML_Sprite *sprite, u8 wpad)
 {
 	ML_MoveSpriteWiimoteIR(sprite, wpad);
 	ML_DrawSprite(sprite);
-	sprite->x += (sprite->width*sprite->scaleX)/2;
-	sprite->y += (sprite->height*sprite->scaleY)/2;
+	sprite->x = Wiimote[wpad].IR.X*1.3;
+	sprite->y = Wiimote[wpad].IR.Y*1.4;
 }
 
 void ML_RotateSprite(ML_Sprite *sprite, float angle, u8 autoRotate)

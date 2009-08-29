@@ -166,7 +166,7 @@ extern bool ML_IsWiimoteInSprite(u8 wpad, ML_Sprite *sprite);
 
 /**
 * \fn bool ML_IsCollision(const ML_Sprite *sprite, const ML_Sprite *sprite2)
-* \brief This function checks if there is a collision between two sprites. It's a box-detection.
+* \brief This function checks if there is a collision between two sprites. It's a box-detection. //DON'T USE WITH CURSOR\\-Use IsWiimoteInSprite instead
 * @param sprite 1st Sprite
 * @param sprite2 2nd Sprite
 * @return 1 if there is collision, 0 else.
@@ -175,7 +175,7 @@ extern bool ML_IsCollision(const ML_Sprite *sprite, const ML_Sprite *sprite2);
 
 /**
 * \fn bool ML_IsCollisionEx(const ML_Sprite *sprite, const ML_Sprite *sprite2)
-* \brief This function checks if there is a collision between two sprites. It's a pixel-detection.
+* \brief This function checks if there is a collision between two sprites. It's a pixel-detection. //DON'T USE WITH CURSOR\\-Use IsWiimoteInSprite instead
 * @param sprite 1st Sprite
 * @param sprite2 2nd Sprite
 * @return 1 if there is collision, 0 else.
@@ -184,7 +184,7 @@ extern bool ML_IsCollisionEx(const ML_Sprite *sprite, const ML_Sprite *sprite2);
 
 /**
 * \fn void ML_Cursor(ML_Sprite *sprite, u8 wpad)
-* \brief This function draws the sprite as a cursor. Wiimote pointer will be in the center of the sprite.
+* \brief This function draws the sprite as a cursor. Wiimote pointer will be in the center of the sprite. X and Y of the cursor will be where the wiimote point to.
 * @param sprite Sprite
 * @param wpad Which Wiimote
 */
