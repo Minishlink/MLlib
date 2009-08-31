@@ -156,17 +156,26 @@ extern void ML_MoveSpriteWiimotePad(ML_Sprite *sprite, u8 wpad);
 extern void ML_MoveSpriteWiimoteIR(ML_Sprite *sprite, u8 wpad);
 
 /**
-* \fn bool ML_IsWiimoteInSprite(u8 wpad, ML_Sprite *sprite)
+* \fn bool ML_IsWiimoteInSprite(u8 wpad, const ML_Sprite *sprite)
 * \brief This function checks if the Wiimote pointer is in the sprite.
 * @param wpad Wiimote number
 * @param sprite Sprite
 * @return 1 if it's in the sprite, 0 else.
 */
-extern bool ML_IsWiimoteInSprite(u8 wpad, ML_Sprite *sprite);
+extern bool ML_IsWiimoteInSprite(u8 wpad, const ML_Sprite *sprite);
+
+/**
+* \fn bool ML_IsWiimoteInSpriteEx(u8 wpad, const ML_Sprite *sprite)
+* \brief Prefer not to use this. It's slow. This function checks if the Wiimote pointer is in the sprite. It's pixel-detection. Don't use with tiled sprites.
+* @param wpad Wiimote number
+* @param sprite Sprite
+* @return 1 if it's in the sprite, 0 else.
+*/
+extern bool ML_IsWiimoteInSpriteEx(u8 wpad, const ML_Sprite *sprite);
 
 /**
 * \fn bool ML_IsCollision(const ML_Sprite *sprite, const ML_Sprite *sprite2)
-* \brief This function checks if there is a collision between two sprites. It's a box-detection. //DON'T USE WITH CURSOR\\-Use IsWiimoteInSprite instead
+* \brief This function checks if there is a collision between two sprites. It's a box-detection. //DON'T USE WITH CURSOR\\-Use IsWiimoteInSprite instead.
 * @param sprite 1st Sprite
 * @param sprite2 2nd Sprite
 * @return 1 if there is collision, 0 else.
@@ -175,7 +184,7 @@ extern bool ML_IsCollision(const ML_Sprite *sprite, const ML_Sprite *sprite2);
 
 /**
 * \fn bool ML_IsCollisionEx(const ML_Sprite *sprite, const ML_Sprite *sprite2)
-* \brief This function checks if there is a collision between two sprites. It's a pixel-detection. //DON'T USE WITH CURSOR\\-Use IsWiimoteInSprite instead
+* \brief Prefer not to use this. It's slow. This function checks if there is a collision between two sprites. It's a pixel-detection. //DON'T USE WITH CURSOR\\-Use IsWiimoteInSprite instead. Don't use with tiled sprites.
 * @param sprite 1st Sprite
 * @param sprite2 2nd Sprite
 * @return 1 if there is collision, 0 else.
@@ -258,6 +267,31 @@ extern void ML_SetSpriteVelocity(ML_Sprite *sprite, int dx, int dy);
 * @param alpha Transparency ( 0 -> 255 )
 */
 extern void ML_SetSpriteAlpha(ML_Sprite *sprite, u8 alpha);
+
+/**
+* \fn void ML_FlipSpriteX(ML_Sprite *sprite, bool flipX)
+* \brief This function flips the sprite horizontally if flipX is set to 1.
+* @param sprite Sprite
+* @param flipX Flipping enabled (1) or disabled (0)
+*/
+extern void ML_FlipSpriteX(ML_Sprite *sprite, bool flipX);
+
+/**
+* \fn void ML_FlipSpriteY(ML_Sprite *sprite, bool flipY)
+* \brief This function flips the sprite vertically if flipY is set to 1.
+* @param sprite Sprite
+* @param flipY Flipping enabled (1) or disabled (0)
+*/
+extern void ML_FlipSpriteY(ML_Sprite *sprite, bool flipY);
+
+/**
+* \fn void ML_FlipSpriteXY(ML_Sprite *sprite, bool flipX, bool flipY)
+* \brief This function flips the sprite.
+* @param sprite Sprite
+* @param flipX Horizontal flipping enabled (1) or disabled (0)
+* @param flipY Vertical flipping enabled (1) or disabled (0)
+*/
+extern void ML_FlipSpriteXY(ML_Sprite *sprite, bool flipX, bool flipY);
 
 #ifdef __cplusplus
    }

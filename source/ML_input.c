@@ -12,7 +12,7 @@ void ML_InitPad()
 {
 	WPAD_Init();
 	WPAD_SetDataFormat(WPAD_CHAN_ALL, WPAD_FMT_BTNS_ACC_IR);
-	WPAD_SetVRes(0, screenMode->fbWidth, screenMode->xfbHeight);
+	WPAD_SetVRes(0, screenMode->fbWidth, 480);
 
 	PAD_Init();
 }
@@ -108,8 +108,9 @@ void ML_GetPadsWii()
 			{
 				Wiimote[i].IR.JustX = ir.x;
 				Wiimote[i].IR.JustY = ir.y;
+				Wiimote[i].IR.Angle = ir.angle;
 	
-				theta = ir.angle / 180.0 * M_PI;
+				theta = Wiimote[i].IR.Angle / 180.0 * M_PI;
 				Wiimote[i].IR.X = ir.x + 10*sinf(theta);
 				Wiimote[i].IR.Y = ir.y - 10*cosf(theta);
 			}
