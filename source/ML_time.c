@@ -2,7 +2,7 @@
 
 /**
 * \file
-* \brief This file contains (RTC) time functions.
+* \brief This file contains time functions and rand functions.
 */
 
 //---------------------------------------------
@@ -20,3 +20,19 @@ char* ML_GetTimeChar()
 	time_t time = ML_GetTime();
 	return ctime(&time);
 }
+
+//---------------------------------------------
+
+void ML_InitRand()
+{	
+	srand(time(NULL));
+}
+
+//---------------------------------------------
+
+int ML_Rand(int min, int max)
+{
+	return (rand() % max) + min; 
+}
+
+
