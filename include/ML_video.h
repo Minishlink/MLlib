@@ -46,6 +46,8 @@ typedef struct {
 	u16 nbTiles; /*!< Number of tiles */
 	u16 tileWidth, /*!< Width of one tile */
 	tileHeight; /*!< Height of one tile */
+	bool flipX, /*!< Is the sprite flipped horizontally or not */
+	flipY; /*!< Is the sprite flipped vertically or not */
 } ML_Sprite;
 
 /**
@@ -189,6 +191,22 @@ extern bool ML_FadeOut();
 extern bool ML_FadeIn();
 
 /**
+* \fn void ML_EnableClipping(int x, int y, int width, int height)
+* \brief This function disables the clipping.
+* @param x X position
+* @param y Y position
+* @param width Width of the rectangle
+* @param height Height of the rectangle
+*/
+extern void ML_EnableClipping(int x, int y, int width, int height);
+
+/**
+* \fn void ML_DisableClipping()
+* \brief This function disables the clipping.
+*/
+extern void ML_DisableClipping();
+
+/**
 * \fn void ML_SetBackgroundColor(GXColor color)
 * \brief This function clears the background with the color you want.
 * @param color New background color
@@ -208,7 +226,7 @@ extern void ML_SplashScreen();
 */
 extern bool ML_Screenshot(const char *filename);
 
-void _drawImage(GXTexObj *texObj, int x, int y, u16 _width, u16 _height, float scaleX, float scaleY, float angle, u8 alpha, bool tiled, u16 frame, u16 tileWidth, u16 tileHeight);
+void _drawImage(GXTexObj *texObj, int x, int y, u16 _width, u16 _height, float scaleX, float scaleY, float angle, u8 alpha, bool tiled, u16 frame, u16 tileWidth, u16 tileHeight, bool flipX, bool flipY);
 extern void ML_GX_Init(); // Init GX system
 extern void ML_GX_Refresh(); // Refresh GX system
 

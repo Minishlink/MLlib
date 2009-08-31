@@ -42,6 +42,7 @@ typedef struct {
 	float X, /*!< X pos of Wiimote IR */
 	Y, /*!< Y pos of Wiimote IR */
 	Z, /*!< Distance from the Screen<->Wiimote */
+	Angle,
 	SmoothX, /*!< Not recommended X pos of Wiimote IR (smoothed) */
 	SmoothY, /*!< Not recommended Y pos of Wiimote IR (smoothed) */
 	JustX, /*!< Not recommended X pos of Wiimote IR (original) */

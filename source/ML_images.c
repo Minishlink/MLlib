@@ -65,29 +65,6 @@ u32 ML_GetPixelColor(ML_Image *image, int x, int y)
 	return((r<<24) | (g<<16) | (b<<8) | a);
 }
 
-void ML_FlipImageX(ML_Image *image)
-{
-	unsigned int x, y, texWidth = image->width - 1;
-
-	for (y = 0; y < image->height; y++) {
-		for (x = 0; x < image->width; x++) {
-			ML_SetPixelColor(image, texWidth - x, y, ML_GetPixelColor(image, x, y));
-			ML_SetPixelColor(image, x, y, ML_GetPixelColor(image, x, y));
-		}
-	}
-}
-
-void ML_FlipImageY(ML_Image *image)
-{
-	unsigned int x, y, texHeight = image->height - 1;
-
-	for (y = 0; y < image->height; y++) {
-		for (x = 0; x < image->width; x++) {
-			ML_SetPixelColor(image, x, texHeight - y, ML_GetPixelColor(image, x, y));
-		}
-	}
-}
-
 void ML_InvertImageColors(ML_Image *image)
 {
 	unsigned int x, y;

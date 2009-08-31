@@ -56,22 +56,6 @@ extern void ML_SetPixelColor(ML_Image *image,  int x, int y, u32 color);
 extern u32 ML_GetPixelColor(ML_Image *image, int x, int y);
 
 /**
-* \fn void ML_FlipImageX(ML_Image *image)
-* \brief This function flips the image horizontally. You need to call ML_FlushImage() after doing your modifications ! ;)
-* @param image Image
-* @see ML_FlushImage
-*/
-extern void ML_FlipImageX(ML_Image *image);
-
-/**
-* \fn void ML_FlipImageY(ML_Image *image)
-* \brief This function flips the image vertically. You need to call ML_FlushImage() after doing your modifications ! ;)
-* @param image Image
-* @see ML_FlushImage
-*/
-extern void ML_FlipImageY(ML_Image *image);
-
-/**
 * \fn void ML_InvertImageColors(ML_Image *image)
 * \brief This function inverts the image colors. You need to call ML_FlushImage() after doing your modifications ! ;)
 * @param image Image

@@ -102,7 +102,7 @@ bool _loadImage(ML_Image *image, ML_Sprite *sprite, ML_Background *background, c
 
 void ML_DrawTexture(GXTexObj *texObj, int x, int y, u16 width, u16 height, float angle, float scaleX, float scaleY, u8 alpha)
 {
-	_drawImage(texObj, x, y, width, height, scaleX, scaleY, angle, alpha, 0, 0, 0, 0);
+	_drawImage(texObj, x, y, width, height, scaleX, scaleY, angle, alpha, 0, 0, 0, 0, 0, 0);
 }
 
 void ML_DrawRect(int x, int y, u16 width, u16 height, u32 rgba)
@@ -171,6 +171,18 @@ bool ML_FadeOut()
 	else return 0;
 }
 
+void ML_EnableClipping(int x, int y, int width, int height)
+{
+	GX_SetClipMode(GX_CLIP_ENABLE);
+    GX_SetScissor(x, y, width, height);
+}
+
+void ML_DisableClipping()
+{
+	GX_SetClipMode(GX_CLIP_DISABLE);
+	GX_SetScissor(0, 0, screenMode->fbWidth, screenMode->efbHeight);
+}
+
 void ML_SetBackgroundColor(GXColor color)
 {
 	GX_SetCopyClear(color, 0x00ffffff);	
@@ -197,7 +209,7 @@ void ML_SplashScreen()
 	{
 		if(Wiimote[0].Held.A) { ok = 0; }
 		
-		_drawImage(&image.texObj, 0, 0, image.width, image.height, 1, 1, 0, 255, 0, 0, 0, 0);
+		_drawImage(&image.texObj, 0, 0, image.width, image.height, 1, 1, 0, 255, 0, 0, 0, 0, 0, 0);
 		
 		i++;
 		if(i >= 1800) ok = 0;
@@ -310,7 +322,7 @@ bool ML_Screenshot(const char *filename)
 
 //---------------------------------------------
 
-void _drawImage(GXTexObj *texObj, int x, int y, u16 _width, u16 _height, float scaleX, float scaleY, float angle, u8 alpha, bool tiled, u16 frame, u16 tileWidth, u16 tileHeight)
+void _drawImage(GXTexObj *texObj, int x, int y, u16 _width, u16 _height, float scaleX, float scaleY, float angle, u8 alpha, bool tiled, u16 frame, u16 tileWidth, u16 tileHeight, bool flipX, bool flipY)
 {
 	Mtx44 m, m1, m2, mv;
 	u16 width, height;
@@ -336,23 +348,23 @@ void _drawImage(GXTexObj *texObj, int x, int y, u16 _width, u16 _height, float s
 		guMtxTransApply(m, m, x+width, y+height, 0);
 		guMtxConcat (GXmodelView2D, m, mv);
 		GX_LoadPosMtxImm (mv, GX_PNMTX0);
-
+		
 		GX_Begin(GX_QUADS, GX_VTXFMT0, 4);
-			GX_Position3f32(-width*scaleX, -height*scaleY, 0);
-			GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
-			GX_TexCoord2f32(0, 0);
+				GX_Position3f32(-width*scaleX, -height*scaleY, 0);
+				GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
+				GX_TexCoord2f32(flipX, flipY);
 
-			GX_Position3f32(width*scaleX, -height*scaleY, 0);
-			GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
-			GX_TexCoord2f32(1, 0);
+				GX_Position3f32(width*scaleX, -height*scaleY, 0);
+				GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
+				GX_TexCoord2f32(!flipX, flipY);
 
-			GX_Position3f32(width*scaleX, height*scaleY, 0);
-			GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
-			GX_TexCoord2f32(1, 1);
+				GX_Position3f32(width*scaleX, height*scaleY, 0);
+				GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
+				GX_TexCoord2f32(!flipX, !flipY);
 
-			GX_Position3f32(-width*scaleX, height*scaleY, 0);
-			GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
-			GX_TexCoord2f32(0, 1);
+				GX_Position3f32(-width*scaleX, height*scaleY, 0);
+				GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
+				GX_TexCoord2f32(flipX, !flipY);
 		GX_End();
 	}
 	else
@@ -367,6 +379,21 @@ void _drawImage(GXTexObj *texObj, int x, int y, u16 _width, u16 _height, float s
 		f32 t1 = (((int)(frame/nbTileW))/(f32)nbTileH)+(FRAME_CORR/_height);
 		f32 t2 = (((int)(frame/nbTileW)+1)/(f32)nbTileH)-(FRAME_CORR/_height);
 		
+		f32 tmp = 0;
+		
+		if(flipX)
+		{
+			tmp = s1;
+			s1 = s2;
+			s2 = tmp;
+		}
+		if(flipY)
+		{
+			tmp = t1;
+			t1 = t2;
+			t2 = tmp;
+		}
+
 		GX_LoadTexObj(texObj, GX_TEXMAP0);
 	
 		GX_SetTevOp(GX_TEVSTAGE0, GX_MODULATE);
@@ -384,6 +411,7 @@ void _drawImage(GXTexObj *texObj, int x, int y, u16 _width, u16 _height, float s
 		guMtxTransApply(m, m, x+width*scaleX, y+height*scaleY, 0);
 		guMtxConcat (GXmodelView2D, m, mv);
 		GX_LoadPosMtxImm (mv, GX_PNMTX0);
+		
 	
 		GX_Begin(GX_QUADS, GX_VTXFMT0, 4);
 			GX_Position3f32(-width, -height, 0);

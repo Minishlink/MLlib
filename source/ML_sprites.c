@@ -29,7 +29,7 @@ void ML_DrawSpriteXY(ML_Sprite *sprite, int x, int y)
 	
 	if(!sprite->animated)
 	{
-		_drawImage(&sprite->image->texObj, sprite->x, sprite->y, sprite->width, sprite->height, sprite->scaleX, sprite->scaleY, sprite->angle, sprite->alpha, sprite->tiled, sprite->currentFrame, sprite->tileWidth, sprite->tileHeight);
+		_drawImage(&sprite->image->texObj, sprite->x, sprite->y, sprite->width, sprite->height, sprite->scaleX, sprite->scaleY, sprite->angle, sprite->alpha, sprite->tiled, sprite->currentFrame, sprite->tileWidth, sprite->tileHeight, sprite->flipX, sprite->flipY);
 	}
 	else
 	{
@@ -70,7 +70,7 @@ void ML_DrawTile(ML_Sprite *sprite, int x, int y, u16 frame)
 	
 	 sprite->x = x; sprite->y = y;
 
-	_drawImage(&sprite->image->texObj, sprite->x, sprite->y, sprite->width, sprite->height, sprite->scaleX, sprite->scaleY, sprite->angle, sprite->alpha, sprite->tiled, frame, sprite->tileWidth, sprite->tileHeight);
+	_drawImage(&sprite->image->texObj, sprite->x, sprite->y, sprite->width, sprite->height, sprite->scaleX, sprite->scaleY, sprite->angle, sprite->alpha, sprite->tiled, frame, sprite->tileWidth, sprite->tileHeight, sprite->flipX, sprite->flipY);
 }
 
 void ML_DrawSpriteText(ML_Sprite *sprite, int x, int y, const char *text, ...)
@@ -176,31 +176,78 @@ void ML_MoveSpriteWiimotePad(ML_Sprite *sprite, u8 wpad)
 
 void ML_MoveSpriteWiimoteIR(ML_Sprite *sprite, u8 wpad)
 {
-	if(Wiimote[wpad].IR.Valid)
+	if(Wiimote[wpad].IR.Valid)// && sprite->x > 0 - sprite->width*sprite->scaleX && sprite->y > 0 - sprite->height*sprite->scaleY)
 	{
-		sprite->x = (Wiimote[wpad].IR.X / screenMode->fbWidth * (screenMode->fbWidth + (sprite->width*sprite->scaleX) * 2)) - (sprite->width*sprite->scaleX/2);
-		sprite->y = (Wiimote[wpad].IR.Y / screenMode->xfbHeight * (screenMode->xfbHeight + (sprite->height*sprite->scaleY) * 2)) - (sprite->height*sprite->scaleY/2);
+		//sprite->x = (Wiimote[wpad].IR.X / screenMode->fbWidth * (screenMode->fbWidth + (sprite->width*sprite->scaleX) * 2)) - (sprite->width*sprite->scaleX/2);
+		//sprite->y = (Wiimote[wpad].IR.Y / screenMode->xfbHeight * (screenMode->xfbHeight + (sprite->height*sprite->scaleY) * 2)) - (sprite->height*sprite->scaleY/2);
+		
+		sprite->x = Wiimote[wpad].IR.X - (sprite->width*sprite->scaleX/2);
+		sprite->y = Wiimote[wpad].IR.Y - (sprite->height*sprite->scaleY/2);
 		
 		sprite->visible = true;
 	} else sprite->visible = false;
 }
 
-bool ML_IsWiimoteInSprite(u8 wpad, ML_Sprite *sprite)
+bool ML_IsWiimoteInSprite(u8 wpad, const ML_Sprite *sprite)
 {	
-	int cursorX = Wiimote[wpad].IR.X*1.3;
-	int cursorY = Wiimote[wpad].IR.Y*1.4;
+	int cursorX = Wiimote[wpad].IR.X;
+	int cursorY = Wiimote[wpad].IR.Y;
 	
 	int sp1_left = sprite->x;
 	int sp1_right = sprite->x + (sprite->tileWidth*sprite->scaleX);
 	int sp1_up = sprite->y;
 	int sp1_down = sprite->y + (sprite->tileHeight*sprite->scaleY);
 	
-	if(sp1_left > cursorX+1 ||
+	if(sp1_left > cursorX ||
 	   sp1_right < cursorX ||
-	   sp1_up > cursorY+1 ||
+	   sp1_up > cursorY ||
 	   sp1_down < cursorY)
 	   return false;
 	else return true;
+}
+
+bool ML_IsWiimoteInSpriteEx(u8 wpad, const ML_Sprite *sprite)
+{
+	int sp1_left = Wiimote[wpad].IR.X;
+	int sp1_right = Wiimote[wpad].IR.X;
+	int sp1_up = Wiimote[wpad].IR.Y;
+	int sp1_down = Wiimote[wpad].IR.Y;
+	
+	int sp2_left = sprite->x;
+	int sp2_right = sprite->x + sprite->tileWidth*sprite->scaleX;
+	int sp2_up = sprite->y;
+	int sp2_down = sprite->y + sprite->tileHeight*sprite->scaleY;
+	
+	if(sp1_left > sp2_right ||
+       sp1_right < sp2_left ||
+       sp1_up > sp2_down ||
+       sp1_down < sp2_up)
+       return false;
+    else
+    {
+    	int rect_left, rect_up, posX_spr2 = 0, posY_spr2 = 0;
+		
+		if(sp1_up < sp2_up)
+			rect_up = sp2_up;
+		else rect_up = sp1_up;
+
+		if(sp1_left < sp2_left)
+			rect_left = sp2_left;
+		else rect_left = sp1_left;
+		
+		posX_spr2 = abs(sp2_left - rect_left);
+		posY_spr2 = abs(sp2_up - rect_up);
+
+		// Exploration des pixels dans le rectangle commun		
+		u32 offset = (((posY_spr2 >> 2)<<4)*(sprite->width)) + ((posX_spr2 >> 2)<<6) + (((posY_spr2%4 << 2) + posX_spr2%4 ) << 1); 
+		u8 a = *(sprite->image->data+offset);
+		
+		// Teste si le pixel n'est pas transparent
+		if(a != 0x00)
+			return true;
+		
+		return false;
+	}
 }
 
 bool ML_IsCollision(const ML_Sprite *sprite, const ML_Sprite *sprite2)
@@ -303,9 +350,15 @@ bool ML_IsCollisionEx(const ML_Sprite *sprite, const ML_Sprite *sprite2)
 void ML_Cursor(ML_Sprite *sprite, u8 wpad)
 {
 	ML_MoveSpriteWiimoteIR(sprite, wpad);
+	sprite->angle = Wiimote[wpad].IR.Angle;
+	
 	ML_DrawSprite(sprite);
-	sprite->x = Wiimote[wpad].IR.X*1.3;
-	sprite->y = Wiimote[wpad].IR.Y*1.4;
+	
+	if(Wiimote[wpad].IR.Valid)// && sprite->x > 0 - sprite->width*sprite->scaleX && sprite->y > 0 - sprite->height*sprite->scaleY) 
+	{
+		sprite->x += sprite->width*sprite->scaleX/2;
+		sprite->y += sprite->height*sprite->scaleY/2;
+	}
 }
 
 void ML_RotateSprite(ML_Sprite *sprite, float angle, u8 autoRotate)
@@ -324,4 +377,7 @@ void ML_SetSpriteSize(ML_Sprite *sprite, u16 width, u16 height) { sprite->width 
 void ML_SetSpriteScale(ML_Sprite *sprite, float scaleX, float scaleY) { sprite->scaleX = scaleX; sprite->scaleY = scaleY; }
 void ML_SetSpriteVelocity(ML_Sprite *sprite, int dx, int dy) { sprite->x = dx; sprite->dy = dy; }
 void ML_SetSpriteAlpha(ML_Sprite *sprite, u8 alpha) { sprite->alpha = alpha; }
+void ML_FlipSpriteX(ML_Sprite *sprite, bool flipX) { sprite->flipX = flipX; }
+void ML_FlipSpriteY(ML_Sprite *sprite, bool flipY) { sprite->flipY = flipY; }
+void ML_FlipSpriteXY(ML_Sprite *sprite, bool flipX, bool flipY) { sprite->flipX = flipX; sprite->flipY = flipY; }
 
