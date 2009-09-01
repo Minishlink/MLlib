@@ -55,9 +55,9 @@ typedef struct {
 * \brief This structure is a part of the WPads, Nunchuks struct. (Gravity Force)
 */
 typedef struct {
-	float X, 
-	Y,
-	Z;
+	float X,  /*!< Horizontal force (-3; 3) */
+	Y, /*!< Vertical force (-3; 3) */
+	Z; /*!< Depth force (-3; 3) */
 } Wii_GForce;
 
 /**
