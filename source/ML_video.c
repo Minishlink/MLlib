@@ -139,14 +139,15 @@ void ML_Brightness(u8 alpha)
 
 bool ML_FadeIn()
 {
-	if(!_fadeMode == FADE_IN)
+	if(_fadeMode != FADE_IN)
 	{
 		_fadeMode = FADE_IN;
 		_alphaFade = 255;
 	}
 	
-	if(_alphaFade > 240) _alphaFade -= 5;
-	else if(_alphaFade <= 240 && _alphaFade > 0) _alphaFade-=4;
+	if(_alphaFade < 5) _alphaFade--;
+	else if(_alphaFade > 240) _alphaFade -= 5;
+	else if(_alphaFade <= 240 && _alphaFade > 7) _alphaFade-=4;
 			
 	ML_Brightness(_alphaFade);
 	
@@ -156,14 +157,15 @@ bool ML_FadeIn()
 
 bool ML_FadeOut()
 {
-	if(!_fadeMode == FADE_OUT)
+	if(_fadeMode != FADE_OUT)
 	{
 		_fadeMode = FADE_OUT;
 		_alphaFade = 0;
 	}
 	
-	if(_alphaFade < 240) _alphaFade += 4;
-	else if(_alphaFade >= 240 && _alphaFade < 255) _alphaFade+=5;
+	if(_alphaFade >= 250) _alphaFade++;
+ 	else if(_alphaFade < 240) _alphaFade += 4;
+	else if(_alphaFade >= 240 && _alphaFade < 249) _alphaFade+=5;
 			
 	ML_Brightness(_alphaFade);
 	
@@ -191,7 +193,7 @@ void ML_SetBackgroundColor(GXColor color)
 void ML_SplashScreen()
 {
 	int i = 0;
-	bool ok = 0, fadeOk = 0;
+	bool ok = 0, ok2 = 0, fadeOk = 0, fadeOk2 = 0;
 	
 	ML_Image image;
 	_initImage(&image);
@@ -207,21 +209,31 @@ void ML_SplashScreen()
 	
 	while(ok)
 	{
-		if(Wiimote[0].Held.A) { ok = 0; }
+		if(Wiimote[0].Held.A) { ok2 = 1; }
 		
 		_drawImage(&image.texObj, 0, 0, image.width, image.height, 1, 1, 0, 255, 0, 0, 0, 0, 0, 0);
 		
 		i++;
-		if(i >= 1800) ok = 0;
+		if(i >= 500) ok2 = 1;
 		
 		if(!fadeOk)
 		{
 			if(ML_FadeIn())
 				fadeOk = 1;
 		}
+		
+		if(ok2 && !fadeOk2)
+		{
+			if(ML_FadeOut())
+			{
+				fadeOk2 = 1;
+				ok = 0;
+			}
+		}
 	
 		ML_Refresh();
 	}
+	
 	ML_Refresh();
 	VIDEO_WaitVSync();
 	ML_DeleteImage(&image);
