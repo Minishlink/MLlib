@@ -172,8 +172,8 @@ install:
 ##---------------------------------------------------------------------------------
 	@mkdir -p $(DEVKITPRO)/MLlib/lib
 	@mkdir -p $(DEVKITPRO)/MLlib/include
-	@cp -frv $(INCDIR)*.h $(DEVKITPRO)/MLlib/include/
-	@cp -frv $(LIBS)/wii/libMLlib.a $(DEVKITPRO)/MLlib/lib/
+	@cp -rv $(INCDIR)*.h $(DEVKITPRO)/MLlib/include/
+	@cp -rv $(LIBS)/wii/libMLlib.a $(DEVKITPRO)/MLlib/lib/
 
 
 #---------------------------------------------------------------------------------

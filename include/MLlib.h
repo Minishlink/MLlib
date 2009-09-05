@@ -40,9 +40,9 @@
 #include <png/png.h>
 
 // FreeTypelib ported to Wii by Tantric
-#include <ft2build.h>
+/*#include <ft2build.h>
 #include FT_FREETYPE_H
-#include FT_BITMAP_H
+#include FT_BITMAP_H*/
 
 
 // MLlib now
@@ -60,7 +60,7 @@
 #include "ML_modplayer.h"
 #include "ML_backgrounds.h"
 #include "ML_images.h"
-#include "ML_font.h"
+//#include "ML_font.h"
 #include "PNG.h"
 
 
