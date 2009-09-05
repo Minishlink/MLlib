@@ -216,13 +216,13 @@ void ML_SplashScreen()
 		i++;
 		if(i >= 500) ok2 = 1;
 		
-		if(!fadeOk)
+		if(!fadeOk && !fadeOk2)
 		{
 			if(ML_FadeIn())
 				fadeOk = 1;
 		}
 		
-		if(ok2 && !fadeOk2)
+		if(ok2 && !fadeOk2 && fadeOk)
 		{
 			if(ML_FadeOut())
 			{
