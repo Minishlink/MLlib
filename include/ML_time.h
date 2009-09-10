@@ -39,6 +39,13 @@ extern void ML_InitRand();
 */
 extern int ML_Rand(int min, int max);
 
+/**
+* \fn int ML_GetFPS()
+* \brief This function returns the FPS.
+* @return Return the FPS.
+*/
+extern int ML_GetFPS();
+
 #ifdef __cplusplus
    }
 #endif /* __cplusplus */
