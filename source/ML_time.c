@@ -35,4 +35,26 @@ int ML_Rand(int min, int max)
 	return (rand() % max) + min; 
 }
 
+//---------------------------------------------
+s8 _fps = 0, // fps
+_fps_n = 0, // counter
+_fps_time = 0, // time
+_fps_last_time = 0; // time-1
+
+int ML_GetFPS()
+{
+	_fps_n++;
+	_fps_time = ML_GetTime();
+	
+	if(_fps_last_time == 0) _fps_last_time = _fps_time;
+	else if(_fps_time != _fps_last_time)
+	{
+		_fps_last_time = _fps_time;
+		_fps = _fps_n;
+		
+		_fps_n = 0;
+	}
+	
+	return _fps;
+}
 
