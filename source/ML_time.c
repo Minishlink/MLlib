@@ -41,6 +41,7 @@ _fps_n = 0, // counter
 _fps_time = 0, // time
 _fps_last_time = 0; // time-1
 
+// Made by Hackotedelaplaque, thanks !
 int ML_GetFPS()
 {
 	_fps_n++;

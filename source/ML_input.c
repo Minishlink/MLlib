@@ -12,7 +12,7 @@ void ML_InitPad()
 {
 	WPAD_Init();
 	WPAD_SetDataFormat(WPAD_CHAN_ALL, WPAD_FMT_BTNS_ACC_IR);
-	WPAD_SetVRes(0, screenMode->fbWidth, 480);
+	WPAD_SetVRes(WPAD_CHAN_ALL, _screenWidth, _screenHeight);
 
 	PAD_Init();
 }
