@@ -181,8 +181,8 @@ void ML_MoveSpriteWiimoteIR(ML_Sprite *sprite, u8 wpad)
 		//sprite->x = (Wiimote[wpad].IR.X / screenMode->fbWidth * (screenMode->fbWidth + (sprite->width*sprite->scaleX) * 2)) - (sprite->width*sprite->scaleX/2);
 		//sprite->y = (Wiimote[wpad].IR.Y / screenMode->xfbHeight * (screenMode->xfbHeight + (sprite->height*sprite->scaleY) * 2)) - (sprite->height*sprite->scaleY/2);
 		
-		sprite->x = Wiimote[wpad].IR.X - (sprite->width*sprite->scaleX/2);
-		sprite->y = Wiimote[wpad].IR.Y - (sprite->height*sprite->scaleY/2);
+		sprite->x = Wiimote[wpad].IR.X - (sprite->tileWidth*sprite->scaleX/2);
+		sprite->y = Wiimote[wpad].IR.Y - (sprite->tileHeight*sprite->scaleY/2);
 		
 		sprite->visible = true;
 	} else sprite->visible = false;
@@ -352,12 +352,16 @@ void ML_Cursor(ML_Sprite *sprite, u8 wpad)
 	ML_MoveSpriteWiimoteIR(sprite, wpad);
 	sprite->angle = Wiimote[wpad].IR.Angle;
 	
-	ML_DrawSprite(sprite);
+	if(sprite->animated)
+		ML_DrawSprite(sprite);
+	else if(sprite->tiled)
+		ML_DrawTile(sprite, sprite->x, sprite->y, sprite->currentFrame);
+	else ML_DrawSprite(sprite);
 	
 	if(Wiimote[wpad].IR.Valid)// && sprite->x > 0 - sprite->width*sprite->scaleX && sprite->y > 0 - sprite->height*sprite->scaleY) 
 	{
-		sprite->x += sprite->width*sprite->scaleX/2;
-		sprite->y += sprite->height*sprite->scaleY/2;
+		sprite->x += sprite->tileWidth*sprite->scaleX/2;
+		sprite->y += sprite->tileHeight*sprite->scaleY/2;
 	}
 }
 
