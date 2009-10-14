@@ -140,6 +140,18 @@ extern void ML_AnimateSprite(ML_Sprite *sprite, bool enabled, u8 waitForXSeconds
 extern void ML_AnimateSpriteEx(ML_Sprite *sprite, bool enabled, u8 waitForXRefreshBetweenFrames, u8 from, u8 to);
 
 /**
+* \fn void ML_AnimateSpriteEx2(ML_Sprite *sprite, bool enabled, u8 waitForXRefreshBetweenFrames, u8 from, u8 to, u8 times)
+* \brief This function animates the sprite which needs to be tiled (and initialized for that). It will animate from "from" to "to" in "time" loops.
+* @param sprite Sprite
+* @param enabled Animation enabled (1) or disabled (0)
+* @param waitForXRefreshBetweenFrames This is the last of time between each frames.
+* @param from From where the sprite will begin the animation
+* @param to To where the sprite will finish the animations
+* @param times How many times it will be looped. (0 means infinite)
+*/
+extern void ML_AnimateSpriteEx2(ML_Sprite *sprite, bool enabled, u8 waitForXRefreshBetweenFrames, u8 from, u8 to, u8 times);
+
+/**
 * \fn void ML_MoveSpriteWiimotePad(ML_Sprite *sprite, u8 wpad)
 * \brief This function moves the sprite with the D-Pad of the Wiimote.
 * @param sprite Sprite

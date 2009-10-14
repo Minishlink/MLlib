@@ -36,7 +36,20 @@ void ML_DrawSpriteXY(ML_Sprite *sprite, int x, int y)
 		if(sprite->i == sprite->waitForXRefreshBetweenFrames)
 		{
 			sprite->i = 0;
-			if(sprite->currentFrame == sprite->anime_to-1) sprite->currentFrame = sprite->anime_from;
+			if(sprite->currentFrame == sprite->animeTo) 
+			{ 
+				if(sprite->timesAnimated > 1)
+				{
+					sprite->timesAnimated--;
+				}
+				else if(sprite->timesAnimated == 1)
+				{
+					sprite->timesAnimated = 0;
+					sprite->animated = false;
+				}	
+				
+				sprite->currentFrame = sprite->animeFrom;			
+			}
 			else sprite->currentFrame++;
 		} else sprite->i++;
 		
@@ -152,7 +165,7 @@ bool ML_IsSpriteVisible(ML_Sprite *sprite)
 
 void ML_AnimateSprite(ML_Sprite *sprite, bool enabled, u8 waitForXRefreshBetweenFrames)
 {
-	ML_AnimateSpriteEx(sprite, enabled, waitForXRefreshBetweenFrames, 0, sprite->nbTiles);
+	ML_AnimateSpriteEx(sprite, enabled, waitForXRefreshBetweenFrames, 0, sprite->nbTiles-1);
 }
 
 void ML_AnimateSpriteEx(ML_Sprite *sprite, bool enabled, u8 waitForXRefreshBetweenFrames, u8 from, u8 to)
@@ -161,8 +174,20 @@ void ML_AnimateSpriteEx(ML_Sprite *sprite, bool enabled, u8 waitForXRefreshBetwe
 	{
 		sprite->animated = enabled;
 		sprite->waitForXRefreshBetweenFrames = waitForXRefreshBetweenFrames;
-		sprite->anime_from = from;
-		sprite->anime_to = to;
+		sprite->animeFrom = from;
+		sprite->animeTo = to;
+	}
+}
+
+void ML_AnimateSpriteEx2(ML_Sprite *sprite, bool enabled, u8 waitForXRefreshBetweenFrames, u8 from, u8 to, u8 times)
+{
+	if(sprite->tiled)
+	{
+		sprite->animated = enabled;
+		sprite->waitForXRefreshBetweenFrames = waitForXRefreshBetweenFrames;
+		sprite->animeFrom = from;
+		sprite->animeTo = to;
+		sprite->timesAnimated = times;
 	}
 }
 
