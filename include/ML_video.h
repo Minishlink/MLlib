@@ -40,8 +40,9 @@ typedef struct {
 	bool tiled; /*!< Is tiling enabled */
 	bool animated; /*!< Is animation enabled */
 	u8 waitForXRefreshBetweenFrames;  /*!< Number of cycles between each frame changes */
-	u8 anime_from, /*!< Animation start at... */
-	anime_to; /*!< Animation end at... */
+	u8 animeFrom, /*!< Animation start at... */
+	animeTo, /*!< Animation end at... */
+	timesAnimated; /*!< Animation will loop X times */
 	u16 currentFrame; /*!< Current frame */
 	u16 nbTiles; /*!< Number of tiles */
 	u16 tileWidth, /*!< Width of one tile */
