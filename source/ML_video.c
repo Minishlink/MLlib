@@ -109,7 +109,7 @@ void ML_DrawRect(int x, int y, u16 width, u16 height, u32 rgba)
 {
 	int x2 = x + width;
     int y2 = y + height;
-    Vector v[] = {{x,y,0.0f}, {x2,y,0.0f}, {x2,y2,0.0f}, {x,y2,0.0f}, {x,y,0.0f}};
+    guVector v[] = {{x,y,0.0f}, {x2,y,0.0f}, {x2,y2,0.0f}, {x,y2,0.0f}, {x,y,0.0f}};
     
     int i;
     GXColor color = RGB_u32_u8(rgba);
@@ -125,7 +125,7 @@ void ML_DrawRect(int x, int y, u16 width, u16 height, u32 rgba)
 
 void ML_Brightness(u8 alpha)
 { 
-    Vector v[] = {{0,0,0.0f}, {screenMode->fbWidth,0,0.0f}, {screenMode->fbWidth,screenMode->xfbHeight,0.0f}, {0,screenMode->xfbHeight,0.0f}, {0,0,0.0f}};    
+    guVector v[] = {{0,0,0.0f}, {screenMode->fbWidth,0,0.0f}, {screenMode->fbWidth,screenMode->xfbHeight,0.0f}, {0,screenMode->xfbHeight,0.0f}, {0,0,0.0f}};    
     int i;
 
     GX_Begin(GX_TRIANGLEFAN, GX_VTXFMT0, 4);
@@ -353,7 +353,7 @@ void _drawImage(GXTexObj *texObj, int x, int y, u16 _width, u16 _height, float s
 		
 		guMtxIdentity (m1);
 		guMtxScaleApply(m1, m1, scaleX, scaleY, 1.0);
-		Vector axis = (Vector) {0, 0, 1};
+		guVector axis = (guVector) {0, 0, 1};
 		guMtxRotAxisDeg (m2, &axis, angle);
 		guMtxConcat(m2, m1, m);
 
@@ -416,7 +416,7 @@ void _drawImage(GXTexObj *texObj, int x, int y, u16 _width, u16 _height, float s
 		
 		guMtxIdentity (m1);
 		guMtxScaleApply(m1, m1, scaleX, scaleY, 1.0);
-		Vector axis = (Vector) {0, 0, 1};
+		guVector axis = (guVector) {0, 0, 1};
 		guMtxRotAxisDeg (m2, &axis, angle);
 		guMtxConcat(m2, m1, m);
 
