@@ -5,6 +5,12 @@
  * @mainpage MLlib Documentation
  * @image html MLlib_logo.png
  * Hi and welcome to the MLlib documentation !
+ * <!-- Woopra Code Start -->
+ * <script type="text/javascript">
+ * var _wh = ((document.location.protocol=='https:') ? "https://sec1.woopra.com" : "http://static.woopra.com");
+ * document.write(unescape("%3Cscript src='" + _wh + "/js/woopra.js' type='text/javascript'%3E%3C/script%3E"));
+ * </script>
+ * <!-- Woopra Code End -->
  */
  
 /**
@@ -39,12 +45,6 @@
 // libpng ported to Wii by mavakadachi 
 #include <png/png.h>
 
-// FreeTypelib ported to Wii by Tantric
-/*#include <ft2build.h>
-#include FT_FREETYPE_H
-#include FT_BITMAP_H*/
-
-
 // MLlib now
 #include "ML_define.h"
 #include "globals.h"
@@ -60,8 +60,7 @@
 #include "ML_modplayer.h"
 #include "ML_backgrounds.h"
 #include "ML_images.h"
-//#include "ML_font.h"
 #include "PNG.h"
 
-
 #endif
+
