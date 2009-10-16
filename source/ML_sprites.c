@@ -277,22 +277,7 @@ bool ML_IsWiimoteInSpriteEx(u8 wpad, const ML_Sprite *sprite)
 
 bool ML_IsCollision(const ML_Sprite *sprite, const ML_Sprite *sprite2)
 {
-	int sp1_left = sprite->x;
-	int sp1_right = sprite->x + sprite->tileWidth*sprite->scaleX;
-	int sp1_up = sprite->y;
-	int sp1_down = sprite->y + sprite->tileHeight*sprite->scaleY;
-	
-	int sp2_left = sprite2->x;
-	int sp2_right = sprite2->x + sprite2->tileWidth*sprite2->scaleX;
-	int sp2_up = sprite2->y;
-	int sp2_down = sprite2->y + sprite2->tileHeight*sprite2->scaleY;
-	
-	if(sp1_left > sp2_right ||
-	   sp1_right < sp2_left ||
-	   sp1_up > sp2_down ||
-	   sp1_down < sp2_up)
-	   return false;
-	else return true;
+	return ML_IsCollisionRectRect(sprite->x, sprite->y, sprite->tileWidth*sprite->scaleX, sprite->tileHeight*sprite->scaleY, sprite2->x, sprite2->y, sprite2->tileWidth*sprite2->scaleX, sprite2->tileHeight*sprite2->scaleY);
 }
 
 bool ML_IsCollisionEx(const ML_Sprite *sprite, const ML_Sprite *sprite2)
@@ -370,6 +355,58 @@ bool ML_IsCollisionEx(const ML_Sprite *sprite, const ML_Sprite *sprite2)
 		}
 		return false;
 	}
+}
+
+bool ML_IsCollisionSpriteRect(const ML_Sprite *sprite, int x, int y, int width, int height)
+{
+	return ML_IsCollisionRectRect(sprite->x, sprite->y, sprite->tileWidth*sprite->scaleX, sprite->tileHeight*sprite->scaleY, x, y, width, height);
+}
+
+bool ML_IsCollisionSpriteCircle(const ML_Sprite *sprite, int centerX, int centerY, int radius)
+{
+	return ML_IsCollisionRectCircle(sprite->x, sprite->y, sprite->tileWidth*sprite->scaleX, sprite->tileHeight*sprite->scaleY, centerX, centerY, radius);
+}
+
+bool ML_IsCollisionRectRect(int x1, int y1, int width1, int height1, int x2, int y2, int width2, int height2)
+{
+	int sp1_right = x1 + width1;
+	int sp1_down = y1 + height1;
+	
+	int sp2_right = x2 + width2;
+	int sp2_down = y2 + height2;
+	
+	if(x1 > sp2_right ||
+		sp1_right < x2 ||
+		y1 > sp2_down ||
+		sp1_down < y2)
+		return false;
+	else return true;
+}
+
+bool ML_IsCollisionCircleCircle(int centerX1, int centerY1, int radius1, int centerX2, int centerY2, int radius2)
+{
+	int radiusTotal = radius1+radius2;
+	
+	if(ML_Distance(centerX1, centerY1, centerX2, centerY2) < radiusTotal*radiusTotal)
+		return true;
+		
+	return false;
+}
+
+bool ML_IsCollisionRectCircle(int x, int y, int width, int height, int centerX, int centerY, int radius)
+{
+	int circleDistanceX = abs(centerX - x - width/2);
+	int circleDistanceY = abs(centerY - y - height/2);
+
+	if(circleDistanceX > (width/2 + radius)) return false;
+	if(circleDistanceY > (height/2 + radius)) return false;
+	
+	if(circleDistanceX <= (width/2)) return true;
+	if(circleDistanceY <= (height/2)) return true;
+	
+	int cornerDistance = ((circleDistanceX - width/2)^2) + ((circleDistanceY - height/2)^2);
+
+	return (cornerDistance <= radius*radius);
 }
 
 void ML_Cursor(ML_Sprite *sprite, u8 wpad)
