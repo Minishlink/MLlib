@@ -204,6 +204,71 @@ extern bool ML_IsCollision(const ML_Sprite *sprite, const ML_Sprite *sprite2);
 extern bool ML_IsCollisionEx(const ML_Sprite *sprite, const ML_Sprite *sprite2);
 
 /**
+* \fn bool ML_IsCollisionSpriteRect(const ML_Sprite *sprite, int x, int y, int width, int height)
+* \brief Detects a collision between a sprite and a rectangle.
+* @param sprite Sprite
+* @param x X position of the rectangle
+* @param y Y position of the rectangle
+* @param width Width of the rectangle
+* @param height Height of the rectangle
+* @return 1 if there is collision, 0 else.
+*/
+extern bool ML_IsCollisionSpriteRect(const ML_Sprite *sprite, int x, int y, int width, int height);
+
+/**
+* \fn bool ML_IsCollisionSpriteCircle(const ML_Sprite *sprite, int centerX, int centerY, int radius)
+* \brief Detects a collision between a sprite and a circle.
+* @param sprite Sprite
+* @param centerX X position of the circle
+* @param centerY Y position of the circle
+* @param radius Radius of the circle
+* @return 1 if there is collision, 0 else.
+*/
+extern bool ML_IsCollisionSpriteCircle(const ML_Sprite *sprite, int centerX, int centerY, int radius);
+
+/**
+* \fn bool ML_IsCollisionRectRect(int x1, int y1, int width1, int height1, int x2, int y2, int width2, int height2)
+* \brief Detects a collision between two rectangles.
+* @param x1 X position of the first rectangle
+* @param y1 Y position of the first rectangle
+* @param width1 Width of the first rectangle
+* @param height1 Height of the first rectangle
+* @param x2 X position of the second rectangle
+* @param y2 Y position of the second rectangle
+* @param width2 Width of the second rectangle
+* @param height2 Height of the second rectangle
+* @return 1 if there is collision, 0 else.
+*/
+extern bool ML_IsCollisionRectRect(int x1, int y1, int width1, int height1, int x2, int y2, int width2, int height2);
+
+/**
+* \fn bool ML_IsCollisionCircleCircle(int centerX1, int centerY1, int radius1, int centerX2, int centerY2, int radius2)
+* \brief Detects a collision between two circles.
+* @param centerX1 X position of the first circle
+* @param centerY1 Y position of the first circle
+* @param radius1 Radius of the first circle
+* @param centerX2 X position of the second circle
+* @param centerY2 Y position of the second circle
+* @param radius2 Radius of the second circle
+* @return 1 if there is collision, 0 else.
+*/
+extern bool ML_IsCollisionCircleCircle(int centerX1, int centerY1, int radius1, int centerX2, int centerY2, int radius2);
+
+/**
+* \fn bool ML_IsCollisionRectCircle(int x, int y, int width, int height, int centerX, int centerY, int radius)
+* \brief Detects a collision between a rectangle and a circle.
+* @param x X position of the rectangle
+* @param y Y position of the rectangle
+* @param width Width of the rectangle
+* @param height Height of the rectangle
+* @param centerX X position of the circle
+* @param centerY Y position of the circle
+* @param radius Radius of the circle
+* @return 1 if there is collision, 0 else.
+*/
+extern bool ML_IsCollisionRectCircle(int x, int y, int width, int height, int centerX, int centerY, int radius);
+
+/**
 * \fn void ML_Cursor(ML_Sprite *sprite, u8 wpad)
 * \brief This function draws the sprite as a cursor. Wiimote pointer will be in the center of the sprite. X and Y of the cursor will be where the wiimote point to.
 * @param sprite Sprite
