@@ -20,3 +20,13 @@ void setReset(bool value)
 	bReset = value;
 }
 
+bool getTTF()
+{
+	return _ttf_enabled;
+}
+
+void setTTF(bool value)
+{
+	_ttf_enabled = value;
+}
+

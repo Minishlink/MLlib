@@ -16,6 +16,7 @@ void ML_Init()
 	setPowerOff(FALSE);
 	setReset(FALSE);
 	setAsnd(FALSE);
+	setTTF(FALSE);
 	
 	SYS_SetResetCallback(_doSystemReset);
 	SYS_SetPowerCallback(_doPowerOff);
@@ -34,6 +35,7 @@ void ML_InitConsoleMode()
 	setPowerOff(FALSE);
 	setReset(FALSE);
 	setAsnd(FALSE);
+	setTTF(FALSE);
 	
 	SYS_SetResetCallback(_doSystemReset);
 	SYS_SetPowerCallback(_doPowerOff);

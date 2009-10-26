@@ -68,7 +68,6 @@ bool _loadImage(ML_Image *image, ML_Sprite *sprite, ML_Background *background, c
 	{
 		if(!fatInitDefault()) return 0;
 		
-		chdir("/");
 		ok = read_png_gx_file(filename, image);
 	}
 	else ok = read_png_gx_file_buffer(buffer, image);
@@ -450,6 +449,96 @@ void _drawImage(GXTexObj *texObj, int x, int y, u16 _width, u16 _height, float s
 	GX_SetVtxDesc(GX_VA_TEX0, GX_NONE);
 }
 
+// not the same as the real FreeTypeGX::copyTextureToFramebuffer at all (just like my _drawImage with colors)
+void FreeTypeGX_copyTextureToFramebuffer(GXTexObj *texObj, int16_t screenX, int16_t screenY, uint16_t texWidth, uint16_t texHeight, GXColor color, u8 alpha, float scaleX, float scaleY, float angle, bool flipX, bool flipY)
+{
+	Mtx44 m, m1, m2, mv;
+	u16 width, height;
+	
+	GX_LoadTexObj(texObj, GX_TEXMAP0);
+
+	GX_SetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+	GX_SetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+	
+	width = texWidth>>1;
+	height = texHeight>>1;
+	
+	guMtxIdentity (m1);
+	guMtxScaleApply(m1, m1, scaleX, scaleY, 1.0);
+	guVector axis = (guVector) {0, 0, 1};
+	guMtxRotAxisDeg (m2, &axis, angle);
+	guMtxConcat(m2, m1, m);
+
+	guMtxTransApply(m, m, screenX+width, screenY+height, 0);
+	guMtxConcat (GXmodelView2D, m, mv);
+	GX_LoadPosMtxImm (mv, GX_PNMTX0);
+	
+	GX_Begin(GX_QUADS, GX_VTXFMT0, 4);
+		GX_Position3f32(-width*scaleX, -height*scaleY, 0);
+		GX_Color4u8(color.r, color.g, color.b, alpha);
+		GX_TexCoord2f32(flipX, flipY);
+
+		GX_Position3f32(width*scaleX, -height*scaleY, 0);
+		GX_Color4u8(color.r, color.g, color.b, alpha);
+		GX_TexCoord2f32(!flipX, flipY);
+
+		GX_Position3f32(width*scaleX, height*scaleY, 0);
+		GX_Color4u8(color.r, color.g, color.b, alpha);
+		GX_TexCoord2f32(!flipX, !flipY);
+
+		GX_Position3f32(-width*scaleX, height*scaleY, 0);
+		GX_Color4u8(color.r, color.g, color.b, alpha);
+		GX_TexCoord2f32(flipX, !flipY);
+	GX_End();
+
+	GX_LoadPosMtxImm(GXmodelView2D, GX_PNMTX0);
+
+	GX_SetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+	GX_SetVtxDesc(GX_VA_TEX0, GX_NONE);
+}
+
+// a very modified FreeTypeGX::copyFeatureToFramebuffer at all
+void FreeTypeGX_copyFeatureToFramebuffer(f32 featureWidth, f32 featureHeight, int16_t screenX, int16_t screenY, GXColor color, u8 alpha)
+{
+	Mtx44 m, m1, m2, mv;
+	u16 width, height;
+	
+	GX_SetTevOp (GX_TEVSTAGE0, GX_PASSCLR);
+    GX_SetVtxDesc (GX_VA_TEX0, GX_NONE);
+	
+	width = featureWidth*0.5;
+	height = featureHeight*0.5;
+	
+	guMtxIdentity (m1);
+	guMtxScaleApply(m1, m1, 1, 1, 1.0);
+	guVector axis = (guVector) {0, 0, 1};
+	guMtxRotAxisDeg (m2, &axis, 0);
+	guMtxConcat(m2, m1, m);
+
+	guMtxTransApply(m, m, screenX+width, screenY+height, 0);
+	guMtxConcat (GXmodelView2D, m, mv);
+	GX_LoadPosMtxImm (mv, GX_PNMTX0);
+
+	GX_Begin(GX_QUADS, GX_VTXFMT0, 4);
+			GX_Position3f32(-width, -height, 0);
+			GX_Color4u8(color.r, color.g, color.b, alpha);
+			GX_Position3f32(width, -height, 0);
+			GX_Color4u8(color.r, color.g, color.b, alpha);
+
+			GX_Position3f32(width, height, 0);
+			GX_Color4u8(color.r, color.g, color.b, alpha);
+
+			GX_Position3f32(-width, height, 0);
+			GX_Color4u8(color.r, color.g, color.b, alpha);
+	GX_End();
+	
+	GX_LoadPosMtxImm(GXmodelView2D, GX_PNMTX0);
+
+	GX_SetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+	GX_SetVtxDesc(GX_VA_TEX0, GX_NONE);
+}
+
+
 void ML_GX_Init()
 {
 	f32 yscale = 0;
@@ -463,9 +552,20 @@ void ML_GX_Init()
         return;
 	memset(gp_fifo,0,DEFAULT_FIFO_SIZE);
 	GX_Init(gp_fifo,DEFAULT_FIFO_SIZE);
-
+	
 	// clears the bg to color and clears the z buffer
 	GX_SetCopyClear(background, 0x00ffffff);
+	
+	GX_SetCullMode(GX_CULL_NONE);
+
+	VIDEO_Configure(screenMode);
+    VIDEO_Flush();
+    VIDEO_WaitVSync();
+	if(screenMode->viTVMode & VI_NON_INTERLACE)
+		VIDEO_WaitVSync();
+	else
+		while(VIDEO_GetNextField())
+			VIDEO_WaitVSync();
 
 	// other gx setup
 	yscale = GX_GetYScaleFactor(screenMode->efbHeight,screenMode->xfbHeight);
@@ -510,8 +610,7 @@ void ML_GX_Init()
     GX_SetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
 
     guMtxIdentity(GXmodelView2D);
-    //guMtxTransApply (GXmodelView2D, GXmodelView2D, 0.0F, 0.0F, -50.0F);
-    guMtxTransApply(GXmodelView2D, GXmodelView2D, 0.0f, 0.0f, -5.0f);
+    guMtxTransApply(GXmodelView2D, GXmodelView2D, 0.0f, 0.0f, -50.0f);
     GX_LoadPosMtxImm(GXmodelView2D, GX_PNMTX0);
 	
     guOrtho(perspective,0, 479, 0, 639, 0, 300.0F);
@@ -520,8 +619,6 @@ void ML_GX_Init()
     GX_SetViewport(0, 0, screenMode->fbWidth, screenMode->efbHeight, 0, 1);
     GX_SetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
     GX_SetAlphaUpdate(GX_TRUE);
-
-    GX_SetCullMode(GX_CULL_NONE);
 }
 
 //---------------------------------------------
@@ -544,18 +641,27 @@ void ML_InitVideo()
 {
 	VIDEO_Init();
 	screenMode = VIDEO_GetPreferredMode(NULL);
+
 	if(CONF_GetAspectRatio() == CONF_ASPECT_16_9)
+	{
+		screenMode->viWidth = VI_MAX_WIDTH_PAL-12;
+		screenMode->viXOrigin = ((VI_MAX_WIDTH_PAL - screenMode->viWidth) / 2) + 2;
+	}
+
+	/*if(CONF_GetAspectRatio() == CONF_ASPECT_16_9)
     {
         screenMode->viWidth = 678;
         screenMode->viXOrigin = (VI_MAX_WIDTH_PAL - 678)/2;
-    }
-    
-    _screenWidth = screenMode->fbWidth;
-    _screenHeight = 480;
-    
-    xfb[0] = MEM_K0_TO_K1(SYS_AllocateFramebuffer(screenMode));
+    }*/
+
+	_screenWidth = screenMode->fbWidth;
+	_screenHeight = 480;
+	
+	VIDEO_Configure(screenMode);
+
+	xfb[0] = MEM_K0_TO_K1(SYS_AllocateFramebuffer(screenMode));
 	xfb[1] = MEM_K0_TO_K1(SYS_AllocateFramebuffer(screenMode));	
-    VIDEO_Configure(screenMode);
+	
 	console_init(xfb[0], 20, 64, screenMode->fbWidth, screenMode->xfbHeight, screenMode->fbWidth*VI_DISPLAY_PIX_SZ);
 
 	VIDEO_SetNextFramebuffer(xfb[0]);
@@ -563,6 +669,7 @@ void ML_InitVideo()
 	VIDEO_ClearFrameBuffer(screenMode, xfb[1], COLOR_BLACK);
 	VIDEO_SetBlack(FALSE);
 	VIDEO_Flush();
+
 	VIDEO_WaitVSync();
 	if(screenMode->viTVMode&VI_NON_INTERLACE) VIDEO_WaitVSync();
 
