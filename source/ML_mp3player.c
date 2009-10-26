@@ -43,8 +43,6 @@ void ML_PlayMP3FromBuffer(const u8 *filename, u32 len)
 
 void ML_PlayMP3FromFile(const char* filename)
 {
-	chdir("/");
-	
 	FILE *fp = fopen(filename,"rb");
 	if(fp == NULL) return;
 	

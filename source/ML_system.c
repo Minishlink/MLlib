@@ -84,7 +84,8 @@ void _flushAndClean(bool GXyes, bool refresh)
 		else ML_RefreshConsoleMode();
 	}
 	
-	if(getAsnd()) { ASND_Pause(1); ASND_End(); }
+	if(getAsnd()) { ASND_Pause(1); ASND_End(); setAsnd(FALSE); }
+	if(getTTF()) { ML_QuitFont(); setTTF(FALSE); }
 	
 	VIDEO_SetBlack(TRUE);
 	

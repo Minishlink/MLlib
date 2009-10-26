@@ -5,14 +5,17 @@
    extern "C" {
 #endif /* __cplusplus */
 
-bool _asnd_enabled;
+bool _asnd_enabled; // Sound enabled
 bool bPowerOff;	// Poweroff flag.
 bool bReset;	// Reset flag.
+bool _ttf_enabled; // Font system enabled
 
 extern void setAsnd(bool value);
 extern bool getAsnd();
 extern void setPowerOff(bool value);
 extern void setReset(bool value);
+extern void setTTF(bool value);
+extern bool getTTF();
 
 #ifdef __cplusplus
    }

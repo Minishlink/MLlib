@@ -1,5 +1,6 @@
 If you want to compile this nighty build, you need to have :
 - libpng installed
+- freetype installed
 - MLlib_Splashscreen.png converted to a .o with bin2o
 - lastest devkitPPC and libogc
 - you'll have to set the environment variable for MLlib and DevkitPro, DevkitPPC ! (see Wiibrew page)

@@ -228,6 +228,9 @@ extern void ML_SplashScreen();
 extern bool ML_Screenshot(const char *filename);
 
 void _drawImage(GXTexObj *texObj, int x, int y, u16 _width, u16 _height, float scaleX, float scaleY, float angle, u8 alpha, bool tiled, u16 frame, u16 tileWidth, u16 tileHeight, bool flipX, bool flipY);
+void FreeTypeGX_copyTextureToFramebuffer(GXTexObj *texObj, int16_t screenX, int16_t screenY, uint16_t texWidth, uint16_t texHeight, GXColor color, u8 alpha, float scaleX, float scaleY, float angle, bool flipX, bool flipY);
+void FreeTypeGX_copyFeatureToFramebuffer(f32 featureWidth, f32 featureHeight, int16_t screenX, int16_t screenY, GXColor color, u8 alpha);
+
 extern void ML_GX_Init(); // Init GX system
 extern void ML_GX_Refresh(); // Refresh GX system
 

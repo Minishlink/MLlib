@@ -30,8 +30,6 @@ void ML_PlayMODFromBuffer(MODPlay *play, const u8 *mod)
 
 void ML_PlayMODFromFile(MODPlay *play, const char *filename)
 {	
-	chdir("/");
-	
 	FILE *fp = fopen(filename,"rb");
 	if(fp == NULL) return;
 	
