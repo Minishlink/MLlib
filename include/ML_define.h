@@ -3,7 +3,7 @@
 
 /**
 * \file
-* \brief This file contains all defines.
+* \brief This file contains some defines.
 */
 
 #ifdef __cplusplus
@@ -18,7 +18,16 @@
 #define MAGENTA 0xf01e
 #define BLACK   0x0000
 
+/**
+* \def GX_COLOR_WHITE
+* \brief White color in a GXColor var.
+*/
 #define GX_COLOR_WHITE (GXColor){0xff, 0xff, 0xff, 0xff}
+
+/**
+* \def GX_COLOR_BLACK
+* \brief Black color in a GXColor var.
+*/
 #define GX_COLOR_BLACK (GXColor){0x00, 0x00, 0x00, 0x00}
 
 #ifdef __cplusplus

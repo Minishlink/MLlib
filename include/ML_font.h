@@ -13,22 +13,22 @@
 #endif /* __cplusplus */
 
 typedef struct ftgxCharData_ {
-	uint16_t glyphAdvanceX;	/**< Character glyph X coordinate advance in pixels. */
-	uint16_t glyphIndex;	/**< Charachter glyph index in the font face. */
+	uint16_t glyphAdvanceX;	/* Character glyph X coordinate advance in pixels. */
+	uint16_t glyphIndex;	/* Charachter glyph index in the font face. */
 
-	uint16_t textureWidth;	/**< Texture width in pixels/bytes. */
-	uint16_t textureHeight;	/**< Texture glyph height in pixels/bytes. */
+	uint16_t textureWidth;	/* Texture width in pixels/bytes. */
+	uint16_t textureHeight;	/* Texture glyph height in pixels/bytes. */
 
-	uint16_t renderOffsetY;	/**< Texture Y axis bearing offset. */
-	uint16_t renderOffsetMax;	/**< Texture Y axis bearing maximum value. */
-	uint16_t renderOffsetMin;	/**< Texture Y axis bearing minimum value. */
+	uint16_t renderOffsetY;	/* Texture Y axis bearing offset. */
+	uint16_t renderOffsetMax;	/* Texture Y axis bearing maximum value. */
+	uint16_t renderOffsetMin;	/* Texture Y axis bearing minimum value. */
 
-	uint32_t* glyphDataTexture;	/**< Glyph texture bitmap data buffer. */
+	uint32_t* glyphDataTexture;	/* Glyph texture bitmap data buffer. */
 } ftgxCharData;
 
 typedef struct ftgxDataOffset_ {
-	uint16_t max;   /**< Maximum data offset. */
-	uint16_t min;   /**< Minimum data offset. */
+	uint16_t max;   /* Maximum data offset. */
+	uint16_t min;   /* Minimum data offset. */
 } ftgxDataOffset;
 
 typedef struct ftMap_ {
@@ -37,52 +37,52 @@ typedef struct ftMap_ {
     UT_hash_handle hh;			/* makes this structure hashable */
 } ftMap;
 
-// Font structure
+/**
+* \struct ML_Font
+* \brief This is the structure for fonts.
+*/
 typedef struct {
-	ftMap *fontData;
-	GXColor color;
-	long x, 
-	y;
-	bool visible;
-	u8 rotated;
-	u8 alpha;
-	float angle;
-	bool flipX,
-	flipY;
-	u16 style;
-	FT_Face ftFace;
+	ftMap *fontData; /*!< Data of the TTF */
+	long x, /*!< X position */
+	y; /*!< Y position */
+	GXColor color; /*!< Color */
+	bool visible; /*!< Visibility */
+	u8 rotated; /*!< Rotated ? */
+	u8 alpha; /*!< Alpha */
+	float angle; /*!< Angle */
+	bool flipX, /*!< Flipped on the X-axis ? */
+	flipY; /*!< Flipped on the Y-axis ? */
+	u16 style; /*!< Style, see defines FONT_... */
+	FT_Face ftFace; 
 	FT_GlyphSlot ftSlot;
 	FT_UInt ftPointSize;
 	bool ftKerningEnabled;
-	bool cacheAll;
 } ML_Font;
 
-#define _TEXT(t) L ## t
+#define FONT_NULL					0x0000 /*!< \brief There won't be any formatting or styling. */
 
-#define FONT_NULL					0x0000
+#define FONT_JUSTIFY_LEFT			0x0001 /*!< The text will be justified by the left. */
+#define FONT_JUSTIFY_CENTER			0x0002 /*!< The text will be justified by the center. */
+#define FONT_JUSTIFY_RIGHT			0x0004 /*!< The text will be justified by the right. */
 
-#define FONT_JUSTIFY_LEFT			0x0001
-#define FONT_JUSTIFY_CENTER			0x0002
-#define FONT_JUSTIFY_RIGHT			0x0004
+#define FONT_ALIGN_TOP				0x0010 /*!< The text will be aligned at the top. */
+#define FONT_ALIGN_MIDDLE			0x0020 /*!< The text will be aligned at the middle. */
+#define FONT_ALIGN_BOTTOM			0x0040 /*!< The text will be aligned at the bottom. */
 
-#define FONT_ALIGN_TOP				0x0010
-#define FONT_ALIGN_MIDDLE			0x0020
-#define FONT_ALIGN_BOTTOM			0x0040
+#define FONT_UNDERLINE				0x0100 /*!< The text will be underlined. */
+#define FONT_STRIKE					0x0200 /*!< The text will be striked. */
 
-#define FONT_UNDERLINE				0x0100
-#define FONT_STRIKE					0x0200
-
-#define FONT_DEFAULT				FONT_JUSTIFY_LEFT | FONT_ALIGN_TOP
+#define FONT_DEFAULT				FONT_JUSTIFY_LEFT | FONT_ALIGN_TOP /*!< \brief This is the default value you should use generally. */
 
 /**
 * \fn void ML_InitFont()
-* \brief This function initializes the font system. You do no hat to call it because it does it automatically.
+* \brief This function initializes the font system. You do no have to call it because it does it automatically.
 */
 extern bool ML_InitFont();
 
 /**
 * \fn void ML_QuitFont()
-* \brief This function quits the font system. You do no hat to call it because it does it automatically.
+* \brief This function quits the font system. You do no have to call it because it does it automatically.
 */
 extern void ML_QuitFont();
 
