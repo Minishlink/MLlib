@@ -30,7 +30,8 @@ extern void ML_DrawSpriteXY(ML_Sprite *sprite, int x, int y);
 
 /**
 * \fn void ML_DrawSpriteFull(ML_Sprite *sprite, int x, int y, float angle, float scaleX, float scaleY, u8 alpha)
-* \brief This function shows the sprite which is already loaded. It can be faster when you have many things to do on the sprites in a time.
+* \brief This function shows the sprite which is already loaded. \n
+It can be faster when you have many things to do on the sprites in a time.
 * @param sprite Sprite
 * @param x X position
 * @param y Y position
@@ -130,7 +131,8 @@ extern void ML_AnimateSprite(ML_Sprite *sprite, bool enabled, u8 waitForXSeconds
 
 /**
 * \fn void ML_AnimateSpriteEx(ML_Sprite *sprite, bool enabled, u8 waitForXRefreshBetweenFrames, u8 from, u8 to)
-* \brief This function animates the sprite which needs to be tiled (and initialized for that). It will animate from "from" to "to" in loops.
+* \brief This function animates the sprite which needs to be tiled (and initialized for that). \n
+It will animate from "from" to "to" in loops.
 * @param sprite Sprite
 * @param enabled Animation enabled (1) or disabled (0)
 * @param waitForXRefreshBetweenFrames This is the last of time between each frames.
@@ -141,7 +143,8 @@ extern void ML_AnimateSpriteEx(ML_Sprite *sprite, bool enabled, u8 waitForXRefre
 
 /**
 * \fn void ML_AnimateSpriteEx2(ML_Sprite *sprite, bool enabled, u8 waitForXRefreshBetweenFrames, u8 from, u8 to, u8 times)
-* \brief This function animates the sprite which needs to be tiled (and initialized for that). It will animate from "from" to "to" in "time" loops.
+* \brief This function animates the sprite which needs to be tiled (and initialized for that). \n
+It will animate from "from" to "to" in "time" loops.
 * @param sprite Sprite
 * @param enabled Animation enabled (1) or disabled (0)
 * @param waitForXRefreshBetweenFrames This is the last of time between each frames.
@@ -178,7 +181,11 @@ extern bool ML_IsWiimoteInSprite(u8 wpad, const ML_Sprite *sprite);
 
 /**
 * \fn bool ML_IsWiimoteInSpriteEx(u8 wpad, const ML_Sprite *sprite)
-* \brief Prefer not to use this. It's slow. This function checks if the Wiimote pointer is in the sprite. It's pixel-detection. Don't use with tiled sprites.
+* \brief Prefer not to use this because it's slower. \n
+This function checks if the Wiimote pointer is in the sprite. \n
+It's a pixel-detection. 
+* \warning Make sure that your sprite is not rotated ! \n
+Don't use with tiled sprites.
 * @param wpad Wiimote number
 * @param sprite Sprite
 * @return 1 if it's in the sprite, 0 else.
@@ -187,7 +194,9 @@ extern bool ML_IsWiimoteInSpriteEx(u8 wpad, const ML_Sprite *sprite);
 
 /**
 * \fn bool ML_IsCollision(const ML_Sprite *sprite, const ML_Sprite *sprite2)
-* \brief This function checks if there is a collision between two sprites. It's a box-detection. //DON'T USE WITH CURSOR\\-Use IsWiimoteInSprite instead.
+* \brief This function checks if there is a collision between two sprites. \n
+It's a box-detection.
+* \warning Don't use it if your sprite is a cursor. (use ML_IsWiimoteInSprite() instead)
 * @param sprite 1st Sprite
 * @param sprite2 2nd Sprite
 * @return 1 if there is collision, 0 else.
@@ -196,7 +205,12 @@ extern bool ML_IsCollision(const ML_Sprite *sprite, const ML_Sprite *sprite2);
 
 /**
 * \fn bool ML_IsCollisionEx(const ML_Sprite *sprite, const ML_Sprite *sprite2)
-* \brief Prefer not to use this. It's slow. This function checks if there is a collision between two sprites. It's a pixel-detection. //DON'T USE WITH CURSOR\\-Use IsWiimoteInSprite instead. Don't use with tiled sprites.
+* \brief Prefer not to use this because it's slower. \n
+This function checks if there is a collision between two sprites. \n
+It's a pixel-detection. 
+* \warning Don't use it if your sprite is a cursor. (use ML_IsWiimoteInSprite() instead) \n
+Also make sure that your sprite is not rotated ! \n
+Don't use with tiled sprites.
 * @param sprite 1st Sprite
 * @param sprite2 2nd Sprite
 * @return 1 if there is collision, 0 else.
@@ -270,7 +284,9 @@ extern bool ML_IsCollisionRectCircle(int x, int y, int width, int height, int ce
 
 /**
 * \fn void ML_Cursor(ML_Sprite *sprite, u8 wpad)
-* \brief This function draws the sprite as a cursor. Wiimote pointer will be in the center of the sprite. X and Y of the cursor will be where the wiimote point to.
+* \brief This function draws the sprite as a cursor. \n
+Wiimote pointer will be in the center of the sprite. \n
+X and Y of the cursor will be where the wiimote point to.
 * @param sprite Sprite
 * @param wpad Which Wiimote
 */
@@ -281,7 +297,8 @@ extern void ML_Cursor(ML_Sprite *sprite, u8 wpad);
 * \brief This function rotates the sprite.
 * @param sprite Sprite
 * @param angle Angle of rotation (degrees)
-* @param autoRotate If TRUE, the sprite will rotate of <angle> degrees each frame. If it's FALSE, the sprite will rotate to the angle indicated.
+* @param autoRotate If TRUE, the sprite will rotate of <angle> degrees each frame. \n
+If it's FALSE, the sprite will rotate to the angle indicated.
 */
 extern void ML_RotateSprite(ML_Sprite *sprite, float angle, u8 autoRotate);
 
