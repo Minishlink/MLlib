@@ -59,6 +59,20 @@ void ML_ExitConsoleMode()
 
 //---------------------------------------------
 
+void ML_ReturnToWii()
+{
+	_flushAndClean(1, 0);
+	SYS_ResetSystem(SYS_RETURNTOMENU, 0, 0);
+}
+
+void ML_ShutdownWii()
+{
+	_flushAndClean(1, 0);
+	SYS_ResetSystem(SYS_POWEROFF, 0, 0);
+}
+
+//---------------------------------------------
+
 void ML_CallbackForPowerAndReset(bool GXyes) // Thanks Botskiz !
 {	
 	if(bReset) // Reset the system.

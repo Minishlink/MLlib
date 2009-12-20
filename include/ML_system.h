@@ -19,18 +19,6 @@ enum T_WiiPower
     WAKEUP     = 0x2005
 };
 
-/** 
-* \def ML_ReturnToWii();
-* \brief Returns to the Wii Menu.
-*/
-#define ML_ReturnToWii(); SYS_ResetSystem(SYS_RETURNTOMENU,0,0); 
-
-/** 
-* \def ML_ShutdownWii();
-* \brief Shutdowns the Wii.
-*/
-#define ML_ShutdownWii(); SYS_ResetSystem(SYS_POWEROFF,0,0);
-
 /**
 * \fn void ML_Exit()
 * \brief This function exits the app/game. If it was launched from HBC/Wiiload, it will return to the HBC; if not, it will return to the Wii menu. :)
@@ -49,6 +37,18 @@ extern void ML_ExitConsoleMode();
 * @param value The Wii will set itself to this value power mode.
 */
 extern void ML_SetPowerMode(int value);
+
+/**
+* \fn void ML_ShutdownWii()
+* \brief Shuts down the Wii
+*/
+extern void ML_ShutdownWii();
+
+/**
+* \fn void ML_ReturnToWii()
+* \brief Returns to the Wii menu
+*/
+extern void ML_ReturnToWii();
 
 void ML_CallbackForPowerAndReset(bool GXyes);
 
