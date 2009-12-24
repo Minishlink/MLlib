@@ -173,7 +173,7 @@ u16 ML_DrawText(ML_Font *font, int x, int y, char *text, ...)
 				switch(wText[i+1])
 				{
 					case L't':
-						x_pos += 24*3;
+						x_pos += 12*3;	
 						i++;
 						break;
 
