@@ -500,6 +500,7 @@ void FreeTypeGX_copyTextureToFramebuffer(GXTexObj *texObj, int16_t screenX, int1
 // a very modified FreeTypeGX::copyFeatureToFramebuffer at all
 void FreeTypeGX_copyFeatureToFramebuffer(f32 featureWidth, f32 featureHeight, int16_t screenX, int16_t screenY, GXColor color, u8 alpha)
 {
+	// TODO: make it simpler
 	Mtx44 m, m1, m2, mv;
 	u16 width, height;
 	
@@ -521,7 +522,8 @@ void FreeTypeGX_copyFeatureToFramebuffer(f32 featureWidth, f32 featureHeight, in
 
 	GX_Begin(GX_QUADS, GX_VTXFMT0, 4);
 			GX_Position3f32(-width, -height, 0);
-			GX_Color4u8(color.r, color.g, color.b, alpha);
+			GX_Color4u8(color.r, color.g, color.b, alpha);
+
 			GX_Position3f32(width, -height, 0);
 			GX_Color4u8(color.r, color.g, color.b, alpha);
 
@@ -626,7 +628,8 @@ void ML_GX_Init()
 void ML_GX_Refresh()
 {
 	GX_DrawDone();
-		GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+	
+	GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 	GX_SetColorUpdate(GX_TRUE);
 	GX_CopyDisp(xfb[whichfb],GX_TRUE);
 }
