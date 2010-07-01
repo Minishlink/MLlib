@@ -45,16 +45,19 @@ void ML_QuitFont()
 
 void ML_DeleteFont(ML_Font *font)
 {
+	GX_DrawDone();
+	GX_Flush();
+	
 	ftMap *s;
 
 	for(s = font->fontData; s != NULL; s = s->hh.next)
 	{
     	if(s->charData.glyphDataTexture) { free(s->charData.glyphDataTexture); s->charData.glyphDataTexture = NULL; }
 	}
-
-	if(font->fontData) { HASH_CLEAR(hh, font->fontData); font->fontData = NULL; }
-
+	
 	FT_Done_Face(font->ftFace);
+
+	if(font->fontData) { HASH_CLEAR(hh, font->fontData); font->fontData = NULL; }	
 }
 
 bool ML_LoadFontFromFile(ML_Font *font, const char *filename, FT_UInt pointSize)
@@ -103,6 +106,9 @@ bool _loadFont(ML_Font *font, const char *filename, const uint8_t* buffer, FT_Lo
 
 	font->ftSlot = font->ftFace->glyph;
 	font->ftKerningEnabled = FT_HAS_KERNING(font->ftFace);
+	
+	font->ftAscender = font->ftPointSize * font->ftFace->ascender / font->ftFace->units_per_EM;
+	font->ftDescender = font->ftPointSize * font->ftFace->descender / font->ftFace->units_per_EM;
 
 	font->alpha = 255;
 	font->color = (GXColor){0xff, 0xff, 0xff, 0xff};
@@ -118,31 +124,7 @@ bool _loadFont(ML_Font *font, const char *filename, const uint8_t* buffer, FT_Lo
 
 // originally FreeTypeGX::drawText();
 u16 ML_DrawText(ML_Font *font, int x, int y, char *text, ...)
-{
-	/*char *buffer;
-	va_list argp;
-    va_start(argp, text);
-	vasprintf(&buffer, text, argp);
-    va_end(argp);
-    if(!buffer) SYS_ResetSystem(SYS_RETURNTOMENU, 0, 0);
-
-	wchar_t *wd = malloc(sizeof(wchar_t) * (strlen(buffer) + 1));
-	FreeTypeGX_charToWideChar(buffer, wd);
-	free(buffer);
-	free(wd);*/
-	
-	/*wchar_t *wText = malloc(sizeof(wchar_t) * (strlen(text) + 1));
-	FreeTypeGX_charToWideChar(text, wText);*/
-	
-	/*char buffer[1024];
-	va_list argp;
-    va_start(argp, text);
-	int size = vsprintf(buffer, text, argp);
-    va_end(argp);
-    
-    wchar_t *wText = malloc(sizeof(wchar_t) * (size + 1));
-	FreeTypeGX_charToWideChar(buffer, wText);*/	
-	
+{	
 	wchar_t *wText = malloc(sizeof(wchar_t) * (strlen(text) + 1));
 	FreeTypeGX_charToWideChar(text, wText);
 
@@ -155,14 +137,11 @@ u16 ML_DrawText(ML_Font *font, int x, int y, char *text, ...)
 
 	GXColor colorTemp = font->color;
 
-	if(font->style & 0x000F)
-	{
+	if(font->style & FONT_JUSTIFY_MASK)
 		x_offset = FreeTypeGX_getStyleOffsetWidth(FreeTypeGX_getWidth(font, wText), font->style);
-	}
-	if(font->style & 0x00F0)
-	{
-		y_offset = FreeTypeGX_getStyleOffsetHeight(FreeTypeGX_getOffset(font, wText), font->style);
-	}
+	
+	if(font->style & FONT_ALIGN_MASK)
+		y_offset = FreeTypeGX_getStyleOffsetHeight(font->ftAscender, font->ftDescender, font->style);
 
 	for (i = 0; i < strLength; i++)
 	{
@@ -252,17 +231,15 @@ u16 ML_DrawText(ML_Font *font, int x, int y, char *text, ...)
 				}
 
 				GX_InitTexObj(&glyphTexture, glyphData->glyphDataTexture, glyphData->textureWidth, glyphData->textureHeight, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
-				//GX_InitTexObjLOD(&glyphTexture, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, 0, 0, GX_ANISO_1);
 				FreeTypeGX_copyTextureToFramebuffer(&glyphTexture, x_pos - x_offset, y_pos - glyphData->renderOffsetY - y_offset, glyphData->textureWidth, glyphData->textureHeight, colorTemp, font->alpha, 1, 1, font->angle, font->flipX, font->flipY);
 				x_pos += glyphData->glyphAdvanceX;
 				printed++;
-
-				if(font->style & 0x0F00) {
-					FreeTypeGX_drawTextFeature(font, x_pos - glyphData->glyphAdvanceX - x_offset, y_pos, FreeTypeGX_getWidthEx(font, wText, i)+2, FreeTypeGX_getOffset(font, wText), font->style);
-				}
 			}
 		}
 	}
+	
+	if(font->style & FONT_STYLE_MASK)
+		FreeTypeGX_drawTextFeature(font, x - x_offset, y - y_offset, FreeTypeGX_getWidth(font, wText), font->style);
 
 	free(wText);
 
@@ -275,10 +252,8 @@ bool FreeTypeGX_cacheGlyphData(ML_Font *font, wchar_t charCode)
 	uint16_t textureWidth = 0, textureHeight = 0;
 
 	gIndex = FT_Get_Char_Index(font->ftFace, charCode);
-	if (!FT_Load_Glyph(font->ftFace, gIndex, FT_LOAD_DEFAULT))
+	if (!FT_Load_Glyph(font->ftFace, gIndex, FT_LOAD_DEFAULT | FT_LOAD_RENDER))
 	{
-		FT_Render_Glyph(font->ftSlot, FT_RENDER_MODE_NORMAL);
-
 		if(font->ftSlot->format == FT_GLYPH_FORMAT_BITMAP)
 		{
 			FT_Bitmap *glyphBitmap = &font->ftSlot->bitmap;
@@ -330,15 +305,19 @@ void FreeTypeGX_loadGlyphData(FT_Bitmap *bmp, ftgxCharData *charData)
 {
 	uint32_t *glyphData = (uint32_t *)(memalign(32, charData->textureWidth * charData->textureHeight * 4));
 	memset(glyphData, 0x00, charData->textureWidth * charData->textureHeight * 4);
-
+	
+	uint8_t *src = (uint8_t *)bmp->buffer;
 	uint16_t imagePosY = 0, imagePosX = 0;
-	uint32_t pixel;
+	uint32_t *dest = glyphData, *ptr = dest;
 
-	for (imagePosY = 0; imagePosY < bmp->rows; imagePosY++) {
-		for (imagePosX = 0; imagePosX < bmp->width; imagePosX++) {
-			pixel = (uint32_t)bmp->buffer[imagePosY * bmp->width + imagePosX];
-			glyphData[imagePosY * charData->textureWidth + imagePosX] = 0x00000000 | (pixel << 24) | (pixel << 16) | (pixel << 8) | pixel;
+	for(imagePosY = 0; imagePosY < bmp->rows; imagePosY++) 
+	{
+		for(imagePosX = 0; imagePosX < bmp->width; imagePosX++) 
+		{
+			*ptr++ = EXPLODE_UINT8_TO_UINT32(*src);
+			src++;
 		}
+		ptr = dest += charData->textureWidth;
 	}
 
 	charData->glyphDataTexture = Metaphrasis_convertBufferToRGBA8(glyphData, charData->textureWidth, charData->textureHeight);
@@ -346,47 +325,15 @@ void FreeTypeGX_loadGlyphData(FT_Bitmap *bmp, ftgxCharData *charData)
 	free(glyphData);
 }
 
-void FreeTypeGX_drawTextFeature(ML_Font *font, int16_t x, int16_t y, uint16_t width, ftgxDataOffset offsetData, uint16_t format)
-{
+void FreeTypeGX_drawTextFeature(ML_Font *font, int16_t x, int16_t y, uint16_t width, uint16_t format)
+{		
 	uint16_t featureHeight = font->ftPointSize >> 4 > 0 ? font->ftPointSize >> 4 : 1;
+	
+	if(format & FONT_STYLE_UNDERLINE)
+		FreeTypeGX_copyFeatureToFramebuffer(width, featureHeight, x, y + 1, font->color, font->alpha);
 
-	if(format & FONT_UNDERLINE)
-	{
-		switch(format & 0x00F0)
-		{
-			case FONT_ALIGN_TOP:
-				FreeTypeGX_copyFeatureToFramebuffer(width, featureHeight, x, y + offsetData.max + 1, font->color, font->alpha);
-				break;
-			case FONT_ALIGN_MIDDLE:
-				FreeTypeGX_copyFeatureToFramebuffer(width, featureHeight, x, y + ((offsetData.max - offsetData.min) >> 1) + 1, font->color, font->alpha);
-				break;
-			case FONT_ALIGN_BOTTOM:
-				FreeTypeGX_copyFeatureToFramebuffer(width, featureHeight, x, y - offsetData.min, font->color, font->alpha);
-				break;
-			default:
-				FreeTypeGX_copyFeatureToFramebuffer(width, featureHeight, x, y + 1, font->color, font->alpha);
-				break;
-		}
-	}
-
-	if(format & FONT_STRIKE)
-	{
-		switch(format & 0x00F0)
-		{
-			case FONT_ALIGN_TOP:
-				FreeTypeGX_copyFeatureToFramebuffer(width, featureHeight, x, y + ((offsetData.max + offsetData.min) >> 1), font->color, font->alpha);
-				break;
-			case FONT_ALIGN_MIDDLE:
-				FreeTypeGX_copyFeatureToFramebuffer(width, featureHeight, x, y, font->color, font->alpha);
-				break;
-			case FONT_ALIGN_BOTTOM:
-				FreeTypeGX_copyFeatureToFramebuffer(width, featureHeight, x, y - ((offsetData.max + offsetData.min) >> 1), font->color, font->alpha);
-				break;
-			default:
-				FreeTypeGX_copyFeatureToFramebuffer(width, featureHeight, x, y - ((offsetData.max - offsetData.min) >> 1), font->color, font->alpha);
-				break;
-		}
-	}
+	if(format & FONT_STYLE_STRIKE)
+		FreeTypeGX_copyFeatureToFramebuffer(width, featureHeight, x, y - (font->ftAscender >> 2), font->color, font->alpha);
 }
 
 
@@ -412,23 +359,36 @@ uint32_t* Metaphrasis_convertBufferToRGBA8(uint32_t* rgbaBuffer, uint16_t buffer
 	uint8_t *src = (uint8_t *)rgbaBuffer;
 	uint8_t *dst = (uint8_t *)dataBufferRGBA8;
 
-	uint16_t block = 0, i = 0, c = 0, ar = 0, gb = 0;
+	uint16_t block = 0, i = 0;
+	uint32_t c = 0, blockWid = 0;
 
 	for(block = 0; block < bufferHeight; block += 4) {
-		    for(i = 0; i < bufferWidth; i += 4) {
-		            for (c = 0; c < 4; c++) {
-		                    for (ar = 0; ar < 4; ar++) {
-		                            *dst++ = src[(((i + ar) + ((block + c) * bufferWidth)) * 4) + 3];
-		                            *dst++ = src[((i + ar) + ((block + c) * bufferWidth)) * 4];
-		                    }
-		            }
-		            for (c = 0; c < 4; c++) {
-		                    for (gb = 0; gb < 4; gb++) {
-		                            *dst++ = src[(((i + gb) + ((block + c) * bufferWidth)) * 4) + 1];
-		                            *dst++ = src[(((i + gb) + ((block + c) * bufferWidth)) * 4) + 2];
-		                    }
-		            }
-		    }
+		for(i = 0; i < bufferWidth; i += 4) {
+            for (c = 0; c < 4; c++) {
+				blockWid = (((block + c) * bufferWidth) + i) << 2 ;
+
+				*dst++ = src[blockWid + 3];  // ar = 0
+				*dst++ = src[blockWid + 0];
+				*dst++ = src[blockWid + 7];  // ar = 1
+				*dst++ = src[blockWid + 4];
+				*dst++ = src[blockWid + 11]; // ar = 2
+				*dst++ = src[blockWid + 8];
+				*dst++ = src[blockWid + 15]; // ar = 3
+				*dst++ = src[blockWid + 12];
+            }
+            for (c = 0; c < 4; c++) {
+				blockWid = (((block + c) * bufferWidth) + i ) << 2 ;
+
+				*dst++ = src[blockWid + 1];  // gb = 0
+				*dst++ = src[blockWid + 2];
+				*dst++ = src[blockWid + 5];  // gb = 1
+				*dst++ = src[blockWid + 6];
+				*dst++ = src[blockWid + 9];  // gb = 2
+				*dst++ = src[blockWid + 10];
+				*dst++ = src[blockWid + 13]; // gb = 3
+				*dst++ = src[blockWid + 14];
+            }
+		}
 	}
 	DCFlushRange(dataBufferRGBA8, bufferSize);
 
@@ -440,7 +400,7 @@ uint16_t FreeTypeGX_getWidth(ML_Font *font, const wchar_t *text)
 	uint16_t strLength = wcslen(text);
 	uint16_t strWidth = 0;
 	FT_Vector pairDelta;
-	uint16_t i = 0;
+	int i = 0;
 
 	for (i = 0; i < strLength; i++)
 	{
@@ -463,7 +423,7 @@ uint16_t FreeTypeGX_getWidth(ML_Font *font, const wchar_t *text)
 	return strWidth;
 }
 
-uint16_t FreeTypeGX_getWidthEx(ML_Font *font, const wchar_t *text, uint16_t i)
+uint16_t FreeTypeGX_getWidthEx(ML_Font *font, const wchar_t *text, int i)
 {
 	uint16_t strWidth = 0;
 	FT_Vector pairDelta;
@@ -488,12 +448,27 @@ uint16_t FreeTypeGX_getWidthEx(ML_Font *font, const wchar_t *text, uint16_t i)
 
 uint16_t FreeTypeGX_getHeight(ML_Font *font, const wchar_t *text)
 {
-    ftgxDataOffset offset = FreeTypeGX_getOffset(font, text);
+	uint16_t strLength = wcslen(text);
+	uint16_t strMax = 0, strMin = 0;
+	int i = 0;
 
-    return offset.max + offset.min;
+	for(i = 0; i < strLength; i++)
+	{
+		ftgxCharData* glyphData = NULL;
+
+		glyphData = &(_findTexInFtMap(font, text[i]))->charData;
+
+		if(glyphData != NULL)
+		{
+			strMax = glyphData->renderOffsetMax > strMax ? glyphData->renderOffsetMax : strMax;
+			strMin = glyphData->renderOffsetMin > strMin ? glyphData->renderOffsetMin : strMin;
+		}
+	}
+
+	return strMax + strMin;
 }
 
-ftgxDataOffset FreeTypeGX_getOffset(ML_Font *font, const wchar_t *text)
+/*ftgxDataOffset FreeTypeGX_getOffset(ML_Font *font, const wchar_t *text)
 {
 	uint16_t strLength = wcslen(text);
 	uint16_t strMax = 0, strMin = 0;
@@ -513,42 +488,36 @@ ftgxDataOffset FreeTypeGX_getOffset(ML_Font *font, const wchar_t *text)
 	}
 
 	return (ftgxDataOffset){strMax, strMin};
-}
+}*/
 
 uint16_t FreeTypeGX_getStyleOffsetWidth(uint16_t width, uint16_t format)
 {
-	if(format & FONT_JUSTIFY_LEFT)
+	switch(format & FONT_JUSTIFY_MASK) 
 	{
-		return 0;
+		case FONT_JUSTIFY_LEFT:
+			return 0;
+		case FONT_JUSTIFY_CENTER:
+			return width >> 1;
+		case FONT_JUSTIFY_RIGHT:
+			return width;
+		default:
+			return 0;
 	}
-	else if(format & FONT_JUSTIFY_CENTER)
-	{
-		return width >> 1;
-	}
-	else if(format & FONT_JUSTIFY_RIGHT)
-	{
-		return width;
-	}
-
-	return 0;
 }
 
-uint16_t FreeTypeGX_getStyleOffsetHeight(ftgxDataOffset offset, uint16_t format)
+uint16_t FreeTypeGX_getStyleOffsetHeight(FT_Short ftAscender, FT_Short ftDescender, uint16_t format)
 {
-	if(format & FONT_ALIGN_TOP)
+	switch(format & FONT_ALIGN_MASK)
 	{
-		return -offset.max;
+		case FONT_ALIGN_TOP:
+			return -ftAscender;
+		case FONT_ALIGN_MIDDLE:
+			return -(ftDescender + ftAscender) >> 1;
+		case FONT_ALIGN_BOTTOM:
+			return ftDescender;
+		default:
+			return 0;
 	}
-	else if(format & FONT_ALIGN_MIDDLE)
-	{
-		return -(offset.max - offset.min) >> 1;
-	}
-	else if(format & FONT_ALIGN_BOTTOM)
-	{
-		return offset.min;
-	}
-
-	return 0;
 }
 
 ftMap *_findTexInFtMap(ML_Font *font, wchar_t charCode)

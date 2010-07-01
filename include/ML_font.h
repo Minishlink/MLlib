@@ -55,22 +55,31 @@ typedef struct {
 	u16 style; /*!< Style, see defines FONT_... */
 	FT_Face ftFace; 
 	FT_GlyphSlot ftSlot;
+	FT_Short ftAscender;
+	FT_Short ftDescender;
 	FT_UInt ftPointSize;
 	bool ftKerningEnabled;
 } ML_Font;
 
+#define EXPLODE_UINT8_TO_UINT32(x) (x << 24) | (x << 16) | (x << 8) | x
+
 #define FONT_NULL					0x0000 /*!< \brief There won't be any formatting or styling. */
 
+#define FONT_JUSTIFY_MASK			0x000f
 #define FONT_JUSTIFY_LEFT			0x0001 /*!< The text will be justified by the left. */
 #define FONT_JUSTIFY_CENTER			0x0002 /*!< The text will be justified by the center. */
 #define FONT_JUSTIFY_RIGHT			0x0004 /*!< The text will be justified by the right. */
 
+#define FONT_ALIGN_MASK				0x00f0
 #define FONT_ALIGN_TOP				0x0010 /*!< The text will be aligned at the top. */
 #define FONT_ALIGN_MIDDLE			0x0020 /*!< The text will be aligned at the middle. */
 #define FONT_ALIGN_BOTTOM			0x0040 /*!< The text will be aligned at the bottom. */
 
-#define FONT_UNDERLINE				0x0100 /*!< The text will be underlined. */
-#define FONT_STRIKE					0x0200 /*!< The text will be striked. */
+#define FONT_STYLE_MASK				0x0f00
+#define FONT_STYLE_UNDERLINE		0x0100 /*!< The text will be underlined. */
+#define FONT_STYLE_STRIKE			0x0200 /*!< The text will be striked. */
+#define FONT_UNDERLINE 				FONT_STYLE_UNDERLINE
+#define FONT_STRIKE 				FONT_STYLE_STRIKE
 
 #define FONT_DEFAULT				FONT_JUSTIFY_LEFT | FONT_ALIGN_TOP /*!< \brief This is the default value you should use generally. */
 
@@ -130,18 +139,18 @@ inline bool _loadFont(ML_Font *font, const char *filename, const uint8_t* buffer
 bool FreeTypeGX_cacheGlyphData(ML_Font *font, wchar_t charCode);
 uint16_t FreeTypeGX_cacheGlyphDataComplete(ML_Font *font);
 void FreeTypeGX_loadGlyphData(FT_Bitmap *bmp, ftgxCharData *charData);
-void FreeTypeGX_drawTextFeature(ML_Font *font, int16_t x, int16_t y, uint16_t width, ftgxDataOffset offsetData, uint16_t format);
+void FreeTypeGX_drawTextFeature(ML_Font *font, int16_t x, int16_t y, uint16_t width, uint16_t format);
 uint16_t FreeTypeGX_adjustTextureWidth(uint16_t textureWidth);
 uint16_t FreeTypeGX_adjustTextureHeight(uint16_t textureHeight);
 void FreeTypeGX_charToWideChar(char* strChar, wchar_t *strWChar);
 
 uint32_t* Metaphrasis_convertBufferToRGBA8(uint32_t* rgbaBuffer, uint16_t bufferWidth, uint16_t bufferHeight);
 uint16_t FreeTypeGX_getWidth(ML_Font *font, const wchar_t *text);
-uint16_t FreeTypeGX_getWidthEx(ML_Font *font, const wchar_t *text, uint16_t i);
+uint16_t FreeTypeGX_getWidthEx(ML_Font *font, const wchar_t *text, int i);
 uint16_t FreeTypeGX_getHeight(ML_Font *font, const wchar_t *text);
-ftgxDataOffset FreeTypeGX_getOffset(ML_Font *font, const wchar_t *text);
+//ftgxDataOffset FreeTypeGX_getOffset(ML_Font *font, const wchar_t *text);
 uint16_t FreeTypeGX_getStyleOffsetWidth(uint16_t width, uint16_t format);
-uint16_t FreeTypeGX_getStyleOffsetHeight(ftgxDataOffset offset, uint16_t format);
+uint16_t FreeTypeGX_getStyleOffsetHeight(FT_Short Ascender, FT_Short Descender, uint16_t format);
 
 ftMap *_findTexInFtMap(ML_Font *font, wchar_t charCode);
 void _addTexToFtMap(ML_Font *font, wchar_t charCode, ftgxCharData charData);
