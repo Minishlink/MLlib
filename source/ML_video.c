@@ -140,6 +140,29 @@ void ML_DrawRect(int x, int y, u16 width, u16 height, u32 rgba, bool filled)
     }
 }
 
+void ML_DrawCircle(int x, int y, int radius, u32 rgba, bool filled)
+{
+	int i;
+    u32 a;
+    f32 ra, G_DTOR = M_DTOR * 10, x1[36], y1[36];
+
+    for(a = 0; a < 36; a++)
+    {
+        ra = a * G_DTOR;
+
+        x1[a] = cos(ra) * radius + x;
+        y1[a] = sin(ra) * radius + y;
+    }
+	
+	if(filled) GX_Begin(GX_TRIANGLEFAN, GX_VTXFMT0, 36);
+	else GX_Begin(GX_LINESTRIP, GX_VTXFMT0, 36);
+	for(i = 0; i < 36; i++) 
+	{
+		GX_Position3f32(x1[i], y1[i], 0.0f);
+		GX_Color1u32(rgba);
+	}
+}
+
 void ML_Brightness(u8 alpha)
 { 
     guVector v[] = {{0,0,0.0f}, {screenMode->fbWidth,0,0.0f}, {screenMode->fbWidth,screenMode->xfbHeight,0.0f}, {0,screenMode->xfbHeight,0.0f}, {0,0,0.0f}};    

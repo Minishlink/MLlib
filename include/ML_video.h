@@ -171,6 +171,17 @@ extern void ML_DrawTexture(GXTexObj *texObj, int x, int y, u16 width, u16 height
 extern void ML_DrawRect(int x, int y, u16 width, u16 height, u32 rgba, bool filled);
 
 /**
+* \fn void ML_DrawCircle(int x, int y, int radius, u32 rgba, bool filled)
+* \brief This function shows a rectangle with the color you want.
+* @param x X position
+* @param y Y position
+* @param radius Radius
+* @param rgba RGBA Color (HTML Color) like 0xFF0016FF (0xRED+GREEN+BLUE+ALPHA)
+* @param filled Should the circle be filled or not ?
+*/
+extern void ML_DrawCircle(int x, int y, int radius, u32 rgba, bool filled);
+
+/**
 * \fn void ML_Brightness(u8 alpha)
 * \brief This function changes the opacity of the entire screen.
 * In fact, it draws a black rectangle which will be opacified.
