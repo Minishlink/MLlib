@@ -77,7 +77,8 @@ bool _loadImage(ML_Image *image, ML_Sprite *sprite, ML_Background *background, c
 	DCFlushRange(image->data, image->width * image->height * 4);
 	
 	GX_InitTexObj(&image->texObj, image->data, image->width, image->height, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);	
-	GX_InitTexObjLOD(&image->texObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, 0, 0, GX_ANISO_1);
+	if(!_aa_enabled)
+		GX_InitTexObjLOD(&image->texObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, 0, 0, GX_ANISO_1);
 	
 	if(sprite)
 	{
@@ -104,22 +105,39 @@ void ML_DrawTexture(GXTexObj *texObj, int x, int y, u16 width, u16 height, float
 	_drawImage(texObj, x, y, width, height, scaleX, scaleY, angle, alpha, 0, 0, 0, 0, 0, 0);
 }
 
-void ML_DrawRect(int x, int y, u16 width, u16 height, u32 rgba)
+void ML_DrawRect(int x, int y, u16 width, u16 height, u32 rgba, bool filled)
 {
 	int x2 = x + width;
     int y2 = y + height;
-    guVector v[] = {{x,y,0.0f}, {x2,y,0.0f}, {x2,y2,0.0f}, {x,y2,0.0f}, {x,y,0.0f}};
     
-    int i;
-    GXColor color = RGB_u32_u8(rgba);
-    
-	GX_Begin(GX_TRIANGLEFAN, GX_VTXFMT0, 4);
-    for(i = 0; i < 4; i++) 
+    if(filled)
     {
-        GX_Position3f32(v[i].x, v[i].y,  v[i].z);
-        GX_Color4u8(color.r, color.g, color.b, color.a);
+		GX_Begin(GX_QUADS, GX_VTXFMT0, 4);
+			GX_Position3f32(x, y, 0.0f);
+			GX_Color1u32(rgba);
+			GX_Position3f32(x2, y, 0.0f);
+			GX_Color1u32(rgba);
+			GX_Position3f32(x2, y2, 0.0f);
+			GX_Color1u32(rgba);
+			GX_Position3f32(x, y2, 0.0f);
+			GX_Color1u32(rgba);
+		GX_End();
+	}
+	else
+	{
+		GX_Begin(GX_LINESTRIP, GX_VTXFMT0, 5);
+			GX_Position3f32(x, y, 0.0f);
+			GX_Color1u32(rgba);
+			GX_Position3f32(x2, y, 0.0f);
+			GX_Color1u32(rgba);
+			GX_Position3f32(x2, y2, 0.0f);
+			GX_Color1u32(rgba);
+			GX_Position3f32(x, y2, 0.0f);
+			GX_Color1u32(rgba);
+			GX_Position3f32(x, y, 0.0f);
+			GX_Color1u32(rgba);
+		GX_End();
     }
-    GX_End();
 }
 
 void ML_Brightness(u8 alpha)
@@ -184,6 +202,16 @@ void ML_DisableClipping()
 	GX_SetScissor(0, 0, screenMode->fbWidth, screenMode->efbHeight);
 }
 
+void ML_EnableTextureAntiAliasing()
+{
+	_aa_enabled = true;
+}
+
+void ML_DisableTextureAntiAliasing()
+{
+	_aa_enabled = false;
+}
+
 void ML_SetBackgroundColor(GXColor color)
 {
 	GX_SetCopyClear(color, 0x00ffffff);	
@@ -202,7 +230,8 @@ void ML_SplashScreen()
 		return;
 	
 	GX_InitTexObj(&image.texObj, image.data, image.width, image.height, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
-	GX_InitTexObjLOD(&image.texObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, 0, 0, GX_ANISO_1);
+	if(!_aa_enabled)
+		GX_InitTexObjLOD(&image.texObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, 0, 0, GX_ANISO_1);
 	
 	DCFlushRange(image.data, image.width * image.height * 4);
 	
@@ -361,21 +390,21 @@ void _drawImage(GXTexObj *texObj, int x, int y, u16 _width, u16 _height, float s
 		GX_LoadPosMtxImm (mv, GX_PNMTX0);
 		
 		GX_Begin(GX_QUADS, GX_VTXFMT0, 4);
-				GX_Position3f32(-width*scaleX, -height*scaleY, 0);
-				GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
-				GX_TexCoord2f32(flipX, flipY);
+			GX_Position3f32(-width*scaleX, -height*scaleY, 0);
+			GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
+			GX_TexCoord2f32(flipX, flipY);
 
-				GX_Position3f32(width*scaleX, -height*scaleY, 0);
-				GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
-				GX_TexCoord2f32(!flipX, flipY);
+			GX_Position3f32(width*scaleX, -height*scaleY, 0);
+			GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
+			GX_TexCoord2f32(!flipX, flipY);
 
-				GX_Position3f32(width*scaleX, height*scaleY, 0);
-				GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
-				GX_TexCoord2f32(!flipX, !flipY);
+			GX_Position3f32(width*scaleX, height*scaleY, 0);
+			GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
+			GX_TexCoord2f32(!flipX, !flipY);
 
-				GX_Position3f32(-width*scaleX, height*scaleY, 0);
-				GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
-				GX_TexCoord2f32(flipX, !flipY);
+			GX_Position3f32(-width*scaleX, height*scaleY, 0);
+			GX_Color4u8(0xFF, 0xFF, 0xFF, alpha);
+			GX_TexCoord2f32(flipX, !flipY);
 		GX_End();
 	}
 	else
@@ -404,6 +433,11 @@ void _drawImage(GXTexObj *texObj, int x, int y, u16 _width, u16 _height, float s
 			t1 = t2;
 			t2 = tmp;
 		}
+		
+		if(_aa_enabled)
+			GX_SetCopyFilter(screenMode->aa, screenMode->sample_pattern, GX_TRUE, screenMode->vfilter);
+		else
+			GX_SetCopyFilter(GX_FALSE, screenMode->sample_pattern, GX_FALSE, screenMode->vfilter);
 
 		GX_LoadTexObj(texObj, GX_TEXMAP0);
 	

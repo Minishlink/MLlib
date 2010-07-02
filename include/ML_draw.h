@@ -10,7 +10,7 @@
    extern "C" {
 #endif /* __cplusplus */
 
-extern GXColor RGB_u32_u8 (u32 color);
+extern GXColor RGBA_u32_u8(u32 color);
 extern u16 RGB_888_565(u8 r, u8 g, u8 b);
 extern u16 BGR_RGB(u32 bgr);
 extern u32 RGB_888_565_2(u32 colorin);

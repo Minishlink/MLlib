@@ -25,7 +25,7 @@ void ML_Exit()
 {
 	_flushAndClean(1, 1);
 	
-	char * sig = (char *)0x80001804;
+	char* sig = (char *)0x80001804;
 	if( sig[0] == 'S' &&
 		sig[1] == 'T' &&
 		sig[2] == 'U' &&
@@ -105,6 +105,8 @@ void _flushAndClean(bool GXyes, bool refresh)
 	
 	if(GXyes)
 	{
+		ML_DisableClipping();
+		GX_DrawDone();
 		GX_AbortFrame();
 		GX_Flush();   
 		ML_GX_FreeMemory();
