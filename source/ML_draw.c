@@ -5,14 +5,14 @@
 * \brief This file contains draw functions.
 */
 
-GXColor RGB_u32_u8 (u32 color) 
+GXColor RGBA_u32_u8(u32 color) 
 {
-	u8 a, r, g, b;
+	u8 r, g, b, a;
 
-	a = (color >> 24) & 0xFF; 
-	r = (color >> 16) & 0xFF; 
-	g = (color >> 8) & 0xFF; 
-	b = (color) & 0xFF; 
+	r = (color >> 24) & 0xFF; 
+	g = (color >> 16) & 0xFF; 
+	b = (color >> 8) & 0xFF; 
+	a = (color) & 0xFF; 
 
 	return (GXColor){r, g, b, a};
 }

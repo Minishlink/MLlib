@@ -159,15 +159,16 @@ inline bool _loadImage(ML_Image *image, ML_Sprite *sprite, ML_Background *backgr
 extern void ML_DrawTexture(GXTexObj *texObj, int x, int y, u16 width, u16 height, float angle, float scaleX, float scaleY, u8 alpha);
 
 /**
-* \fn void ML_DrawRect(int x, int y, u16 width, u16 height, u32 rgba)
+* \fn void ML_DrawRect(int x, int y, u16 width, u16 height, u32 rgba, bool filled)
 * \brief This function shows a rectangle with the color you want.
 * @param x X position
 * @param y Y position
 * @param width Width
 * @param height Height
 * @param rgba RGBA Color (HTML Color) like 0xFF0016FF (0xRED+GREEN+BLUE+ALPHA)
+* @param filled Should the rectangle be filled or not ?
 */
-extern void ML_DrawRect(int x, int y, u16 width, u16 height, u32 rgba);
+extern void ML_DrawRect(int x, int y, u16 width, u16 height, u32 rgba, bool filled);
 
 /**
 * \fn void ML_Brightness(u8 alpha)
@@ -206,6 +207,18 @@ extern void ML_EnableClipping(int x, int y, int width, int height);
 * \brief This function disables the clipping.
 */
 extern void ML_DisableClipping();
+
+/**
+* \fn void ML_EnableTextureAntiAliasing()
+* \brief This function enables the anti-aliasing on textures.
+*/
+extern void ML_EnableTextureAntiAliasing();
+
+/**
+* \fn void ML_DisableTextureAntiAliasing()
+* \brief This function disables the anti-aliasing on textures.
+*/
+extern void ML_DisableTextureAntiAliasing();
 
 /**
 * \fn void ML_SetBackgroundColor(GXColor color)

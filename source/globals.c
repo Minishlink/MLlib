@@ -30,3 +30,13 @@ void setTTF(bool value)
 	_ttf_enabled = value;
 }
 
+bool getAA()
+{
+	return _aa_enabled;
+}
+
+void setAA(bool value)
+{
+	_aa_enabled = value;
+}
+
