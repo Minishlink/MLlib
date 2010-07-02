@@ -495,7 +495,7 @@ void FreeTypeGX_copyTextureToFramebuffer(GXTexObj *texObj, int16_t screenX, int1
 	u16 width, height;
 	
 	if(_aa_enabled)
-			GX_SetCopyFilter(screenMode->aa, screenMode->sample_pattern, GX_TRUE, screenMode->vfilter);
+		GX_SetCopyFilter(screenMode->aa, screenMode->sample_pattern, GX_TRUE, screenMode->vfilter);
 	else
 		GX_SetCopyFilter(GX_FALSE, screenMode->sample_pattern, GX_FALSE, screenMode->vfilter);
 		
