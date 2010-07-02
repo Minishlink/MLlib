@@ -369,6 +369,11 @@ void _drawImage(GXTexObj *texObj, int x, int y, u16 _width, u16 _height, float s
 		
 	if(!tiled)
 	{
+		if(_aa_enabled)
+			GX_SetCopyFilter(screenMode->aa, screenMode->sample_pattern, GX_TRUE, screenMode->vfilter);
+		else
+			GX_SetCopyFilter(GX_FALSE, screenMode->sample_pattern, GX_FALSE, screenMode->vfilter);
+		
 		GX_LoadTexObj(texObj, GX_TEXMAP0);
 
 		GX_SetTevOp(GX_TEVSTAGE0, GX_MODULATE);
@@ -489,6 +494,11 @@ void FreeTypeGX_copyTextureToFramebuffer(GXTexObj *texObj, int16_t screenX, int1
 	Mtx44 m, m1, m2, mv;
 	u16 width, height;
 	
+	if(_aa_enabled)
+			GX_SetCopyFilter(screenMode->aa, screenMode->sample_pattern, GX_TRUE, screenMode->vfilter);
+	else
+		GX_SetCopyFilter(GX_FALSE, screenMode->sample_pattern, GX_FALSE, screenMode->vfilter);
+		
 	GX_LoadTexObj(texObj, GX_TEXMAP0);
 
 	GX_SetTevOp(GX_TEVSTAGE0, GX_MODULATE);
