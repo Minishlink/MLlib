@@ -8,6 +8,12 @@
 u8 nb_wiimote = 1, nb_pads_gc = 0;
 u8 _nunchuk_enabled = 0, _cpad_enabled = 0, _guitar_enabled = 0;
 
+WPads Wiimote[WPAD_MAX_WIIMOTES];
+Nunchuks Nunchuk[WPAD_MAX_WIIMOTES];
+CPads CPad[WPAD_MAX_WIIMOTES];
+GH Guitar[WPAD_MAX_WIIMOTES];
+GC_Pads Pad[4];
+
 void ML_InitPad()
 {
 	WPAD_Init();

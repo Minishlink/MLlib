@@ -86,7 +86,7 @@ typedef struct {
 	bool Enabled; /*!< Is the Nunchuk enabled ? */
 } WPads;
 
-WPads Wiimote[WPAD_MAX_WIIMOTES];
+extern WPads Wiimote[WPAD_MAX_WIIMOTES];
 
 /**
 * \struct Nunchuk_Buttons
@@ -122,7 +122,7 @@ typedef struct {
 	Wii_Orientation Orient; /*!< see struct Wii_Orientation */
 } Nunchuks;
 
-Nunchuks Nunchuk[WPAD_MAX_WIIMOTES];
+extern Nunchuks Nunchuk[WPAD_MAX_WIIMOTES];
 
 /**
 * \struct CPad_Buttons
@@ -158,7 +158,7 @@ typedef struct {
 	RightStick; /*!< see struct Joystick */
 } CPads;
 
-CPads CPad[WPAD_MAX_WIIMOTES];
+extern CPads CPad[WPAD_MAX_WIIMOTES];
 
 /**
 * \struct GH_Buttons
@@ -187,7 +187,7 @@ typedef struct {
 	Joystick Stick;
 } GH;
 
-GH Guitar[WPAD_MAX_WIIMOTES];
+extern GH Guitar[WPAD_MAX_WIIMOTES];
 
 
 // ---------------
@@ -247,7 +247,7 @@ typedef struct {
 	GC_Sticks Stick; /*!< see struct GC_Sticks */
 } GC_Pads;
 
-GC_Pads Pad[4];
+extern GC_Pads Pad[4];
 
 /**
 * \fn void ML_InitPad()

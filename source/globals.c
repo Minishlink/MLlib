@@ -1,5 +1,11 @@
 #include <MLlib.h>
 
+bool _asnd_enabled; // Sound enabled
+bool bPowerOff;	// Poweroff flag.
+bool bReset;	// Reset flag.
+bool _ttf_enabled; // Font system enabled
+bool _aa_enabled; // Anti-aliasing for textures enabled
+
 void setAsnd(bool value)
 {
 	_asnd_enabled = value;

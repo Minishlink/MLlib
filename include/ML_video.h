@@ -81,8 +81,9 @@ typedef struct
   u32 biCompression;		/*** Is this compressed? ***/
 } __attribute__ ((__packed__)) WINBITMAP;
 
-GXRModeObj *screenMode;
-int _screenWidth, _screenHeight;
+extern GXRModeObj *screenMode;
+extern int _screenWidth, _screenHeight;
+extern Mtx GXmodelView2D;
 
 /**
 * \file

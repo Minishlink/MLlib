@@ -16,13 +16,15 @@ static u32 whichfb = 0;
 
 // GX
 static void *gp_fifo = NULL;
-static Mtx GXmodelView2D;
+Mtx GXmodelView2D;
 
 // Others
 static u8 _alphaFade;
 static bool _fadeMode = 0;
 #define FADE_OUT	0
 #define FADE_IN		1
+GXRModeObj *screenMode;
+int _screenWidth, _screenHeight;
 
 /**
 * \file
@@ -77,7 +79,7 @@ bool _loadImage(ML_Image *image, ML_Sprite *sprite, ML_Background *background, c
 	DCFlushRange(image->data, image->width * image->height * 4);
 	
 	GX_InitTexObj(&image->texObj, image->data, image->width, image->height, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);	
-	if(!_aa_enabled)
+	if(!getAA())
 		GX_InitTexObjLOD(&image->texObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, 0, 0, GX_ANISO_1);
 	
 	if(sprite)
@@ -253,7 +255,7 @@ void ML_SplashScreen()
 		return;
 	
 	GX_InitTexObj(&image.texObj, image.data, image.width, image.height, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
-	if(!_aa_enabled)
+	if(!getAA())
 		GX_InitTexObjLOD(&image.texObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, 0, 0, GX_ANISO_1);
 	
 	DCFlushRange(image.data, image.width * image.height * 4);
@@ -392,7 +394,7 @@ void _drawImage(GXTexObj *texObj, int x, int y, u16 _width, u16 _height, float s
 		
 	if(!tiled)
 	{
-		if(_aa_enabled)
+		if(getAA())
 			GX_SetCopyFilter(screenMode->aa, screenMode->sample_pattern, GX_TRUE, screenMode->vfilter);
 		else
 			GX_SetCopyFilter(GX_FALSE, screenMode->sample_pattern, GX_FALSE, screenMode->vfilter);
@@ -462,7 +464,7 @@ void _drawImage(GXTexObj *texObj, int x, int y, u16 _width, u16 _height, float s
 			t2 = tmp;
 		}
 		
-		if(_aa_enabled)
+		if(getAA())
 			GX_SetCopyFilter(screenMode->aa, screenMode->sample_pattern, GX_TRUE, screenMode->vfilter);
 		else
 			GX_SetCopyFilter(GX_FALSE, screenMode->sample_pattern, GX_FALSE, screenMode->vfilter);
@@ -517,7 +519,7 @@ void FreeTypeGX_copyTextureToFramebuffer(GXTexObj *texObj, int16_t screenX, int1
 	Mtx44 m, m1, m2, mv;
 	u16 width, height;
 	
-	if(_aa_enabled)
+	if(getAA())
 		GX_SetCopyFilter(screenMode->aa, screenMode->sample_pattern, GX_TRUE, screenMode->vfilter);
 	else
 		GX_SetCopyFilter(GX_FALSE, screenMode->sample_pattern, GX_FALSE, screenMode->vfilter);
