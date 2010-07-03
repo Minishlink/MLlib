@@ -569,12 +569,11 @@ void FreeTypeGX_copyTextureToFramebuffer(GXTexObj *texObj, int16_t screenX, int1
 // a very modified FreeTypeGX::copyFeatureToFramebuffer at all
 void FreeTypeGX_copyFeatureToFramebuffer(f32 featureWidth, f32 featureHeight, int16_t screenX, int16_t screenY, GXColor color, u8 alpha)
 {
-	// TODO: make it simpler
 	Mtx44 m, m1, m2, mv;
 	u16 width, height;
 	
-	GX_SetTevOp (GX_TEVSTAGE0, GX_PASSCLR);
-    GX_SetVtxDesc (GX_VA_TEX0, GX_NONE);
+	GX_SetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+    GX_SetVtxDesc(GX_VA_TEX0, GX_NONE);
 	
 	width = featureWidth*0.5;
 	height = featureHeight*0.5;
@@ -590,16 +589,16 @@ void FreeTypeGX_copyFeatureToFramebuffer(f32 featureWidth, f32 featureHeight, in
 	GX_LoadPosMtxImm (mv, GX_PNMTX0);
 
 	GX_Begin(GX_QUADS, GX_VTXFMT0, 4);
-			GX_Position3f32(-width, -height, 0);
+			GX_Position3f32(-width, -height, 0.0f);
 			GX_Color4u8(color.r, color.g, color.b, alpha);
 
-			GX_Position3f32(width, -height, 0);
+			GX_Position3f32(width, -height, 0.0f);
 			GX_Color4u8(color.r, color.g, color.b, alpha);
 
-			GX_Position3f32(width, height, 0);
+			GX_Position3f32(width, height, 0.0f);
 			GX_Color4u8(color.r, color.g, color.b, alpha);
 
-			GX_Position3f32(-width, height, 0);
+			GX_Position3f32(-width, height, 0.0f);
 			GX_Color4u8(color.r, color.g, color.b, alpha);
 	GX_End();
 	
@@ -697,6 +696,7 @@ void ML_GX_Init()
 void ML_GX_Refresh()
 {
 	GX_DrawDone();
+	// GX_InvalidateTexAll(); -> ?
 	
 	GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 	GX_SetColorUpdate(GX_TRUE);
