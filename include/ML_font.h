@@ -148,7 +148,6 @@ uint32_t* Metaphrasis_convertBufferToRGBA8(uint32_t* rgbaBuffer, uint16_t buffer
 uint16_t FreeTypeGX_getWidth(ML_Font *font, const wchar_t *text);
 uint16_t FreeTypeGX_getWidthEx(ML_Font *font, const wchar_t *text, int i);
 uint16_t FreeTypeGX_getHeight(ML_Font *font, const wchar_t *text);
-//ftgxDataOffset FreeTypeGX_getOffset(ML_Font *font, const wchar_t *text);
 uint16_t FreeTypeGX_getStyleOffsetWidth(uint16_t width, uint16_t format);
 uint16_t FreeTypeGX_getStyleOffsetHeight(FT_Short Ascender, FT_Short Descender, uint16_t format);
 

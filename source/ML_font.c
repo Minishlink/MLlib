@@ -158,7 +158,7 @@ u16 ML_DrawText(ML_Font *font, int x, int y, char *text, ...)
 
 					case L'n':
 						x_pos = x;
-						y_pos += FreeTypeGX_getHeight(font, wText);
+						y_pos += FreeTypeGX_getHeight(font, wText) + (font->ftPointSize >> 4 > 0 ? font->ftPointSize >> 4 : 1) + 1;
 						i++;
 						break;
 
@@ -235,13 +235,14 @@ u16 ML_DrawText(ML_Font *font, int x, int y, char *text, ...)
 					GX_InitTexObjLOD(&glyphTexture, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, 0, 0, GX_ANISO_1);		
 				FreeTypeGX_copyTextureToFramebuffer(&glyphTexture, x_pos - x_offset, y_pos - glyphData->renderOffsetY - y_offset, glyphData->textureWidth, glyphData->textureHeight, colorTemp, font->alpha, 1, 1, font->angle, font->flipX, font->flipY);
 				x_pos += glyphData->glyphAdvanceX;
+				
+				if(font->style & FONT_STYLE_MASK)
+					FreeTypeGX_drawTextFeature(font, x_pos - glyphData->glyphAdvanceX, y_pos - y_offset, FreeTypeGX_getWidthEx(font, wText, i), font->style);
+				
 				printed++;
 			}
 		}
 	}
-	
-	if(font->style & FONT_STYLE_MASK)
-		FreeTypeGX_drawTextFeature(font, x - x_offset, y - y_offset, FreeTypeGX_getWidth(font, wText), font->style);
 
 	free(wText);
 
@@ -438,21 +439,20 @@ uint16_t FreeTypeGX_getWidthEx(ML_Font *font, const wchar_t *text, int i)
 	FT_Vector pairDelta;
 
 	ftgxCharData* glyphData = NULL;
-
 	glyphData = &(_findTexInFtMap(font, text[i]))->charData;
 
 	if(glyphData != NULL)
 	{
 		if(font->ftKerningEnabled && (i > 0))
 		{
-			FT_Get_Kerning(font->ftFace, (_findTexInFtMap(font, text[i-1]))->charData.glyphIndex, glyphData->glyphIndex, FT_KERNING_DEFAULT, &pairDelta);
+			FT_Get_Kerning(font->ftFace, (_findTexInFtMap(font, text[i]))->charData.glyphIndex, glyphData->glyphIndex, FT_KERNING_DEFAULT, &pairDelta);
 			strWidth += pairDelta.x >> 6;
 		}
 
 		strWidth += glyphData->glyphAdvanceX;
 	}
 
-	return strWidth;
+	return strWidth+1;
 }
 
 uint16_t FreeTypeGX_getHeight(ML_Font *font, const wchar_t *text)
