@@ -231,7 +231,7 @@ u16 ML_DrawText(ML_Font *font, int x, int y, char *text, ...)
 				}
 
 				GX_InitTexObj(&glyphTexture, glyphData->glyphDataTexture, glyphData->textureWidth, glyphData->textureHeight, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
-				if(!_aa_enabled)
+				if(!getAA())
 					GX_InitTexObjLOD(&glyphTexture, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, 0, 0, GX_ANISO_1);		
 				FreeTypeGX_copyTextureToFramebuffer(&glyphTexture, x_pos - x_offset, y_pos - glyphData->renderOffsetY - y_offset, glyphData->textureWidth, glyphData->textureHeight, colorTemp, font->alpha, 1, 1, font->angle, font->flipX, font->flipY);
 				x_pos += glyphData->glyphAdvanceX;

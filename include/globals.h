@@ -5,11 +5,11 @@
    extern "C" {
 #endif /* __cplusplus */
 
-bool _asnd_enabled; // Sound enabled
-bool bPowerOff;	// Poweroff flag.
-bool bReset;	// Reset flag.
-bool _ttf_enabled; // Font system enabled
-bool _aa_enabled; // anti-alisaing for textures enabled
+extern bool _asnd_enabled; // Sound enabled
+extern bool bPowerOff;	// Poweroff flag.
+extern bool bReset;	// Reset flag.
+extern bool _ttf_enabled; // Font system enabled
+extern bool _aa_enabled; // Anti-aliasing for textures enabled
 
 extern void setAsnd(bool value);
 extern bool getAsnd();
