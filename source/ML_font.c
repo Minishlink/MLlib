@@ -347,6 +347,13 @@ uint16_t FreeTypeGX_adjustTextureHeight(uint16_t textureHeight) {
 
 void FreeTypeGX_charToWideChar(char* strChar, wchar_t *strWChar)
 {
+	int bt = mbstowcs(strWChar, strChar, strlen(strChar));
+	if (bt) 
+	{
+		strWChar[bt] = (wchar_t)'\0';
+		return;
+	}
+	
 	char *tempSrc = strChar;
 	wchar_t *tempDest = strWChar;
 	while((*tempDest++ = *tempSrc++));
@@ -469,28 +476,6 @@ uint16_t FreeTypeGX_getHeight(ML_Font *font, const wchar_t *text)
 
 	return strMax + strMin;
 }
-
-/*ftgxDataOffset FreeTypeGX_getOffset(ML_Font *font, const wchar_t *text)
-{
-	uint16_t strLength = wcslen(text);
-	uint16_t strMax = 0, strMin = 0;
-	uint16_t i = 0;
-
-	for(i = 0; i < strLength; i++)
-	{
-		ftgxCharData* glyphData = NULL;
-
-		glyphData = &(_findTexInFtMap(font, text[i]))->charData;
-
-		if(glyphData != NULL)
-		{
-			strMax = glyphData->renderOffsetMax > strMax ? glyphData->renderOffsetMax : strMax;
-			strMin = glyphData->renderOffsetMin > strMin ? glyphData->renderOffsetMin : strMin;
-		}
-	}
-
-	return (ftgxDataOffset){strMax, strMin};
-}*/
 
 uint16_t FreeTypeGX_getStyleOffsetWidth(uint16_t width, uint16_t format)
 {
