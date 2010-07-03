@@ -88,42 +88,69 @@ void ML_DrawTile(ML_Sprite *sprite, int x, int y, u16 frame)
 
 void ML_DrawSpriteText(ML_Sprite *sprite, int x, int y, const char *text, ...)
 { 
-    int i = 0, size = 0, j = 0;
+	int i = 0, size = 0, j = 0; // current index, size, number of char for this line passed
     char buffer[1024];
-	u8 c = 0;
-	y += sprite->tileHeight*sprite->scaleY;
+	u8 c = 0; // current char
+	
+	size = strlen(text);
+	if(size > 1024) return;
 	
     va_list argp;
     va_start(argp, text);
     size = vsprintf(buffer, text, argp);
     va_end(argp);
 	
-    for(i=0; i < size; i++) 
+    for(i=0; i < size; i++)
     {
         c = buffer[i]-32;
-        if(buffer[i] == '\n' || x+j*sprite->tileWidth*sprite->scaleX >= screenMode->fbWidth) { y += sprite->tileHeight*sprite->scaleY; j = -1; }
-        else ML_DrawTile(sprite, x+j*sprite->tileWidth*sprite->scaleX, y, c); j++; 
+        if(buffer[i] == '\n')
+        {
+        	y += sprite->tileHeight*sprite->scaleY;
+        	j = 0;
+        }
+        else if(x+j*sprite->tileWidth*sprite->scaleX >= _screenWidth) 
+        { 
+        	y += sprite->tileHeight*sprite->scaleY; 
+        	ML_DrawTile(sprite, x, y, c); 
+        	j = 0;
+        }
+        else ML_DrawTile(sprite, x+j*sprite->tileWidth*sprite->scaleX, y, c); j++;
+        
+        if(y+sprite->tileHeight*sprite->scaleY >= _screenHeight) return;
     }
 }
 
 void ML_DrawSpriteTextBox(ML_Sprite *sprite, int x, int y, int x2, int y2, const char *text, ...)
 {
-	int i = 0, size = 0, j = 0;
+	int i = 0, size = 0, j = 0; // current index, size, number of char for this line passed
     char buffer[1024];
-	u8 c = 0;
-	y += sprite->tileHeight*sprite->scaleY;
+	u8 c = 0; // current char
+	
+	size = strlen(text);
+	if(size > 1024) return;
 	
     va_list argp;
     va_start(argp, text);
     size = vsprintf(buffer, text, argp);
     va_end(argp);
 	
-    for(i=0; i < size; i++) 
+    for(i=0; i < size; i++)
     {
         c = buffer[i]-32;
-        if(y > y2) return;
-        if(buffer[i] == '\n' || x+j*sprite->tileWidth*sprite->scaleX >= x2) { y += sprite->tileHeight*sprite->scaleY; j = -1; }
-        else ML_DrawTile(sprite, x+j*sprite->tileWidth*sprite->scaleX, y, c); j++; 
+        if(buffer[i] == '\n')
+        {
+        	y += sprite->tileHeight*sprite->scaleY;
+        	j = 0;
+        }
+        else if(x+j*sprite->tileWidth*sprite->scaleX >= x2) 
+        { 
+        	y += sprite->tileHeight*sprite->scaleY; 
+        	ML_DrawTile(sprite, x, y, c); 
+        	j = 0;
+        }
+        else ML_DrawTile(sprite, x+j*sprite->tileWidth*sprite->scaleX, y, c); j++;
+        
+        if(y+sprite->tileHeight*sprite->scaleY >= y2) return;
     }
 }
 
@@ -140,7 +167,6 @@ void ML_DrawSpriteSimpleText(ML_Sprite *sprite, int x, int y, const char *text)
 {
 	int i = 0, size = strlen(text);
 	u8 c = 0;
-	y += sprite->tileHeight*sprite->scaleY;
 	
     for(i=0; i < size; i++)
     {
