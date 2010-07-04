@@ -125,10 +125,27 @@ bool _loadFont(ML_Font *font, const char *filename, const uint8_t* buffer, FT_Lo
 // originally FreeTypeGX::drawText();
 u16 ML_DrawText(ML_Font *font, int x, int y, char *text, ...)
 {	
-	wchar_t *wText = malloc(sizeof(wchar_t) * (strlen(text) + 1));
-	FreeTypeGX_charToWideChar(text, wText);
+	char buffer[1024];
+	uint16_t strLength = strlen(text);
+	if(strLength > 1024) return 0;
+	
+	bool draw = false;
 
-	uint16_t strLength = wcslen(wText);
+	va_list argp;
+	va_start(argp, text);
+	strLength = vsprintf(buffer, text, argp);
+	va_end(argp);
+
+	wchar_t *wText = malloc(sizeof(wchar_t) * (strLength + 1));
+
+	if(wText)
+		 FreeTypeGX_charToWideChar(buffer, wText);
+	else return 0;
+	
+	strLength = wcslen(wText);
+	
+	u8 newLineHeight = FreeTypeGX_getHeight(font, wText);
+	
 	uint16_t x_pos = x, y_pos = y, printed = 0;
 	uint16_t x_offset = 0, y_offset = 0;
 	uint16_t i = 0;
@@ -145,23 +162,11 @@ u16 ML_DrawText(ML_Font *font, int x, int y, char *text, ...)
 
 	for (i = 0; i < strLength; i++)
 	{
-		if(wText[i] == L'%') // is there a special key ?
+		switch(wText[i])
 		{
-			if(wText[i-1] != L'\\')
-			{
+			case L'#': // is there a special key ?
 				switch(wText[i+1])
-				{
-					case L't':
-						x_pos += 12*3;	
-						i++;
-						break;
-
-					case L'n':
-						x_pos = x;
-						y_pos += FreeTypeGX_getHeight(font, wText) + (font->ftPointSize >> 4 > 0 ? font->ftPointSize >> 4 : 1) + 1;
-						i++;
-						break;
-
+				{ // we look at the next char
 					case L'c':
 						switch(wText[i+2])
 						{
@@ -210,13 +215,34 @@ u16 ML_DrawText(ML_Font *font, int x, int y, char *text, ...)
 								break;
 						}
 						i++;
+						draw = false;
 						break;
-					default:
+					default: // if nothing then we draw it !
+						draw = true;
 						break;	
-				}// switch %c
-			} // not going to be drawn
-		} // is there a special key ?
-		else
+				} // finished looking at the next char
+				break;
+			case L'\n':
+				if(wText[i-1] != L'\\')
+				{
+					x_pos = x;
+					y_pos += newLineHeight + (font->ftPointSize >> 4 > 0 ? font->ftPointSize >> 4 : 1) + 1;
+					draw = false;
+				} else draw = true;
+				break;
+			case L'\t':
+				if(wText[i-1] != L'\\')
+				{
+					x_pos += 12*3;
+					draw = false;
+				} else draw = true;
+				break;
+			default:
+				draw = true;
+				break;
+		}
+		
+		if(draw)
 		{
 			ftgxCharData* glyphData = NULL;
 
@@ -407,12 +433,11 @@ uint32_t* Metaphrasis_convertBufferToRGBA8(uint32_t* rgbaBuffer, uint16_t buffer
 
 uint16_t FreeTypeGX_getWidth(ML_Font *font, const wchar_t *text)
 {
-	uint16_t strLength = wcslen(text);
 	uint16_t strWidth = 0;
 	FT_Vector pairDelta;
 	int i = 0;
 
-	for (i = 0; i < strLength; i++)
+	while(text[i])
 	{
 		ftgxCharData* glyphData = NULL;
 
@@ -428,6 +453,7 @@ uint16_t FreeTypeGX_getWidth(ML_Font *font, const wchar_t *text)
 
 			strWidth += glyphData->glyphAdvanceX;
 		}
+		i++;
 	}
 
 	return strWidth;
@@ -457,11 +483,10 @@ uint16_t FreeTypeGX_getWidthEx(ML_Font *font, const wchar_t *text, int i)
 
 uint16_t FreeTypeGX_getHeight(ML_Font *font, const wchar_t *text)
 {
-	uint16_t strLength = wcslen(text);
 	uint16_t strMax = 0, strMin = 0;
 	int i = 0;
 
-	for(i = 0; i < strLength; i++)
+	while(text[i])
 	{
 		ftgxCharData* glyphData = NULL;
 
@@ -472,6 +497,7 @@ uint16_t FreeTypeGX_getHeight(ML_Font *font, const wchar_t *text)
 			strMax = glyphData->renderOffsetMax > strMax ? glyphData->renderOffsetMax : strMax;
 			strMin = glyphData->renderOffsetMin > strMin ? glyphData->renderOffsetMin : strMin;
 		}
+		i++;
 	}
 
 	return strMax + strMin;
