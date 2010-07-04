@@ -25,6 +25,7 @@
 #include <ogcsys.h>
 #include <ogc/ios.h>
 #include <ogc/ipc.h>
+#include <ogc/lwp_watchdog.h>
 #include <mp3player.h>
 #include <asndlib.h>
 #include <gcmodplay.h>

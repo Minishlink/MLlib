@@ -46,6 +46,20 @@ extern int ML_Rand(int min, int max);
 */
 extern int ML_GetFPS();
 
+/**
+* \fn void ML_Delay(u32 ms)
+* \brief This function waits.
+* @param ms Time to wait in milliseconds
+*/
+extern void ML_Wait(u32 ms);
+
+/**
+* \fn u32 ML_ElapsedTime()
+* \brief This function returns the time elapsed in milliseconds.
+* @return Time elapsed in ms.
+*/
+extern u32 ML_ElapsedTime();
+
 #ifdef __cplusplus
    }
 #endif /* __cplusplus */
