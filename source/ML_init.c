@@ -24,6 +24,8 @@ void ML_Init()
 	WPAD_SetPowerButtonCallback(_doPadPowerOff);
 	
 	VIDEO_WaitVSync();
+	
+	setStartTime(gettime() / TB_TIMER_CLOCK);
 }
 
 //---------------------------------------------
@@ -44,6 +46,8 @@ void ML_InitConsoleMode()
 	WPAD_SetPowerButtonCallback(_doPadPowerOff);
 	
 	VIDEO_WaitVSync();
+	
+	setStartTime(gettime() / TB_TIMER_CLOCK);
 }
 
 //---------------------------------------------

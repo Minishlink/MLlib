@@ -63,10 +63,6 @@ int ML_GetFPS()
 
 void ML_Wait(u32 ms)
 {
-	/*struct timespec ts;
-	ts.tv_sec = (time_t)(ms / 1000);
-    ts.tv_nsec = (ms % 1000) * 1000 * 1000;
-	(void)nanosleep(&ts);*/
 	usleep(ms * 1000);
 }
 
@@ -74,6 +70,6 @@ void ML_Wait(u32 ms)
 
 u32 ML_ElapsedTime()
 {
-	return gettime() / TB_TIMER_CLOCK;
+	return ((gettime() / TB_TIMER_CLOCK) - getStartTime());
 }	
 
