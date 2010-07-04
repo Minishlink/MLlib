@@ -696,7 +696,6 @@ void ML_GX_Init()
 void ML_GX_Refresh()
 {
 	GX_DrawDone();
-	// GX_InvalidateTexAll(); -> ?
 	
 	GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 	GX_SetColorUpdate(GX_TRUE);
@@ -796,7 +795,6 @@ void ML_Refresh()
 
 	whichfb ^= 1;
 	ML_CallbackForPowerAndReset(1);
-	GX_InvalidateTexAll();
 }
 
 void ML_GX_FreeMemory()

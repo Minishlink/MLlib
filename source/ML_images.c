@@ -30,7 +30,10 @@ void ML_FlushImage(ML_Image *image)
 {
 	DCFlushRange(image->data, image->width * image->height * 4);
 	GX_InitTexObj(&image->texObj, image->data, image->width, image->height, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);	
-	GX_InitTexObjLOD(&image->texObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, 0, 0, GX_ANISO_1);
+	if(!getAA())
+		GX_InitTexObjLOD(&image->texObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, 0, 0, GX_ANISO_1);
+		
+	GX_InvalidateTexAll();
 }
 
 // These two next functions are mainly inspired from GRRLIB, thank you for these equation/algorithm !
