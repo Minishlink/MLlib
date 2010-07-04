@@ -5,6 +5,7 @@ bool bPowerOff;	// Poweroff flag.
 bool bReset;	// Reset flag.
 bool _ttf_enabled; // Font system enabled
 bool _aa_enabled; // Anti-aliasing for textures enabled
+u32 _startTime;
 
 void setAsnd(bool value)
 {
@@ -44,5 +45,15 @@ bool getAA()
 void setAA(bool value)
 {
 	_aa_enabled = value;
+}
+
+u32 getStartTime()
+{
+	return _startTime;
+}
+
+void setStartTime(u32 value)
+{
+	_startTime = value;
 }
 

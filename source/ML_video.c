@@ -163,6 +163,7 @@ void ML_DrawCircle(int x, int y, int radius, u32 rgba, bool filled)
 		GX_Position3f32(x1[i], y1[i], 0.0f);
 		GX_Color1u32(rgba);
 	}
+	GX_End();
 }
 
 void ML_Brightness(u8 alpha)
