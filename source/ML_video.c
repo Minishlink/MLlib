@@ -626,26 +626,13 @@ void ML_GX_Init()
 	
 	// clears the bg to color and clears the z buffer
 	GX_SetCopyClear(background, 0x00ffffff);
-	
-	GX_SetCullMode(GX_CULL_NONE);
-
-	VIDEO_Configure(screenMode);
-    VIDEO_Flush();
-    VIDEO_WaitVSync();
-	if(screenMode->viTVMode & VI_NON_INTERLACE)
-		VIDEO_WaitVSync();
-	else
-		while(VIDEO_GetNextField())
-			VIDEO_WaitVSync();
 
 	// other gx setup
 	yscale = GX_GetYScaleFactor(screenMode->efbHeight,screenMode->xfbHeight);
 	xfbHeight = GX_SetDispCopyYScale(yscale);
-	GX_SetScissor(0, 0, screenMode->fbWidth, screenMode->efbHeight);
 	GX_SetDispCopySrc(0, 0, screenMode->fbWidth, screenMode->efbHeight);
 	GX_SetDispCopyDst(screenMode->fbWidth, xfbHeight);
 	GX_SetCopyFilter(screenMode->aa, screenMode->sample_pattern, GX_TRUE, screenMode->vfilter);
-
 	GX_SetFieldMode(screenMode->field_rendering,((screenMode->viHeight==2*screenMode->xfbHeight)?GX_ENABLE:GX_DISABLE));
 
 	if (screenMode->aa)
@@ -681,15 +668,21 @@ void ML_GX_Init()
     GX_SetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
 
     guMtxIdentity(GXmodelView2D);
-    guMtxTransApply(GXmodelView2D, GXmodelView2D, 0.0f, 0.0f, -50.0f);
+    guMtxTransApply(GXmodelView2D, GXmodelView2D, 0.0f, 0.0f, -100.0f);
     GX_LoadPosMtxImm(GXmodelView2D, GX_PNMTX0);
 	
-    guOrtho(perspective,0, 479, 0, 639, 0, 300.0F);
+    guOrtho(perspective,0, screenMode->efbHeight, 0, screenMode->fbWidth, 0, 1000.0F);
     GX_LoadProjectionMtx(perspective, GX_ORTHOGRAPHIC);
 
     GX_SetViewport(0, 0, screenMode->fbWidth, screenMode->efbHeight, 0, 1);
     GX_SetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+    GX_SetAlphaCompare(GX_GREATER, 0, GX_AOP_AND, GX_ALWAYS, 0);
+    GX_SetColorUpdate(GX_ENABLE);
     GX_SetAlphaUpdate(GX_TRUE);
+    GX_SetCullMode(GX_CULL_NONE);
+    GX_SetScissor(0, 0, screenMode->fbWidth, screenMode->efbHeight);
+
+	VIDEO_SetBlack(false);
 }
 
 //---------------------------------------------
@@ -712,6 +705,7 @@ void ML_GX_Refresh()
 void ML_InitVideo()
 {
 	VIDEO_Init();
+	VIDEO_SetBlack(TRUE);
 	screenMode = VIDEO_GetPreferredMode(NULL);
 
 	if(CONF_GetAspectRatio() == CONF_ASPECT_16_9)
@@ -725,11 +719,11 @@ void ML_InitVideo()
         screenMode->viWidth = 678;
         screenMode->viXOrigin = (VI_MAX_WIDTH_PAL - 678)/2;
     }*/
-
-	_screenWidth = screenMode->fbWidth;
-	_screenHeight = 480;
 	
 	VIDEO_Configure(screenMode);
+	
+	_screenWidth = screenMode->fbWidth;
+	_screenHeight = screenMode->xfbHeight;
 
 	xfb[0] = MEM_K0_TO_K1(SYS_AllocateFramebuffer(screenMode));
 	xfb[1] = MEM_K0_TO_K1(SYS_AllocateFramebuffer(screenMode));	
@@ -739,11 +733,14 @@ void ML_InitVideo()
 	VIDEO_SetNextFramebuffer(xfb[0]);
 	VIDEO_ClearFrameBuffer(screenMode, xfb[0], COLOR_BLACK);
 	VIDEO_ClearFrameBuffer(screenMode, xfb[1], COLOR_BLACK);
-	VIDEO_SetBlack(FALSE);
 	VIDEO_Flush();
 
 	VIDEO_WaitVSync();
-	if(screenMode->viTVMode&VI_NON_INTERLACE) VIDEO_WaitVSync();
+	if(screenMode->viTVMode & VI_NON_INTERLACE)
+		VIDEO_WaitVSync();
+	else
+		while(VIDEO_GetNextField())
+			VIDEO_WaitVSync();
 
 	whichfb ^= 1;
 }
@@ -769,9 +766,10 @@ void ML_CleanVideoBGColor(int color)
 void ML_VSync()
 {
 	VIDEO_SetNextFramebuffer(xfb[whichfb]);
-	VIDEO_SetBlack(FALSE);
 	VIDEO_Flush();
 	VIDEO_WaitVSync();
+	if (screenMode->viTVMode &VI_NON_INTERLACE)
+		VIDEO_WaitVSync();
 }
 
 //---------------------------------------------
@@ -779,10 +777,9 @@ void ML_VSync()
 void ML_RefreshConsoleMode()
 {
 	ML_GetPads();
+	ML_VSync();
 	
-	VIDEO_Flush();
-	VIDEO_WaitVSync();
-	
+	whichfb ^= 1;	
 	ML_CallbackForPowerAndReset(0);
 }
 

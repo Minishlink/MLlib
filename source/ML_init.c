@@ -33,6 +33,7 @@ void ML_Init()
 void ML_InitConsoleMode()
 {
 	ML_InitVideo();
+	VIDEO_SetBlack(FALSE);
 	ML_InitPad();
 	
 	setPowerOff(FALSE);
