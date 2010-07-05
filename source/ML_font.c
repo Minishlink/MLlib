@@ -144,7 +144,7 @@ u16 ML_DrawText(ML_Font *font, int x, int y, char *text, ...)
 	
 	strLength = wcslen(wText);
 	
-	u8 newLineHeight = FreeTypeGX_getHeight(font, wText);
+	u8 newLineHeight = FreeTypeGX_getHeight(font, wText) + (font->ftPointSize >> 4 > 0 ? font->ftPointSize >> 4 : 1);
 	
 	uint16_t x_pos = x, y_pos = y, printed = 0;
 	uint16_t x_offset = 0, y_offset = 0;
@@ -160,7 +160,7 @@ u16 ML_DrawText(ML_Font *font, int x, int y, char *text, ...)
 	if(font->style & FONT_ALIGN_MASK)
 		y_offset = FreeTypeGX_getStyleOffsetHeight(font->ftAscender, font->ftDescender, font->style);
 
-	for (i = 0; i < strLength; i++)
+	while(wText[i])
 	{
 		switch(wText[i])
 		{
@@ -217,27 +217,23 @@ u16 ML_DrawText(ML_Font *font, int x, int y, char *text, ...)
 						i++;
 						draw = false;
 						break;
+					case L'n': // jump line
+							x_pos = x;
+							y_pos += newLineHeight;
+							i++;
+							draw = false;
+						break;
+					case L't': // tabulation
+							x_pos += 12*3;
+							i++;
+							draw = false;
+						break;
 					default: // if nothing then we draw it !
 						draw = true;
 						break;	
 				} // finished looking at the next char
-				break;
-			case L'\n':
-				if(wText[i-1] != L'\\')
-				{
-					x_pos = x;
-					y_pos += newLineHeight + (font->ftPointSize >> 4 > 0 ? font->ftPointSize >> 4 : 1) + 1;
-					draw = false;
-				} else draw = true;
-				break;
-			case L'\t':
-				if(wText[i-1] != L'\\')
-				{
-					x_pos += 12*3;
-					draw = false;
-				} else draw = true;
-				break;
-			default:
+				break; 
+			default: // if no special key, we draw
 				draw = true;
 				break;
 		}
@@ -268,6 +264,8 @@ u16 ML_DrawText(ML_Font *font, int x, int y, char *text, ...)
 				printed++;
 			}
 		}
+		
+		i++;
 	}
 
 	free(wText);
