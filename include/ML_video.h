@@ -5,7 +5,7 @@
    extern "C" {
 #endif /* __cplusplus */
 
-#define DEFAULT_FIFO_SIZE	(1024*1024)
+#define DEFAULT_FIFO_SIZE	(256*1024)
 
 /**
 * \struct ML_Image
