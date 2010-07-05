@@ -102,9 +102,9 @@ bool _loadImage(ML_Image *image, ML_Sprite *sprite, ML_Background *background, c
 	return 1;
 }
 
-void ML_DrawTexture(GXTexObj *texObj, int x, int y, u16 width, u16 height, float angle, float scaleX, float scaleY, u8 alpha)
+void ML_DrawTexture(GXTexObj *texObj, u8 *data,  int x, int y, u16 width, u16 height, float angle, float scaleX, float scaleY, u8 alpha)
 {
-	_drawImage(texObj, x, y, width, height, scaleX, scaleY, angle, alpha, 0, 0, 0, 0, 0, 0);
+	_drawImage(texObj, data, x, y, width, height, scaleX, scaleY, angle, alpha, 0, 0, 0, 0, 0, 0);
 }
 
 void ML_DrawRect(int x, int y, u16 width, u16 height, u32 rgba, bool filled)
@@ -255,17 +255,17 @@ void ML_SplashScreen()
 	if(!ok)
 		return;
 	
+	DCFlushRange(image.data, image.width * image.height * 4);
+	
 	GX_InitTexObj(&image.texObj, image.data, image.width, image.height, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
 	if(!getAA())
 		GX_InitTexObjLOD(&image.texObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, 0, 0, GX_ANISO_1);
-	
-	DCFlushRange(image.data, image.width * image.height * 4);
 	
 	while(ok)
 	{
 		if(Wiimote[0].Held.A) { ok2 = 1; }
 		
-		_drawImage(&image.texObj, 0, 0, image.width, image.height, 1, 1, 0, 255, 0, 0, 0, 0, 0, 0);
+		_drawImage(&image.texObj, image.data, 0, 0, image.width, image.height, 1, 1, 0, 255, 0, 0, 0, 0, 0, 0);
 		
 		i++;
 		if(i >= 500) ok2 = 1;
@@ -388,13 +388,16 @@ bool ML_Screenshot(const char *filename)
 
 //---------------------------------------------
 
-void _drawImage(GXTexObj *texObj, int x, int y, u16 _width, u16 _height, float scaleX, float scaleY, float angle, u8 alpha, bool tiled, u16 frame, u16 tileWidth, u16 tileHeight, bool flipX, bool flipY)
+void _drawImage(GXTexObj *texObj, u8 *data, int x, int y, u16 _width, u16 _height, float scaleX, float scaleY, float angle, u8 alpha, bool tiled, u16 frame, u16 tileWidth, u16 tileHeight, bool flipX, bool flipY)
 {
 	Mtx44 m, m1, m2, mv;
 	u16 width, height;
 		
 	if(!tiled)
 	{
+		GX_InitTexObj(texObj, data, _width, _height, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);	
+			if(!getAA())
+		GX_InitTexObjLOD(texObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, 0, 0, GX_ANISO_1);
 		if(getAA())
 			GX_SetCopyFilter(screenMode->aa, screenMode->sample_pattern, GX_TRUE, screenMode->vfilter);
 		else
@@ -465,6 +468,9 @@ void _drawImage(GXTexObj *texObj, int x, int y, u16 _width, u16 _height, float s
 			t2 = tmp;
 		}
 		
+		GX_InitTexObj(texObj, data, _width, _height, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);	
+			if(!getAA())
+		GX_InitTexObjLOD(texObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, 0, 0, GX_ANISO_1);
 		if(getAA())
 			GX_SetCopyFilter(screenMode->aa, screenMode->sample_pattern, GX_TRUE, screenMode->vfilter);
 		else

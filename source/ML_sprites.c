@@ -29,7 +29,7 @@ void ML_DrawSpriteXY(ML_Sprite *sprite, int x, int y)
 	
 	if(!sprite->animated)
 	{
-		_drawImage(&sprite->image->texObj, sprite->x, sprite->y, sprite->width, sprite->height, sprite->scaleX, sprite->scaleY, sprite->angle, sprite->alpha, sprite->tiled, sprite->currentFrame, sprite->tileWidth, sprite->tileHeight, sprite->flipX, sprite->flipY);
+		_drawImage(&sprite->image->texObj, sprite->image->data, sprite->x, sprite->y, sprite->width, sprite->height, sprite->scaleX, sprite->scaleY, sprite->angle, sprite->alpha, sprite->tiled, sprite->currentFrame, sprite->tileWidth, sprite->tileHeight, sprite->flipX, sprite->flipY);
 	}
 	else
 	{
@@ -83,7 +83,7 @@ void ML_DrawTile(ML_Sprite *sprite, int x, int y, u16 frame)
 	
 	 sprite->x = x; sprite->y = y;
 
-	_drawImage(&sprite->image->texObj, sprite->x, sprite->y, sprite->width, sprite->height, sprite->scaleX, sprite->scaleY, sprite->angle, sprite->alpha, sprite->tiled, frame, sprite->tileWidth, sprite->tileHeight, sprite->flipX, sprite->flipY);
+	_drawImage(&sprite->image->texObj, sprite->image->data, sprite->x, sprite->y, sprite->width, sprite->height, sprite->scaleX, sprite->scaleY, sprite->angle, sprite->alpha, sprite->tiled, frame, sprite->tileWidth, sprite->tileHeight, sprite->flipX, sprite->flipY);
 }
 
 void ML_DrawSpriteText(ML_Sprite *sprite, int x, int y, const char *text, ...)
