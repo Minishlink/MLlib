@@ -47,7 +47,7 @@ extern int ML_Rand(int min, int max);
 extern int ML_GetFPS();
 
 /**
-* \fn void ML_Delay(u32 ms)
+* \fn void ML_Wait(u32 ms)
 * \brief This function waits.
 * @param ms Time to wait in milliseconds
 */
