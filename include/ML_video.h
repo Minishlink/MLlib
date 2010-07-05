@@ -145,9 +145,10 @@ extern bool ML_LoadBackgroundFromFile(ML_Image *image, ML_Background *background
 inline bool _loadImage(ML_Image *image, ML_Sprite *sprite, ML_Background *background, char *filename, const u8 *buffer, int x, int y, bool fat);
 
 /**
-* \fn void ML_DrawTexture(GXTexObj *texObj, int x, int y, u16 width, u16 height, float angle, float scaleX, float scaleY, u8 alpha)
+* \fn void ML_DrawTexture(GXTexObj *texObj, u8 *data, int x, int y, u16 width, u16 height, float angle, float scaleX, float scaleY, u8 alpha)
 * \brief This function shows the sprite which is already loaded. It can be faster when you have many things to do on the sprites in a time.
-* @param texObj GX Texture (it's sprite.texObj)
+* @param texObj GX Texture (it's sprite.image->texObj)
+* @param data Image data (it's sprite.image->data)
 * @param x X position
 * @param y Y position
 * @param width Width

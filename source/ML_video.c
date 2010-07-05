@@ -398,6 +398,7 @@ void _drawImage(GXTexObj *texObj, u8 *data, int x, int y, u16 _width, u16 _heigh
 		GX_InitTexObj(texObj, data, _width, _height, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);	
 			if(!getAA())
 		GX_InitTexObjLOD(texObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, 0, 0, GX_ANISO_1);
+		
 		if(getAA())
 			GX_SetCopyFilter(screenMode->aa, screenMode->sample_pattern, GX_TRUE, screenMode->vfilter);
 		else
@@ -471,6 +472,7 @@ void _drawImage(GXTexObj *texObj, u8 *data, int x, int y, u16 _width, u16 _heigh
 		GX_InitTexObj(texObj, data, _width, _height, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);	
 			if(!getAA())
 		GX_InitTexObjLOD(texObj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, 0, 0, GX_ANISO_1);
+		
 		if(getAA())
 			GX_SetCopyFilter(screenMode->aa, screenMode->sample_pattern, GX_TRUE, screenMode->vfilter);
 		else
