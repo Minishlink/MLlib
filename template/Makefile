@@ -1,7 +1,8 @@
 # MLlib project Makefile by Minishlink
 
 #-------------------------------------------------------
-# Just uncomment the one you want.# If unsure, uncomment nothing.
+# Just uncomment the one you want.
+# If unsure, uncomment nothing.
 # Enjoy!
 #-------------------------------------------------------
 
@@ -133,6 +134,10 @@ clean:
 #---------------------------------------------------------------------------------
 run:
 	wiiload $(TARGET).dol
+	
+#---------------------------------------------------------------------------------
+emu:
+	dolphin-emu -e ./$(TARGET).dol
 
 all:
 	make clean
