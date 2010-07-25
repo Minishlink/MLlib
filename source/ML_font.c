@@ -273,6 +273,103 @@ u16 ML_DrawText(ML_Font *font, int x, int y, char *text, ...)
 	return printed;
 }
 
+ML_TextInfo ML_GetTextInfo(ML_Font* font, char* text, ...)
+{
+	ML_TextInfo textinfo = { 0, 0, 0 };
+	
+	char buffer[1024];
+	uint16_t strLength = strlen(text);
+	if(strLength > 1024) return textinfo;
+	
+	bool draw = false;
+	
+	va_list argp;
+	va_start(argp, text);
+	strLength = vsprintf(buffer, text, argp);
+	va_end(argp);
+	
+	wchar_t *wText = malloc(sizeof(wchar_t) * (strLength + 1));
+	
+	if(wText)
+		FreeTypeGX_charToWideChar(buffer, wText);
+	else return textinfo;
+	
+	strLength = wcslen(wText);
+	
+	u8 newLineHeight = FreeTypeGX_getHeight(font, wText) + (font->ftPointSize >> 4 > 0 ? font->ftPointSize >> 4 : 1);
+	
+	uint16_t x = 0, y = 0;
+	uint16_t x_pos = x, y_pos = y, printed = 0;
+	uint16_t x_offset = 0, y_offset = 0;
+	uint16_t i = 0;
+	FT_Vector pairDelta;
+	
+	if(font->style & FONT_JUSTIFY_MASK)
+		x_offset = FreeTypeGX_getStyleOffsetWidth(FreeTypeGX_getWidth(font, wText), font->style);
+	
+	if(font->style & FONT_ALIGN_MASK)
+		y_offset = FreeTypeGX_getStyleOffsetHeight(font->ftAscender, font->ftDescender, font->style);
+	
+	while(wText[i])
+	{
+		if(wText[i] == L'#')
+		{
+			if(wText[i+1] == L'n')
+			{
+				if (x_pos - x > textinfo.width) textinfo.width = x_pos - x;
+				x_pos = x;
+				y_pos += newLineHeight;
+				i++;
+				draw = FALSE;
+			}
+			else if(wText[i+1] == L't')
+			{
+				x_pos+= 12*3;
+				i++;
+				draw = FALSE;
+			}
+			else if(wText[i+1] == L'c')
+			{
+				if(wText[i+2] >= L'0' && wText[i+2] <= L'9') i++;
+				i++;
+				draw = FALSE;
+			}
+			else draw = true;
+		}
+		else draw = TRUE;
+		
+		if(draw)
+		{
+			ftgxCharData* glyphData = NULL;
+			
+			glyphData = &(_findTexInFtMap(font, wText[i]))->charData;
+			
+			if(glyphData != NULL)
+			{
+				if(font->ftKerningEnabled && i)
+				{
+					FT_Get_Kerning(font->ftFace, (_findTexInFtMap(font, wText[i-1]))->charData.glyphIndex, glyphData->glyphIndex, FT_KERNING_DEFAULT, &pairDelta);
+					x_pos += pairDelta.x >> 6;
+				}
+				
+				x_pos += glyphData->glyphAdvanceX;
+				
+				printed++;
+			}
+		}
+		
+		i++;
+	}
+	
+	free(wText);
+	
+	if (x_pos - x > textinfo.width) textinfo.width = x_pos -x;
+	textinfo.height = y_pos - y + newLineHeight;
+	textinfo.printed = printed;
+	
+	return textinfo;
+}
+
 bool FreeTypeGX_cacheGlyphData(ML_Font *font, wchar_t charCode)
 {
 	FT_UInt gIndex;
