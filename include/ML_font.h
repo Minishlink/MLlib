@@ -60,6 +60,16 @@ typedef struct {
 	FT_UInt ftPointSize;
 	bool ftKerningEnabled;
 } ML_Font;
+	   
+/**
+* \struct ML_TextInfo
+* \brief This is the structure for info about a text drawn or about to be drawn.
+*/
+typedef struct {
+	int width;
+	int height;
+	int printed;
+} ML_TextInfo;
 
 #define EXPLODE_UINT8_TO_UINT32(x) (x << 24) | (x << 16) | (x << 8) | x
 
@@ -133,6 +143,15 @@ extern bool ML_LoadFontFromFile(ML_Font *font, const char *filename, FT_UInt poi
 * @return Number of caracters printed
 */
 extern u16 ML_DrawText(ML_Font *font, int x, int y, char *text, ...);
+	   
+/**
+* \fn ML_TextInfo ML_GetTextInfo(ML_Font* font, char* text, ...)
+* \brief This function get infos from the drawing of a text.
+* @param font Font structure
+* @param text Text
+* @return Structure ML_textInfo to know info from the text
+*/
+extern ML_TextInfo ML_GetTextInfo(ML_Font* font, char* text, ...);
 
 inline bool _loadFont(ML_Font *font, const char *filename, const uint8_t* buffer, FT_Long bufferSize, FT_UInt pointSize, bool fat);
 
