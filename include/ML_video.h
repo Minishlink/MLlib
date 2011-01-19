@@ -66,6 +66,17 @@ typedef struct {
 	float angle; /*!< Angle in degrees */
 } ML_Background;
 
+/**
+* \struct ML_Rect
+* \brief This is the structure for rectangle.
+*/
+typedef struct {
+	s16 x,  /*!< X position */
+	y; /*!< Y position */
+	u16 width, /*!< Width */
+	height; /*!< Height */
+} ML_Rect;
+
 // BMP structure
 typedef struct
 {
