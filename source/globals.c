@@ -1,6 +1,7 @@
 #include <MLlib.h>
 
-bool _asnd_enabled; // Sound enabled
+bool _asnd_enabled; // ASound enabled
+bool _aesnd_enabled; // AESound enabled
 bool bPowerOff;	// Poweroff flag.
 bool bReset;	// Reset flag.
 bool _ttf_enabled; // Font system enabled
@@ -16,6 +17,17 @@ bool getAsnd()
 {
 	return _asnd_enabled;
 }
+
+void setAesnd(bool value)
+{
+	_aesnd_enabled = value;
+}
+
+bool getAesnd() 
+{
+	return _aesnd_enabled;
+}
+
 
 void setPowerOff(bool value)
 {

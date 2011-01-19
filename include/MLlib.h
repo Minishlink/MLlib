@@ -28,6 +28,7 @@
 #include <ogc/lwp_watchdog.h>
 #include <mp3player.h>
 #include <asndlib.h>
+#include <aesndlib.h>
 #include <gcmodplay.h>
 #include <time.h>
 #include <sys/time.h>

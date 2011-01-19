@@ -14,6 +14,8 @@ extern u32 _startTime; // time elapsed since Wii started at the beginning the th
 
 extern void setAsnd(bool value);
 extern bool getAsnd();
+extern void setAesnd(bool value);
+extern bool getAesnd();
 extern void setPowerOff(bool value);
 extern void setReset(bool value);
 extern void setTTF(bool value);

@@ -9,10 +9,10 @@
 
 void ML_InitMOD(MODPlay *play)
 {	
-	if(!getAsnd())
+	if(!getAesnd())
 	{
-		ASND_Init();
-		setAsnd(TRUE);
+		AESND_Init(NULL);
+		setAesnd(TRUE);
 	}
 	MODPlay_Init(play);
 }
